@@ -82,9 +82,7 @@ C:\Users\Helbert\Desktop\DM-Cerebro\
 │   ├── engenharia-bdi-tcu.md          ➔ BDI TCU 2622/2013
 │   ├── engenharia-eap-curvas.md       ➔ Largest-Remainder + Curva S
 │   ├── fiscal-sefaz-a1.md             ➔ PKCS#12, XMLDSig, SEFAZ DF-e
-│   ├── protocolo-triade-agentes.md    ➔ Divisão Gemini + M3 + Z.AI
-│   ├── projeto-biolar.md              ➔ (legado — ver projects/biolar/)
-│   └── projeto-canteirohub-dmerp.md   ➔ (legado — ver projects/canteirohub/)
+│   └── protocolo-triade-agentes.md    ➔ Divisão Gemini + M3 + Z.AI
 │
 └── � prompts/             ➔ 🤖 Prompts Copy-Paste para IAs
     ├── PROMPT_ZAI_HERMES.md
