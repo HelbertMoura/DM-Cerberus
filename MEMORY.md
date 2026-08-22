@@ -11,6 +11,7 @@ status: ativo
 > **Diretriz de Design:** Industrial Solid-State (Azul Aço #1E40AF, Chumbo #0F172A, Fundo Sólido #F1F5F9, sem neon/gradientes).  
 > **Proibição:** BANIMENTO TOTAL DE EMOJIS no UI de botões e tabelas — usar Lucide-React vetorial.  
 > **Multi-Tenant Estrito:** Todo modelo novo deve herdar de `TenantAwareModel`.
+> **Internacionalização Obrigatória:** Suporte 100% aos 3 idiomas (Português PT-BR, Inglês EN-US e Espanhol ES) em todos os módulos. Zero strings hardcoded.
 
 ---
 

@@ -24,3 +24,9 @@ status: ativo
 ### [ADR-003] Roteamento SPA Universal por Hash & Histórico Nativo (Rodada 143 · Gemini)
 - **Decisão:** Sincronização de telas do frontend via `window.location.hash` e escuta aos eventos `popstate`/`hashchange`.
 - **Motivo:** Permite links diretos, persistência total no F5 e navegação nativa com os botões Voltar/Avançar do navegador.
+
+---
+
+### [ADR-004] RDO Digital Offline-First & Sincronização Dexie IndexedDB (Rodada 150 · Tríade)
+- **Decisão:** O Diário de Obra (RDO) armazena registros e fotos comprimidas via Canvas API no IndexedDB local do celular, sincronizando automaticamente com o backend Django em transação atômica quando o sinal 4G é restabelecido. Clima registrado nos 3 turnos (Manhã/Tarde/Noite) para respaldo jurídico de dias impraticáveis.
+- **Motivo:** Canteiros de obra têm conexão intermitente. O mestre nunca pode perder o relatório diário ou ficar travado sem sinal.
