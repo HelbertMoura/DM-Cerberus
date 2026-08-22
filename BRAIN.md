@@ -37,7 +37,7 @@ status: ativo
    ---
    ```
 4. **Toda IA lê este BRAIN.md antes de agir** + `projects/_shared/TRIADE_PROTOCOLO.md` para regras operacionais + `projects/_shared/CONTRATO_AGENTES.md` para contrato obrigatório.
-5. **Toda IA atualiza o cérebro ao concluir tarefa** (ver `CONTRATO_AGENTES.md` — sempre commitar + pushar).
+5. **Toda IA atualiza o cérebro ao concluir tarefa** (ver `CONTRATO_AGENTES.md` — sempre commitar + pushar) E adiciona entrada em `HANDOVER.md` (log de passagem de bastão).
 6. **`raw/` é gaveta temporária** — após ingestão, mover para `raw/processed/AAAA-MM-DD/`.
 
 ---
@@ -50,9 +50,9 @@ C:\Users\Helbert\Desktop\DM-Cerebro\
 ├── 📄 BRAIN.md             ➔ Este arquivo (mapa mestre + regras)
 ├── 📄 MEMORY.md            ➔ Memória executiva permanente
 ├── 📄 DECISIONS.md         ➔ ADRs (Architecture Decision Records)
-├── 📄 AGENTS.md            ➔ Protocolo operacional da tríade
+├── 📄 HANDOVER.md          ➔ 🤝 Log de passagem de bastão entre agentes
 ├── � LEARNINGS.md         ➔ Caderno de lições aprendidas
-├── 📄 ROADMAP.md           ➔ Visão de entregas e sprints
+├── 📄 ROADMAP.md           � Visão de entregas e sprints
 │
 ├── 📂 raw/                 ➔ � Gaveta de Ingestão (jogue PDFs/manuais aqui)
 │   ├── README.md           ➔ Política de uso e retenção
@@ -75,7 +75,13 @@ C:\Users\Helbert\Desktop\DM-Cerebro\
 │   │   └── README.md
 │   ├── apae-juatuba/
 │   │   └── README.md
-│   └── _shared/            ➔ Conhecimento cross-product
+│   └── _shared/            � Cross-product + Protocolo da Tríade
+│       ├── README.md
+│       ├── TRIADE_PROTOCOLO.md    ➔ Papéis Gemini + M3 + Z.AI
+│       ├── CONTRATO_AGENTES.md    ➔ Contrato obrigatório ler/atualizar
+│       ├── github-publicar.md
+│       ├── backup-procedimento.md
+│       └── backup-dm-cerebro.sh
 │
 ├── 📂 wiki/                ➔ 📚 Conhecimento Técnico Destilado
 │   ├── infra-servidor-rocky.md        ➔ Mapa do servidor 192.168.226.103
@@ -86,7 +92,8 @@ C:\Users\Helbert\Desktop\DM-Cerebro\
 │
 └── � prompts/             ➔ 🤖 Prompts Copy-Paste para IAs
     ├── PROMPT_ZAI_HERMES.md
-    └── PROMPT_MINIMAX_M3.md
+    ├── PROMPT_MINIMAX_M3.md
+    └── SYSTEM_PROMPT_PADRAO_M3.md   ➔ 🆕 Copy-paste pro MiniMax M3
 ```
 
 ---

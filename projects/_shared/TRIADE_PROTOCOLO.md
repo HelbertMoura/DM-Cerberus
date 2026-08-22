@@ -121,6 +121,7 @@ Toda decisão técnica, cálculo ou tela criada é **imediatamente** registrada 
 | Conhecimento técnico | `wiki/<tema>.md` |
 | Sprint / prazo | `ROADMAP.md` |
 | Prompt reutilizável | `prompts/PROMPT_<agente>.md` |
+| Passagem de bastão entre agentes/sessões | `HANDOVER.md` (formato padrão) |
 
 ---
 
@@ -132,6 +133,7 @@ Toda decisão técnica, cálculo ou tela criada é **imediatamente** registrada 
 3. Se for decisão nova → marca ADR em `DECISIONS.md`
 4. Se for armadilha → adiciona LEARN em `LEARNINGS.md`
 5. Respeita as 6 Regras de Ouro (especialmente 3-emoji, 4-i18n, 5-44px, 6-LGPD)
+6. **Adiciona entrada de handover** em `HANDOVER.md` (passagem de bastão rastreável)
 
 **PROIBIÇÕES:**
 1. Mexer em outro projeto sem avisar (commit message claro)
