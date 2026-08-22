@@ -7,24 +7,23 @@ status: ativo
 
 # ⚙️ Configuração de Modelos e Auth — Hub Dev Maniac's
 
-> **Modelo padrão do projeto:** GLM 5.3 (Z.AI)
-> **Fallback:** MiniMax M3
+> **Modelo padrão do Hermes Agent:** MiniMax M3
+> **GLM 5.3:** disponível pra **invocação manual** (não padrão)
+> **Fallback automático:** GLM 5.3 (só se M3 falhar)
+
+> 📖 **Como invocar GLM 5.3 manualmente:** ver `invocacao-manual-glm.md`
 
 ---
 
-## 🧠 Hierarquia de modelos
+## � Hierarquia de modelos
 
 ```
-1º GLM 5.3     → Z.AI    (matemática, ADRs, decisões pesadas) ← NOVO PADRÃO
-2º MiniMax M3  → MiniMax  (volume de código, TDD, scaffolding)  ← FALLBACK
-3º Gemini 3.7  → Google   (orquestração, deploys)               ← via MCP
+1º MiniMax M3  → MiniMax  (padrão do Hermes, todas as sessões)
+2º GLM 5.3     → Z.AI    (fallback automático se M3 falhar + invocação manual)
+3º Gemini 3.7  → Google   (orquestração via MCP, sem custo de API)
 ```
 
-**Por quê essa ordem?**
-
-- **GLM 5.3** tem raciocínio matemático denso e ADRs melhores (uso cirúrgico)
-- **MiniMax M3** é o "braçal" — rápido pra código repetitivo, TDD, scaffold
-- **Gemini** continua sendo o orquestrador (via MCP, não consome API key direto)
+**Decisão (22/08/2026):** GLM 5.3 **NÃO** vira padrão global. Fica disponível pra invocação manual em tarefas que exigem matemática densa (ADRs, cálculos, diagnósticos profundos).
 
 ---
 
