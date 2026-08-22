@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Login — Dev Maniac's Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+
+  <!-- Background gradient -->
+  <div class="bg-gradient"></div>
+
+  <main class="login-container">
+
+    <!-- Logo -->
+    <div class="brand">
+      <div class="logo">
+        <span class="logo-d">D</span><span class="logo-m">M</span>
+      </div>
+      <h1 class="brand-title">Dev Maniac's</h1>
+      <p class="brand-subtitle">Hub Remoto de IDEs</p>
+    </div>
+
+    <!-- Form -->
+    <form class="login-form" id="loginForm">
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          placeholder="helbertcurcio@gmail.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Senha</label>
+        <div class="input-password">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+          <button type="button" class="toggle-password" aria-label="Mostrar senha">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember" name="remember">
+          <span>Lembrar por 30 dias</span>
+        </label>
+        <a href="#" class="link-forgot">Esqueci a senha</a>
+      </div>
+
+      <button type="submit" class="btn-primary">
+        <span>Entrar</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+
+      <!-- 2FA (aparece depois do login) -->
+      <div class="form-group tfa-group hidden" id="tfaGroup">
+        <label for="totp" class="form-label">
+          Código 2FA
+          <span class="badge-info">Google Authenticator</span>
+        </label>
+        <input
+          type="text"
+          id="totp"
+          name="totp"
+          class="form-input form-input-mono"
+          placeholder="000000"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          autocomplete="one-time-code"
+          inputmode="numeric"
+        >
+        <p class="form-hint">Abra o app e digite o código de 6 dígitos</p>
+      </div>
+
+    </form>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p class="footer-text">
+        🔒 Acesso protegido · Cloudflare + 2FA + Audit Log
+      </p>
+      <p class="footer-version">v1.0.0 · DM Hub</p>
+    </footer>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
