@@ -1,0 +1,55 @@
+# Gitignore do DM-Cerebro
+# Dev Maniac's Systems — Helbert Moura
+
+# Pastas temporárias e processadas (após 90 dias, deletar manualmente)
+raw/processed/*/
+!raw/processed/.gitkeep
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporários e backups
+*.bak
+*.tmp
+*.swp
+*.swo
+*~
+.~lock.*
+
+# Logs
+*.log
+
+# Binários grandes (PDFs de ingesting devem ser movidos para processed/)
+*.pdf
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Editor
+.vscode/
+.idea/
+*.iml
+
+# Python (se houver scripts)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node (se houver)
+node_modules/
+dist/
+build/
+
+# Ambiente
+.env
+.env.local
+*.local
+
+# Cuidado: NÃO ignorar
+# - *.md (são o cérebro!)
+# - *.json de configuração legítima
