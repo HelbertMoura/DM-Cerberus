@@ -1,6 +1,6 @@
 ---
-titulo: Mockup HTML — Hub Dev Maniac's
-tags: [mockup, html, demo, hub, devmaniacs, identidade-visual]
+titulo: Mockup — Hub Dev Maniac's (identidade oficial)
+tags: [mockup, html, demo, hub, devmaniacs, brand, oficial]
 atualizado: 2026-08-22
 status: ativo
 fase: 1-de-3
@@ -8,7 +8,7 @@ fase: 1-de-3
 
 # 🎨 Mockup HTML — Hub Dev Maniac's
 
-> **Visualizar a cara do Hub AGORA**, sem precisar de Docker, Next.js ou servidor. Só abrir o HTML no navegador.
+> Mockup visual usando a **identidade oficial da marca** (extraída de devmaniacs.com.br via curl).
 
 ---
 
@@ -16,162 +16,128 @@ fase: 1-de-3
 
 ```
 mockup/
-├── login.html       ← tela de login (email + senha + 2FA)
-├── dashboard.html   ← hub principal com 3 cards (Gemini, M3, Z.AI)
-├── styles.css       ← identidade visual completa (Dev Maniac's)
+├── login.html       ← tela de login (com mascote oficial)
+├── dashboard.html   ← hub principal (4 cards: Gemini, M3, Z.AI, VSCode Web)
+├── styles.css       ← paleta oficial + tipografia Inter/JetBrains Mono
 ├── app.js           ← interações JS (demo)
 └── README.md        ← este arquivo
 ```
 
 ---
 
+## 🎨 Identidade aplicada (oficial)
+
+| Token | Valor | Fonte |
+|---|---|---|
+| **Navy (principal)** | `#061637` | CSS oficial |
+| **Paper (fundo)** | `#fff` + `#faf6ed` | mascote.webp + CSS |
+| **Purple (acento)** | `#6b4c9a` | CSS oficial |
+| **Cyan (destaque)** | `#08b9ca` | CSS oficial |
+| **Coral (alerta)** | `#ff4c4c` | CSS oficial |
+| **Yellow (highlight)** | `#ffd166` | CSS oficial |
+| **Tipografia sans** | **Inter** | `devmaniacs.com.br` |
+| **Tipografia mono** | **JetBrains Mono** | `devmaniacs.com.br` |
+| **Logo** | `/brand/dev-maniacs-mark.png` | `devmaniacs.com.br/brand/` |
+| **Mascote** | `/brand/dev-maniacs-mascot.webp` | `devmaniacs.com.br/brand/` |
+| **Tagline** | Tecnologia feita de perto. Suporte também. | site oficial |
+
+**Estilo:** brutalista industrial, sombras sólidas (`8px 8px 0`), tipografia mono em títulos, prefixos `DM//` (DM//CASE, DM//HUB), numeração `01/02/03/04` industrial.
+
+---
+
 ## 🚀 Como visualizar
 
-### Opção 1 — Abrir direto (mais rápido)
+### Local (rápido)
 
-1. Navega até: `C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\mockup\`
-2. **Duplo clique** em `login.html`
-3. Abre no navegador padrão
-4. Clica em "Entrar" (fake) → mostra 2FA → digita qualquer 6 dígitos → vai pro dashboard
+**Duplo clique** em `login.html` — abre no navegador padrão.
 
-### Opção 2 — Servidor local (PWA-friendly)
+### Servidor local (PWA-friendly)
 
 ```bash
 cd "C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\mockup"
-
-# Python
 python -m http.server 8080
-
-# OU Node.js
-npx serve -p 8080
 ```
 
 Abre: http://localhost:8080/login.html
 
-**Por que servidor?** O mockup simula PWA. Pra testar "instalar como app", precisa de HTTP (não `file://`).
+### No celular (mesma rede)
 
----
+1. Descobre IP do PC: `ipconfig` (Windows) → IPv4 (ex: `192.168.0.105`)
+2. Celular: `http://<IP>:8080/login.html`
 
-## � Como testar no celular
-
-### Via rede local (mesmo Wi-Fi)
-
-1. Sobe servidor (Opção 2 acima)
-2. Descobre IP do PC: `ipconfig` (Windows) → procura "IPv4"
-3. No celular, abre: `http://<IP>:8080/login.html`
-4. Exemplo: `http://192.168.0.105:8080/login.html`
-
-### Via Cloudflare Tunnel (já funciona!)
-
-Se você já tem `cloudflared` rodando, expõe o mockup:
+### Via Cloudflare Tunnel (qualquer rede)
 
 ```bash
 cloudflared tunnel --url http://localhost:8080
 ```
 
-Ele gera URL pública tipo `https://xxx.trycloudflare.com` que abre **em qualquer rede, qualquer lugar**.
+Gera URL pública tipo `https://xxx.trycloudflare.com`.
 
 ---
 
-## 🎨 O que tá incluído no mockup
+## 🧪 O que testar
 
-### ✅ Identidade Dev Maniac's
-- Paleta de cores oficial (roxos `#7C3AED`, `#5B21B6`, `#A78BFA`)
-- Tipografia (Space Grotesk + Inter + JetBrains Mono)
-- Logo monograma "DM" com gradiente
-- Tema dark nativo
-- Botões ISO 44px (regra da casa)
+### Login
 
-### ✅ Login Page
-- Campo email com autocomplete
-- Campo senha com botão mostrar/ocultar
-- Checkbox "Lembrar por 30 dias"
-- Link "Esqueci a senha"
-- **Fluxo 2FA fake** (simula o passo real: login → código TOTP)
-- Input 2FA com auto-submit nos 6 dígitos
+1. Abre `login.html`
+2. Vê o mascote oficial à esquerda em fundo navy com pixeis coloridos
+3. Digita email/senha qualquer → clica "Entrar"
+4. Aparece campo TOTP → digita 6 dígitos → vai pro dashboard
 
-### ✅ Dashboard
-- Header com logo, status, notificações, avatar
-- Saudação personalizada (Helbert 👋)
-- **4 cards de IDE:**
-  - �️ **Gemini** (online)
-  - 🚀 **MiniMax M3** (trabalhando, com barra de progresso)
-  - 🧠 **Z.AI Code** (online)
-  - 🆚 **VSCode Web** (code-server, compacto)
-- Ações rápidas (3 botões)
-- Atividade recente (4 últimos eventos)
-- Bottom nav mobile-first
+### Dashboard
 
-### ✅ PWA-ready
-- `manifest.json` (estrutura criada em `pwa/public/`)
-- Service Worker placeholder
-- Meta tags iOS (apple-mobile-web-app-*)
-- Theme color `#7C3AED`
+1. Vê o painel "DM//HUB 2026" com stripe colorida (coral + yellow + cyan + purple)
+2. 4 cards: Gemini (online), M3 (trabalhando, 67%), Z.AI (online), VSCode Web
+3. Clica "Conectar" em qualquer IDE → simula conexão
+4. Bottom nav mobile funciona
+5. Redimensiona janela pra ~390px → vira layout celular
 
 ---
 
-## ⚠️ O que é MOCK vs. REAL
+## ✅ O que mudou (vs. mockup anterior)
 
-| Feature | Mock | Real (Fase 1) |
-|---|---|---|
-| **Login** | Frontend só, fake submit | Backend Node.js + Auth.js + Argon2id |
-| **2FA** | Input visual, aceita qualquer código | TOTP real (otplib + Google Authenticator) |
-| **Status IDEs** | Hardcoded | Heartbeat via WebSocket + Docker healthcheck |
-| **Conectar IDE** | Alert "demo" | iframe real + code-server :8446 |
-| **Audit log** | Não registra | PostgreSQL `dm_hub.audit_log` |
-
-**Importante:** o mockup serve pra **validar a cara visual**. A lógica real vem nas Fases 1-3 (docker-compose + code-server + Guacamole).
-
----
-
-## 🎯 Como dar feedback
-
-Você pode mexer em **qualquer** coisa:
-
-### Mudar cores
-Edita `styles.css` → bloco `:root`:
-```css
---color-primary: #7C3AED;      /* roxo principal */
---color-primary-dark: #5B21B6; /* hover */
-```
-
-### Mudar logo
-Edita `login.html` ou `dashboard.html` → bloco `.logo`:
-```html
-<div class="logo">
-  <span class="logo-d">D</span><span class="logo-m">M</span>
-</div>
-```
-
-### Adicionar campo
-Edita o `<form>` em `login.html` + adiciona estilo em `styles.css`.
+| Antes | Agora |
+|---|---|
+| Tema dark com gradientes roxos | Tema claro com navy `#061637` + acentos |
+| Logo "DM" inventado em CSS | Logo oficial `dev-maniacs-mark.png` |
+| Fonte Space Grotesk | **Inter** + **JetBrains Mono** (oficial) |
+| Cards com bordas arredondadas e sombras suaves | Sombras sólidas `8px 8px 0` (estilo brutalista) |
+| Cores inventadas (#7C3AED etc) | **Cores oficiais** do site (extraídas via curl) |
+| Sem identidade com o site | **Igual ao devmaniacs.com.br** |
+| Estilo "feito por IA" genérico | Estilo **Dev Maniac's** oficial |
 
 ---
 
-## 📋 Checklist visual (validação)
+## � Fontes dos arquivos oficiais
 
-Antes de eu seguir pra Fase 2, confere:
+| Arquivo | Origem |
+|---|---|
+| `assets/brand/dev-maniacs-mark.png` | https://devmaniacs.com.br/brand/dev-maniacs-mark.png |
+| `assets/brand/dev-maniacs-mascot.webp` | https://devmaniacs.com.br/brand/dev-maniacs-mascot.webp |
+| `assets/brand/dev-maniacs-social-card.png` | https://devmaniacs.com.br/brand/dev-maniacs-social-card.png |
+| `assets/brand/devmaniacs-styles.css` | https://devmaniacs.com.br/_next/static/chunks/24-wcb0m4nhax.css |
 
-- [ ] As cores combinam com a identidade Dev Maniac's?
-- [ ] O layout funciona no celular? (resize a janela)
-- [ ] Os 3 cards (Gemini, M3, Z.AI) tão claros?
-- [ ] O fluxo login → 2FA → dashboard tá intuitivo?
-- [ ] Falta alguma informação nos cards?
-- [ ] Quer mudar nome de alguma coisa?
-- [ ] A barra de progresso do M3 faz sentido?
-- [ ] A atividade recente mostra o que você precisa?
+**Verificado em:** 2026-08-22 22:16 UTC
 
 ---
 
-## 🔗 Próximos passos
+## 🎯 Validação visual
 
-Quando você aprovar o mockup:
+- [ ] O fundo navy + papel claro parece com o site oficial?
+- [ ] O mascote aparece no login (estilo cartoon oficial)?
+- [ ] O logo "DM" pixel art aparece no header e login?
+- [ ] As fontes Inter + JetBrains Mono carregaram?
+- [ ] As sombras sólidas `8px 8px 0` estão visíveis nos cards?
+- [ ] Os prefixos `DM//` e a numeração `01/02/03/04` aparecem?
+- [ ] Falta algo da identidade oficial?
 
-1. **Crio** `setup-fase-1.md` (passo a passo code-server no Rocky)
-2. **Crio** `docker-compose.yml` (stack mínimo Fase 1)
-3. **Crio** `cloudflare-tunnel.md` (config subdomínio)
-4. **Crio** `auth-seguranca.md` (login + 2FA real)
-5. **Codifico** Next.js substituindo este mockup (mas mantendo o visual)
+---
+
+## ⏭️ Próximos passos
+
+1. **Validar visual** com você
+2. Se aprovado → `setup-fase-1.md` + `docker-compose.yml` + `cloudflare-tunnel.md`
+3. Codar versão Next.js substituindo o mockup
 
 ---
 

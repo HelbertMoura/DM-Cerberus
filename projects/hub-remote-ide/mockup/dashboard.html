@@ -3,325 +3,357 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#7C3AED">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Hub — Dev Maniac's</title>
+  <meta name="theme-color" content="#061637">
+  <meta name="color-scheme" content="light dark">
+  <title>Hub · Dev Maniac's</title>
+  <link rel="icon" href="../assets/brand/dev-maniacs-mark.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/brand/dev-maniacs-mark.png">
   <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body class="dashboard-page">
-
-  <!-- Background -->
-  <div class="bg-gradient"></div>
 
   <!-- Header -->
   <header class="app-header">
     <div class="header-left">
-      <div class="logo logo-small">
-        <span class="logo-d">D</span><span class="logo-m">M</span>
-      </div>
+      <img src="../assets/brand/dev-maniacs-mark.png" alt="Dev Maniac's" class="brand-mark" width="40" height="40">
       <div class="header-title">
-        <h1 class="header-name">Hub Remoto</h1>
-        <p class="header-status">
-          <span class="status-dot status-online"></span>
-          3 IDEs disponíveis
-        </p>
+        <strong class="header-name">DEV MANIAC'S</strong>
+        <small class="header-meta">
+          <span class="status-dot status-dot--online"></span>
+          Hub Remoto · 3 IDEs online
+        </small>
       </div>
     </div>
+
+    <nav class="header-nav" aria-label="Navegação">
+      <a href="#" class="nav-link is-active">Hub</a>
+      <a href="#" class="nav-link">Atividade</a>
+      <a href="#" class="nav-link">Comandos</a>
+      <a href="#" class="nav-link">Audit</a>
+    </nav>
+
     <div class="header-right">
       <button class="icon-btn" aria-label="Notificações">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
         </svg>
-        <span class="badge-notification">2</span>
+        <span class="icon-badge">2</span>
       </button>
-      <button class="icon-btn" aria-label="Configurações">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-      </button>
-      <div class="user-avatar">HM</div>
+      <div class="user-chip" role="button" tabindex="0">
+        <span class="user-avatar">HM</span>
+        <span class="user-name">Helbert Moura</span>
+      </div>
     </div>
   </header>
 
   <main class="dashboard-main">
 
-    <!-- Saudação -->
-    <section class="greeting">
-      <h2 class="greeting-title">Bom dia, Helbert 👋</h2>
-      <p class="greeting-subtitle">3 agentes prontos · Última atividade há 2 min</p>
-    </section>
-
-    <!-- Cards dos IDEs -->
-    <section class="ides-grid">
-
-      <!-- Gemini -->
-      <article class="ide-card online">
-        <header class="ide-card-header">
-          <div class="ide-icon ide-icon-gemini">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-          </div>
-          <div class="ide-info">
-            <h3 class="ide-name">Gemini</h3>
-            <p class="ide-model">Gemini 3.7 Flash</p>
-          </div>
-          <span class="badge-online">Online</span>
-        </header>
-
-        <div class="ide-card-body">
-          <div class="ide-stat">
-            <span class="stat-label">Sessão ativa</span>
-            <span class="stat-value">dm-erp · M07</span>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">Última ação</span>
-            <span class="stat-value">há 2 min</span>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">PRs abertos</span>
-            <span class="stat-value">3</span>
-          </div>
-        </div>
-
-        <footer class="ide-card-footer">
-          <button class="btn-card btn-card-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            Conectar
-          </button>
-          <button class="btn-card btn-card-secondary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            Detalhes
-          </button>
-        </footer>
-      </article>
-
-      <!-- M3 (MiniMax Code) -->
-      <article class="ide-card working">
-        <header class="ide-card-header">
-          <div class="ide-icon ide-icon-m3">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-          </div>
-          <div class="ide-info">
-            <h3 class="ide-name">MiniMax M3</h3>
-            <p class="ide-model">MiniMax-M3</p>
-          </div>
-          <span class="badge-working">Trabalhando</span>
-        </header>
-
-        <div class="ide-card-body">
-          <div class="ide-stat">
-            <span class="stat-label">Tarefa atual</span>
-            <span class="stat-value">Scaffold r92</span>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">Progresso</span>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 67%"></div>
-            </div>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">Tempo</span>
-            <span class="stat-value">14min</span>
-          </div>
-        </div>
-
-        <footer class="ide-card-footer">
-          <button class="btn-card btn-card-primary" disabled>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="6" y="4" width="4" height="16"></rect>
-              <rect x="14" y="4" width="4" height="16"></rect>
-            </svg>
-            Em uso
-          </button>
-          <button class="btn-card btn-card-secondary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="1" y1="1" x2="23" y2="23"></line>
-              <path d="M21 21H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2z"></path>
-            </svg>
-            Parar
-          </button>
-        </footer>
-      </article>
-
-      <!-- Z.AI Code -->
-      <article class="ide-card online">
-        <header class="ide-card-header">
-          <div class="ide-icon ide-icon-zai">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-              <path d="M2 12h20"></path>
-            </svg>
-          </div>
-          <div class="ide-info">
-            <h3 class="ide-name">Z.AI Code</h3>
-            <p class="ide-model">GLM 5.3 Max</p>
-          </div>
-          <span class="badge-online">Online</span>
-        </header>
-
-        <div class="ide-card-body">
-          <div class="ide-stat">
-            <span class="stat-label">Sessão ativa</span>
-            <span class="stat-value">dm-erp · rdo-m07</span>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">Última ação</span>
-            <span class="stat-value">há 5 min</span>
-          </div>
-          <div class="ide-stat">
-            <span class="stat-label">ADRs escritas</span>
-            <span class="stat-value">5 hoje</span>
-          </div>
-        </div>
-
-        <footer class="ide-card-footer">
-          <button class="btn-card btn-card-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            Conectar
-          </button>
-          <button class="btn-card btn-card-secondary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            Detalhes
-          </button>
-        </footer>
-      </article>
-
-      <!-- code-server (Fase 1) -->
-      <article class="ide-card online ide-card-compact">
-        <header class="ide-card-header">
-          <div class="ide-icon ide-icon-vscode">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 4 20 10 15 10"></polyline>
-              <polyline points="4 20 4 14 9 14"></polyline>
-              <line x1="4" y1="10" x2="13" y2="20"></line>
-              <line x1="20" y1="14" x2="11" y2="4"></line>
-            </svg>
-          </div>
-          <div class="ide-info">
-            <h3 class="ide-name">VSCode Web</h3>
-            <p class="ide-model">code-server 4.96</p>
-          </div>
-          <span class="badge-online">Online</span>
-        </header>
-
-        <footer class="ide-card-footer">
-          <button class="btn-card btn-card-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            Abrir
-          </button>
-        </footer>
-      </article>
-
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="quick-actions">
-      <h3 class="section-title">Ações rápidas</h3>
-      <div class="actions-grid">
-        <button class="action-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>Enviar comando</span>
-        </button>
-        <button class="action-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          <span>Ver audit log</span>
-        </button>
-        <button class="action-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <span>Status do server</span>
-        </button>
+    <!-- Build panel (hero do estilo DM//BUILD 2026) -->
+    <section class="build-panel" aria-label="DM//HUB BUILD 2026">
+      <div class="build-panel-bar">
+        <span>DM//HUB 2026</span>
+        <span class="build-status">
+          <span class="status-dot status-dot--online"></span>
+          ONLINE
+        </span>
+      </div>
+      <div class="build-panel-body">
+        <p class="prompt-mono">&gt;_ REMOTE_IDE_CONTROL</p>
+        <h1 class="build-title">Da IDE à obra.</h1>
+        <p class="build-subtitle">Conecte-se aos seus agentes a partir do celular, tablet ou outro PC. Código, infraestrutura e operação em uma só superfície.</p>
+        <ol class="build-steps">
+          <li><span>01</span>escolher IDE</li>
+          <li><span>02</span>conectar</li>
+          <li><span>03</span>operar</li>
+          <li><span>04</span>commitar</li>
+        </ol>
+      </div>
+      <div class="build-panel-stripe">
+        <i></i><i></i><i></i><i></i>
       </div>
     </section>
 
-    <!-- Recent Activity -->
-    <section class="recent-activity">
-      <h3 class="section-title">Atividade recente</h3>
-      <ul class="activity-list">
-        <li class="activity-item">
-          <span class="activity-time">há 2 min</span>
-          <span class="activity-icon">♊️</span>
-          <span class="activity-text"><strong>Gemini</strong> recebeu ordem do Módulo 07 (RDO Offline-First)</span>
-        </li>
-        <li class="activity-item">
-          <span class="activity-time">há 4 min</span>
-          <span class="activity-icon">🧠</span>
-          <span class="activity-text"><strong>Z.AI</strong> mapeou motor offline r92 (+5 ADRs escritos)</span>
-        </li>
-        <li class="activity-item">
-          <span class="activity-time">há 6 min</span>
-          <span class="activity-icon">🚀</span>
-          <span class="activity-text"><strong>M3</strong> fez scaffold da estrutura inicial (7 arquivos)</span>
-        </li>
-        <li class="activity-item">
-          <span class="activity-time">há 18 min</span>
-          <span class="activity-icon">✅</span>
-          <span class="activity-text"><strong>Deploy</strong> canteirohub.devmaniacs.com.br atualizado</span>
-        </li>
-      </ul>
+    <!-- Grid dos IDEs -->
+    <section class="section" aria-labelledby="ides-heading">
+      <header class="section-header">
+        <p class="eyebrow"><span class="eyebrow-bar"></span> IDEs DISPONÍVEIS</p>
+        <h2 id="ides-heading" class="section-title">Seus agentes remotos</h2>
+        <p class="section-subtitle">Cada ambiente roda dentro do Rocky Linux (192.168.226.103). Conexões via Cloudflare Tunnel com TLS 1.3.</p>
+      </header>
+
+      <div class="ides-grid">
+
+        <!-- Gemini -->
+        <article class="ide-card ide-card--online">
+          <div class="ide-card-top">
+            <span class="ide-card-index">01</span>
+            <span class="ide-card-tag">DM//CASE</span>
+            <span class="status-badge status-badge--online">
+              <span class="status-dot"></span>
+              ONLINE
+            </span>
+          </div>
+
+          <div class="ide-card-body">
+            <div class="ide-avatar ide-avatar--gemini" aria-hidden="true">G</div>
+            <h3 class="ide-name">Gemini</h3>
+            <p class="ide-model">Gemini 3.7 Flash High</p>
+          </div>
+
+          <dl class="ide-stats">
+            <div>
+              <dt>Sessão</dt>
+              <dd>dm-erp · M07 RDO</dd>
+            </div>
+            <div>
+              <dt>Última ação</dt>
+              <dd>há 2 min</dd>
+            </div>
+            <div>
+              <dt>PRs abertos</dt>
+              <dd>3</dd>
+            </div>
+          </dl>
+
+          <div class="ide-card-actions">
+            <button class="btn-card btn-card--primary" data-ide="gemini">
+              Conectar
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+            <button class="btn-card btn-card--ghost">Detalhes</button>
+          </div>
+        </article>
+
+        <!-- MiniMax M3 -->
+        <article class="ide-card ide-card--working">
+          <div class="ide-card-top">
+            <span class="ide-card-index">02</span>
+            <span class="ide-card-tag">DM//CASE</span>
+            <span class="status-badge status-badge--working">
+              <span class="status-dot status-dot--working"></span>
+              TRABALHANDO
+            </span>
+          </div>
+
+          <div class="ide-card-body">
+            <div class="ide-avatar ide-avatar--m3" aria-hidden="true">M3</div>
+            <h3 class="ide-name">MiniMax M3</h3>
+            <p class="ide-model">MiniMax-M3 (Mavis)</p>
+          </div>
+
+          <dl class="ide-stats">
+            <div>
+              <dt>Tarefa atual</dt>
+              <dd>Scaffold r92</dd>
+            </div>
+            <div>
+              <dt>Progresso</dt>
+              <dd>
+                <span class="progress" aria-label="67%">
+                  <span class="progress-bar" style="--progress: 67%"></span>
+                </span>
+                <span class="progress-value">67%</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Tempo</dt>
+              <dd>14 min</dd>
+            </div>
+          </dl>
+
+          <div class="ide-card-actions">
+            <button class="btn-card btn-card--primary" disabled>
+              Em uso
+            </button>
+            <button class="btn-card btn-card--ghost">Cancelar</button>
+          </div>
+        </article>
+
+        <!-- Z.AI Code -->
+        <article class="ide-card ide-card--online">
+          <div class="ide-card-top">
+            <span class="ide-card-index">03</span>
+            <span class="ide-card-tag">DM//CASE</span>
+            <span class="status-badge status-badge--online">
+              <span class="status-dot"></span>
+              ONLINE
+            </span>
+          </div>
+
+          <div class="ide-card-body">
+            <div class="ide-avatar ide-avatar--zai" aria-hidden="true">Z</div>
+            <h3 class="ide-name">Z.AI Code</h3>
+            <p class="ide-model">GLM 5.3 Max</p>
+          </div>
+
+          <dl class="ide-stats">
+            <div>
+              <dt>Sessão</dt>
+              <dd>dm-erp · rdo-m07</dd>
+            </div>
+            <div>
+              <dt>Última ação</dt>
+              <dd>há 5 min</dd>
+            </div>
+            <div>
+              <dt>ADRs hoje</dt>
+              <dd>5</dd>
+            </div>
+          </dl>
+
+          <div class="ide-card-actions">
+            <button class="btn-card btn-card--primary" data-ide="zai">
+              Conectar
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+            <button class="btn-card btn-card--ghost">Detalhes</button>
+          </div>
+        </article>
+
+        <!-- code-server (Fase 1) -->
+        <article class="ide-card ide-card--online ide-card--compact">
+          <div class="ide-card-top">
+            <span class="ide-card-index">04</span>
+            <span class="ide-card-tag">DM//CASE</span>
+            <span class="status-badge status-badge--online">
+              <span class="status-dot"></span>
+              ONLINE
+            </span>
+          </div>
+
+          <div class="ide-card-body ide-card-body--compact">
+            <div class="ide-avatar ide-avatar--vscode" aria-hidden="true">VS</div>
+            <h3 class="ide-name">VSCode Web</h3>
+            <p class="ide-model">code-server 4.96</p>
+          </div>
+
+          <div class="ide-card-actions">
+            <button class="btn-card btn-card--primary" data-ide="vscode">
+              Abrir
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Ações rápidas + Atividade -->
+    <section class="dual-grid">
+
+      <article class="panel">
+        <header class="panel-header">
+          <p class="eyebrow"><span class="eyebrow-bar"></span> AÇÕES RÁPIDAS</p>
+          <h3 class="panel-title">Comandos diretos</h3>
+        </header>
+        <div class="actions-grid">
+          <button class="action-tile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+            <span>Enviar comando</span>
+          </button>
+          <button class="action-tile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Audit log</span>
+          </button>
+          <button class="action-tile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="2"></rect>
+              <path d="M9 9h6v6H9z"></path>
+            </svg>
+            <span>Status server</span>
+          </button>
+          <button class="action-tile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+            </svg>
+            <span>Reiniciar sessão</span>
+          </button>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header class="panel-header">
+          <p class="eyebrow"><span class="eyebrow-bar"></span> ATIVIDADE RECENTE</p>
+          <h3 class="panel-title">Últimos eventos</h3>
+        </header>
+        <ol class="activity-list">
+          <li class="activity-item">
+            <time class="activity-time">2 min</time>
+            <span class="activity-source activity-source--gemini">GEMINI</span>
+            <span class="activity-text">recebeu ordem do Módulo 07 (RDO Offline-First).</span>
+          </li>
+          <li class="activity-item">
+            <time class="activity-time">4 min</time>
+            <span class="activity-source activity-source--zai">Z.AI</span>
+            <span class="activity-text">mapeou motor offline r92 e escreveu 5 ADRs.</span>
+          </li>
+          <li class="activity-item">
+            <time class="activity-time">6 min</time>
+            <span class="activity-source activity-source--m3">M3</span>
+            <span class="activity-text">fez scaffold da estrutura inicial (7 arquivos).</span>
+          </li>
+          <li class="activity-item">
+            <time class="activity-time">18 min</time>
+            <span class="activity-source activity-source--system">DEPLOY</span>
+            <span class="activity-text">canteirohub.devmaniacs.com.br atualizado.</span>
+          </li>
+          <li class="activity-item">
+            <time class="activity-time">32 min</time>
+            <span class="activity-source activity-source--system">GIT</span>
+            <span class="activity-text">3 commits enviados para HelbertMoura/DM-Cerebro.</span>
+          </li>
+        </ol>
+      </article>
+
     </section>
 
   </main>
 
-  <!-- Bottom Nav (mobile) -->
-  <nav class="bottom-nav">
-    <a href="#" class="nav-item active">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <a href="#" class="bottom-link is-active">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
       </svg>
       <span>Hub</span>
     </a>
-    <a href="#" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <a href="#" class="bottom-link">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
       </svg>
       <span>Atividade</span>
     </a>
-    <a href="#" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+    <a href="#" class="bottom-link">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="4 17 10 11 4 5"></polyline>
+        <line x1="12" y1="19" x2="20" y2="19"></line>
       </svg>
       <span>Comandos</span>
     </a>
-    <a href="#" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
+    <a href="#" class="bottom-link">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
       </svg>
-      <span>Perfil</span>
+      <span>Audit</span>
     </a>
   </nav>
 

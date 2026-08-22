@@ -1,127 +1,123 @@
 /**
  * Dev Maniac's Hub — Mockup
- * JavaScript pra demo (login + 2FA fake + dashboard fake)
+ * Interações JS demo
  */
 
-// ============================================
-// LOGIN
-// ============================================
-(function initLogin() {
-  const form = document.getElementById('loginForm');
-  if (!form) return;
+(function () {
+  'use strict';
 
-  const tfaGroup = document.getElementById('tfaGroup');
-  const totpInput = document.getElementById('totp');
-  const submitBtn = form.querySelector('.btn-primary span');
+  /* ============================================================
+     LOGIN
+     ============================================================ */
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    const submitBtn = document.getElementById('submitBtn');
+    const totpStep = document.getElementById('totpStep');
+    const totpInput = document.getElementById('totp');
+    const submitLabel = submitBtn.querySelector('span');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
 
-  // Toggle password
-  const toggleBtn = form.querySelector('.toggle-password');
-  const passwordInput = document.getElementById('password');
-  if (toggleBtn && passwordInput) {
-    toggleBtn.addEventListener('click', () => {
-      const isPassword = passwordInput.type === 'password';
-      passwordInput.type = isPassword ? 'text' : 'password';
-      toggleBtn.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
-    });
-  }
-
-  // Submit fake
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    if (tfaGroup.classList.contains('hidden')) {
-      // Simula request de 2FA
-      submitBtn.textContent = 'Verificando...';
-      setTimeout(() => {
-        tfaGroup.classList.remove('hidden');
-        submitBtn.textContent = 'Validar 2FA';
-        totpInput?.focus();
-      }, 800);
-    } else {
-      // Simula login completo
-      submitBtn.textContent = 'Autenticando...';
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 1000);
+    // Toggle visibilidade senha
+    if (togglePassword && passwordInput) {
+      togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePassword.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+      });
     }
-  });
 
-  // Auto-advance 2FA (6 dígitos)
-  if (totpInput) {
-    totpInput.addEventListener('input', (e) => {
-      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-      e.target.value = value;
-      if (value.length === 6) {
-        form.requestSubmit();
+    // Submit fake (2 steps)
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (totpStep.classList.contains('hidden')) {
+        // Step 1: pedir senha
+        submitLabel.textContent = 'Verificando...';
+        submitBtn.disabled = true;
+        setTimeout(() => {
+          totpStep.classList.remove('hidden');
+          submitLabel.textContent = 'Validar';
+          submitBtn.disabled = false;
+          totpInput.focus();
+        }, 700);
+      } else {
+        // Step 2: validar TOTP
+        submitLabel.textContent = 'Autenticando...';
+        submitBtn.disabled = true;
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 900);
       }
     });
+
+    // Auto-submit quando TOTP completa 6 dígitos
+    if (totpInput) {
+      totpInput.addEventListener('input', (e) => {
+        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+        e.target.value = value;
+        if (value.length === 6) {
+          loginForm.requestSubmit();
+        }
+      });
+    }
   }
-})();
 
-// ============================================
-// DASHBOARD
-// ============================================
-(function initDashboard() {
-  if (!document.querySelector('.dashboard-page')) return;
+  /* ============================================================
+     DASHBOARD
+     ============================================================ */
+  if (!document.body.classList.contains('dashboard-page')) return;
 
-  // Simula heartbeat (status dos IDEs)
-  setInterval(() => {
-    // Aqui entraria fetch('/api/ides/status') — mock só pra demo
-  }, 30000);
-
-  // Conectar IDE (mock)
-  document.querySelectorAll('.btn-card-primary:not(:disabled)').forEach(btn => {
+  // Conectar IDEs (mock)
+  document.querySelectorAll('[data-ide]').forEach((btn) => {
     btn.addEventListener('click', () => {
+      const ide = btn.getAttribute('data-ide');
       const card = btn.closest('.ide-card');
-      const name = card?.querySelector('.ide-name')?.textContent || 'IDE';
+      const name = card?.querySelector('.ide-name')?.textContent || ide;
+
+      btn.disabled = true;
       btn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;" aria-hidden="true">
           <line x1="12" y1="2" x2="12" y2="6"></line>
           <line x1="12" y1="18" x2="12" y2="22"></line>
           <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
           <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
           <line x1="2" y1="12" x2="6" y2="12"></line>
           <line x1="18" y1="12" x2="22" y2="12"></line>
-          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-          <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
         </svg>
-        Conectando...
+        Conectando
       `;
+
       setTimeout(() => {
-        alert(`🚀 Demo: abriria ${name} em iframe fullscreen.\n\nNa versão real: WebSocket + noVNC/CDP conforme o IDE.`);
+        alert(`Conectando ao ${name}...\n\nNa versão real:\n- iframe com sessão autenticada\n- WebSocket para clipboard + arquivos\n- 2FA context-aware para ações sensíveis`);
+        btn.disabled = false;
         btn.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
           Conectar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         `;
       }, 1500);
     });
   });
 
-  // Bottom nav active
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
+  // Bottom nav active state
+  document.querySelectorAll('.bottom-link').forEach((link) => {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
+      document.querySelectorAll('.bottom-link').forEach((l) => l.classList.remove('is-active'));
+      link.classList.add('is-active');
     });
   });
 
-  // CSS: spin animation
+  // Inject spin keyframes
   const style = document.createElement('style');
-  style.textContent = `
-    .spin { animation: spin 1s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  `;
+  style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
   document.head.appendChild(style);
 
-  // PWA install prompt
-  let deferredPrompt;
+  // PWA install prompt (futuro)
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPrompt = e;
-    // Poderia mostrar botão "Instalar DM Hub" aqui
-    console.log('� PWA: usuário pode instalar o app');
+    // console.log('PWA disponível para instalação');
   });
 })();

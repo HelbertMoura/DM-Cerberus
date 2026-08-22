@@ -1,237 +1,227 @@
 ---
-titulo: Identidade Visual Dev Maniac's — Hub Remoto
-tags: [identidade, visual, cores, logo, devmaniacs, hub, brand]
+titulo: Identidade Visual Oficial — Dev Maniac's (Hub Remoto)
+tags: [identidade, visual, cores, logo, mascote, fontes, devmaniacs, hub, brand, oficial]
 atualizado: 2026-08-22
 status: ativo
+fonte: https://devmaniacs.com.br/
 ---
 
-# 🎨 Identidade Visual Dev Maniac's — Hub Remoto
+# 🎨 Identidade Visual Oficial — Dev Maniac's
 
-> Cores, tipografia, logo e padrões visuais baseados em https://devmaniacs.com.br/
+> Identidade extraída diretamente do site oficial via curl em 22/08/2026.
+> Arquivos fonte salvos em `assets/brand/`.
 
 ---
 
-## 🎨 Paleta de Cores
+## 🖼️ Logo e Mascote (originais baixados)
 
-### Cores Primárias
-
-| Nome | Hex | RGB | Uso |
-|---|---|---|---|
-| **Roxo Dev Maniac's** | `#7C3AED` | `124, 58, 237` | Botões primários, links, ícones ativos |
-| **Roxo Profundo** | `#5B21B6` | `91, 33, 182` | Hover, gradientes escuros |
-| **Roxo Claro** | `#A78BFA` | `167, 139, 250` | Backgrounds suaves, highlights |
-| **Violeta Elétrico** | `#8B5CF6` | `139, 92, 246` | Acentos, badges, status online |
-| **Preto Profundo** | `#0F0B1E` | `15, 11, 30` | Background principal (dark) |
-| **Branco Puro** | `#FFFFFF` | `255, 255, 255` | Texto principal |
-
-### Cores Secundárias
-
-| Nome | Hex | Uso |
+| Arquivo | URL oficial | Uso |
 |---|---|---|
-| **Cinza Escuro** | `#1E1B2E` | Cards, painéis secundários |
-| **Cinza Médio** | `#2D2A3F` | Borders, dividers |
-| **Cinza Claro** | `#9CA3AF` | Texto secundário, labels |
-| **Verde Sucesso** | `#10B981` | Status "online", sucesso |
-| **Vermelho Erro** | `#EF4444` | Status "offline", erro |
-| **Amarelo Aviso** | `#F59E0B` | Avisos, alertas |
+| `dev-maniacs-mark.png` | /brand/dev-maniacs-mark.png | Logo principal (64×64 px padrão) |
+| `dev-maniacs-mascot.webp` | /brand/dev-maniacs-mascot.webp | Mascote (Helbert, ~146×146 px) |
+| `dev-maniacs-social-card.png` | /brand/dev-maniacs-social-card.png | Open Graph / social preview |
+| `devmaniacs-styles.css` | /_next/static/chunks/24-wcb0m4nhax.css | CSS fonte (55KB, 1 linha minified) |
 
-### Gradientes
+**Local:** `assets/brand/`
+
+---
+
+## 🎨 Logo (Mark)
+
+**Descrição visual:**
+- Quadrado navy escuro `#061637`
+- Letras **"DM"** estilizadas em **pixel art** (estilo 8-bit)
+- Cada letra tem 2 cores: **D** (vermelho + roxo), **M** (amarelo + cyan)
+- À direita: **gamepad** com D-pad branco + botões coloridos (vermelho, amarelo, cyan)
+- Fundo: navy sólido, cantos levemente arredondados
+- Funciona em **qualquer fundo** (transparente no entorno)
+
+**Tamanhos padrão:**
+- Header: 40×40 px
+- Login: 56×56 px
+- Favicon: 64×64 px
+
+**Tagline oficial:** "Tecnologia feita de perto. Suporte também."
+
+---
+
+## 🦸 Mascote (Helbert Moura)
+
+**Estilo:** Cartoon 3D semi-realista (Pixar/Blender)
+
+**Características:**
+- Boné navy `#061637`
+- Headphone preto com detalhes cyan
+- Óculos de armação preta, **olhos verdes**
+- Jaqueta navy com **zíper cyan** + camiseta branca com **logo "DM" cyan/navy**
+- Calça jeans escura
+- Tênis navy com detalhes **amarelo + cyan + roxo**
+- Mão esquerda: **gamepad preto com botões coloridos**
+- Mão direita: **laptop cinza com stickers pixel art**
+- Smartwatch preto
+
+**Background do mascote (característico da marca):**
+- Bege claro `#faf6ed`
+- Pequenos **pixels coloridos** espalhados (vermelho, amarelo, cyan, roxo, coral)
+
+**Uso recomendado no Hub:**
+- Tela de login (coluna esquerda)
+- Empty states do dashboard
+- Footer do PWA
+- Avatar padrão (quando usuário não tem foto)
+
+---
+
+## 🎨 Paleta de Cores Oficial
+
+**Extraída do CSS oficial via grep** (variáveis CSS ativas):
+
+| Token | Valor | Uso principal |
+|---|---|---|
+| `--navy` | `#061637` | Background principal, texto, sombras |
+| `--navy-soft` | `#10244d` | Background secundário |
+| `--paper` | `#ffffff` | Texto sobre fundo escuro |
+| `--paper-warm` | `#faf6ed` | Background do mascote (cards claros) |
+| `--ink` | `#17213a` | Texto sobre fundo claro |
+| `--line` | `rgba(6, 22, 55, 0.12)` | Bordas e divisores |
+| `--muted` | `#435f73` | Texto secundário |
+
+### Acentos (usar com moderação)
+
+| Token | Valor | Quando usar |
+|---|---|---|
+| `--purple` | `#6b4c9a` | Eyebrows, detalhes sutis |
+| `--cyan` | `#08b9ca` | Links, hovers, status online, destaques |
+| `--coral` | `#ff4c4c` | Alertas, erros, destaques quentes |
+| `--yellow` | `#ffd166` | Highlights, warnings, badges |
+
+### Cores dos parceiros (projetos)
+
+| Parceiro | Accent |
+|---|---|
+| Teenus Construtora | `--cyan` `#08b9ca` |
+| Biolar | `--coral` `#ff4c4c` |
+| APAE Juatuba | `--purple` `#6b4c9a` |
+| Vitor Tec. | `--yellow` `#ffd166` |
+| Terabyte | `--navy` `#061637` |
+
+---
+
+## 🔤 Tipografia Oficial
+
+**Confirmado no site oficial:**
+
+| Família | Uso | Fallback |
+|---|---|---|
+| **Inter** | Todo texto (sans-serif) | `Arial, sans-serif` |
+| **JetBrains Mono** | Código, prefixos `DM//`, tags, números | `Consolas, monospace` |
+
+**Pesos usados no site:**
+- Inter: 400 (body), 600 (subtítulos), 700 (títulos)
+- JetBrains Mono: 400 (tags), 500 (destaques), 700 (títulos mono)
+
+**Cuidado:**
+- ❌ **NÃO usar** Space Grotesk, Roboto, Open Sans
+- ❌ **NÃO usar** mono em parágrafos grandes
+- ✅ Mono **apenas** em: tags, prefixos, código, numeração, status
+
+---
+
+## 🎭 Estilo Visual (características da marca)
+
+### Elementos gráficos únicos
+
+- **Sombras sólidas brutalistas:** `box-shadow: 8px 8px 0 var(--navy)`
+- **Sombras pequenas:** `box-shadow: 4px 4px 0 var(--navy)`
+- **Prefixos `DM//`:** DM//CASE, DM//HUB, DM//BUILD 2026, DM//GAME, DM//PROFILE
+- **Numeração industrial:** `01`, `02`, `03`, `04` em boxes navy
+- **Stripes coloridas:** sequências coral → yellow → cyan → purple (bandeira Dev Maniac's)
+- **Eyebrows com barrinha:** `<span class="eyebrow-bar"></span> TEXTO` em roxo
+- **Prompts mono:** `>_ PRODUCT_ENGINEERING` em cyan
+
+### O que NÃO fazer
+
+- ❌ Gradientes vibrantes em backgrounds
+- ❌ Efeitos neon / glow / blur
+- ❌ Transparências em textos críticos
+- ❌ Sombras suaves (`box-shadow: 0 4px 12px rgba(...)`)
+- ❌ Border-radius grandes (> 8px) exceto em avatares/circular
+- ❌ Animações longas (> 200ms)
+- ❌ Emojis decorativos (somente ícones SVG Lucide)
+
+### Componentes oficiais do site
+
+| Componente | Estrutura CSS |
+|---|---|
+| `.shell` | Container com max-width |
+| `.eyebrow` | Texto pequeno + barrinha decorativa |
+| `.section` | Seção com padding generoso |
+| `.button--primary` | Fundo navy, texto paper, sombra 7px |
+| `.button--ghost` | Transparente, border 2px navy |
+| `.engine-card` | Card industrial com stripe no topo |
+| `.build-panel` | Painel estilo DM//BUILD com barra superior |
+| `.build-panel__stripe` | 4 blocos coloridos: coral/yellow/cyan/purple |
+
+---
+
+## 📐 Layout Tokens
 
 ```css
-/* Gradiente principal (header, hero) */
-background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #0F0B1E 100%);
-
-/* Gradiente secundário (botões) */
-background: linear-gradient(90deg, #8B5CF6 0%, #7C3AED 100%);
-
-/* Gradiente card hover */
-background: linear-gradient(135deg, #1E1B2E 0%, #2D2A3F 100%);
-```
-
----
-
-## 🔤 Tipografia
-
-| Uso | Fonte | Peso |
-|---|---|---|
-| **Logo / Título** | **Space Grotesk** | 700 (Bold) |
-| **Heading** | **Inter** | 600 (Semi-Bold) |
-| **Body** | **Inter** | 400 (Regular) |
-| **Code** | **JetBrains Mono** | 400/500 |
-
-```html
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-```
-
-```css
+/* Espaçamentos (do site oficial) */
 :root {
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --shadow: 8px 8px 0 var(--navy);
+  --shadow-sm: 4px 4px 0 var(--navy);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;  /* máximo permitido */
 }
 ```
+
+**Princípios:**
+- **Espaço é luxo** — não encher layouts
+- **Bordas finas** (2px) ao invés de 1px
+- **Sombras sólidas** ao invés de suaves
+- **Contraste alto** — texto navy em papel, ou paper em navy
+- **Mobile-first** — `shell` com max-width adaptativo
 
 ---
 
-## 🏷️ Logo
+## 🆚 Comparação (mockup novo vs. oficial)
 
-A logo "DM" Dev Maniac's segue o padrão de **monograma em shield**:
+| Item | Site oficial | Mockup Hub |
+|---|---|---|
+| Background | Navy `#061637` + papel | ✅ Mesmo |
+| Logo | `dev-maniacs-mark.png` | ✅ Mesmo (mesmo arquivo) |
+| Mascote | `dev-maniacs-mascot.webp` | ✅ Mesmo (mesmo arquivo) |
+| Tipografia sans | Inter | ✅ Inter |
+| Tipografia mono | JetBrains Mono | ✅ JetBrains Mono |
+| Sombras | `8px 8px 0` | ✅ `8px 8px 0` |
+| Eyebrows | Barrinha roxa | ✅ Barrinha roxa |
+| Prompts | `>_ TEXTO` cyan | ✅ `>_ TEXTO` cyan |
+| Numeracao | `01/02/03` industrial | ✅ `01/02/03` industrial |
+| Stripe colorido | coral/yellow/cyan/purple | ✅ coral/yellow/cyan/purple |
+| Tagline | "Tecnologia feita de perto" | ✅ Será exibido no footer |
 
-```
-�─────────────────────┐
-│                     │
-│      ╔══════╗      │
-│      ║  D   ║      │
-│      ║ M M  ║      │
-│      ╚══════╝      │
-│                     │
-│   DEV MANIAC'S      │
-│                     │
-└─────────────────────┘
-```
-
-**Elementos:**
-- Monograma "DM" em **Space Grotesk Bold**
-- Fundo do monograma: gradiente roxo `#7C3AED → #5B21B6`
-- Contorno: `#A78BFA` (1px)
-- Texto "DEV MANIAC'S" abaixo: Inter Semi-Bold 12px, espaçamento 0.2em, uppercase
-
-**SVG placeholder** (criar em `assets/logo.svg`):
-
-```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="dmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#5B21B6"/>
-    </linearGradient>
-  </defs>
-  <rect x="10" y="10" width="80" height="80" rx="16" fill="url(#dmGrad)" stroke="#A78BFA" stroke-width="2"/>
-  <text x="50" y="58" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="36" fill="#FFFFFF">DM</text>
-</svg>
-```
+**Resultado:** Hub visualmente é **gêmeo do site oficial**.
 
 ---
 
-## 🧩 Componentes
+## 🛡️ Compliance Checklist
 
-### Botão Primário
+Antes de commitar qualquer página do Hub, verificar:
 
-```css
-.btn-primary {
-  background: linear-gradient(90deg, #8B5CF6 0%, #7C3AED 100%);
-  color: #FFFFFF;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-height: 44px; /* ISO 44px (regra Dev Maniac's) */
-}
-
-.btn-primary:hover {
-  background: linear-gradient(90deg, #7C3AED 0%, #5B21B6 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-}
-```
-
-### Card de IDE
-
-```css
-.ide-card {
-  background: #1E1B2E;
-  border: 1px solid #2D2A3F;
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s;
-  min-height: 200px;
-}
-
-.ide-card:hover {
-  border-color: #7C3AED;
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
-}
-
-.ide-card.online {
-  border-left: 4px solid #10B981;
-}
-
-.ide-card.offline {
-  border-left: 4px solid #EF4444;
-  opacity: 0.6;
-}
-```
-
-### Status Badge
-
-```css
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.badge-online { background: rgba(16, 185, 129, 0.15); color: #10B981; }
-.badge-offline { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
-.badge-working { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
-```
-
----
-
-## � PWA — Manifest
-
-```json
-{
-  "name": "Dev Maniac's Hub",
-  "short_name": "DM Hub",
-  "description": "Hub remoto dos IDEs Dev Maniac's",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0F0B1E",
-  "theme_color": "#7C3AED",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
-```
-
----
-
-## 🚫 O que NÃO usar (regras da casa)
-
-- ❌ **Emoticons no UI** → usar **Lucide-React** (ícones vetoriais)
-- ❌ **Fontes decorativas** → só Inter + Space Grotesk + JetBrains Mono
-- ❌ **Cores fora da paleta** → manter identidade consistente
-- ❌ **Botões < 44px** → ISO 44px (regra Dev Maniac's, luva + sol)
-- ❌ **Emojis em logs/messages** → só ícones
-
----
-
-## 🔗 Referências
-
-- Site oficial: https://devmaniacs.com.br/
-- DM-Cerebro identidade: ver `BRAIN.md` e `MEMORY.md`
-- Padrão PWA: https://web.dev/learn/pwa/
+- [ ] Usa Inter (sans) + JetBrains Mono (mono)
+- [ ] Cores só da paleta oficial
+- [ ] Sombras sólidas `8px 8px 0`
+- [ ] Bordas 2px navy
+- [ ] Eyebrows com barrinha roxa
+- [ ] Sem emojis decorativos
+- [ ] Sem gradientes em backgrounds
+- [ ] Sem blur/transparência em texto
+- [ ] Logo `dev-maniacs-mark.png` (não inventado)
+- [ ] Numeração industrial `01/02/03`
 
 ---
 
 **Owner:** Helbert Moura · Dev Maniac's Systems · 22/08/2026
+**Fonte:** https://devmaniacs.com.br/ + arquivos em `assets/brand/`

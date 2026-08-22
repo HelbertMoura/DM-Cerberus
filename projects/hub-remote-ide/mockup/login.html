@@ -3,115 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#7C3AED">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Login — Dev Maniac's Hub</title>
+  <meta name="theme-color" content="#061637">
+  <meta name="color-scheme" content="light dark">
+  <title>Entrar · Hub DM</title>
+  <link rel="icon" href="../assets/brand/dev-maniacs-mark.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/brand/dev-maniacs-mark.png">
   <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body class="login-page">
 
-  <!-- Background gradient -->
-  <div class="bg-gradient"></div>
+  <div class="login-grid">
 
-  <main class="login-container">
+    <!-- Coluna esquerda: mascote + brand -->
+    <aside class="login-aside" aria-label="Dev Maniac's">
+      <header class="aside-brand">
+        <img src="../assets/brand/dev-maniacs-mark.png" alt="Dev Maniac's" class="brand-mark" width="56" height="56">
+        <div class="brand-copy">
+          <strong>DEV MANIAC'S</strong>
+          <small>HUB REMOTO DE IDEs</small>
+        </div>
+      </header>
 
-    <!-- Logo -->
-    <div class="brand">
-      <div class="logo">
-        <span class="logo-d">D</span><span class="logo-m">M</span>
-      </div>
-      <h1 class="brand-title">Dev Maniac's</h1>
-      <p class="brand-subtitle">Hub Remoto de IDEs</p>
-    </div>
-
-    <!-- Form -->
-    <form class="login-form" id="loginForm">
-
-      <div class="form-group">
-        <label for="email" class="form-label">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          class="form-input"
-          placeholder="helbertcurcio@gmail.com"
-          autocomplete="email"
-          required
-        >
+      <div class="aside-mascot">
+        <img src="../assets/brand/dev-maniacs-mascot.webp" alt="Helbert Moura, fundador da Dev Maniac's" width="320" height="320">
       </div>
 
-      <div class="form-group">
-        <label for="password" class="form-label">Senha</label>
-        <div class="input-password">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="form-input"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            required
-          >
-          <button type="button" class="toggle-password" aria-label="Mostrar senha">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
+      <footer class="aside-meta">
+        <span class="meta-tag">HM//PROFILE</span>
+        <span class="meta-status">
+          <i class="status-dot"></i>
+          ONLINE
+        </span>
+      </footer>
+    </aside>
+
+    <!-- Coluna direita: form -->
+    <main class="login-main">
+
+      <div class="login-shell">
+
+        <p class="eyebrow"><span class="eyebrow-bar"></span> ACESSO RESTRITO</p>
+
+        <h1 class="login-title">Hub Remoto de IDEs</h1>
+        <p class="login-subtitle">Gerencie Gemini, MiniMax M3 e Z.AI Code de qualquer lugar.</p>
+
+        <form class="login-form" id="loginForm" novalidate>
+
+          <label class="field">
+            <span class="field-label">E-mail</span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="field-input"
+              placeholder="helbertcurcio@gmail.com"
+              autocomplete="email"
+              required
+            >
+          </label>
+
+          <label class="field">
+            <span class="field-label">Senha</span>
+            <div class="field-password">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="field-input"
+                placeholder="••••••••"
+                autocomplete="current-password"
+                required
+              >
+              <button type="button" class="field-toggle" aria-label="Mostrar senha" id="togglePassword">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </label>
+
+          <div class="form-row">
+            <label class="checkbox">
+              <input type="checkbox" id="remember" name="remember">
+              <span>Lembrar por 30 dias</span>
+            </label>
+            <a href="#" class="link">Esqueci a senha</a>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <span>Entrar</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </button>
-        </div>
+
+          <!-- TOTP step (aparece após submit fake) -->
+          <div class="totp-step hidden" id="totpStep" aria-live="polite">
+            <div class="totp-divider">
+              <span>Confirme com 2FA</span>
+            </div>
+            <label class="field">
+              <span class="field-label">
+                Código TOTP
+                <span class="field-hint">Google Authenticator</span>
+              </span>
+              <input
+                type="text"
+                id="totp"
+                name="totp"
+                class="field-input field-input-mono"
+                placeholder="000000"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                autocomplete="one-time-code"
+                inputmode="numeric"
+              >
+            </label>
+          </div>
+
+        </form>
+
+        <footer class="login-footer">
+          <small class="footer-meta">Mateus Leme · Minas Gerais · Brasil</small>
+          <small class="footer-version">DM//HUB v1.0.0 · build 22.08.2026</small>
+        </footer>
+
       </div>
 
-      <div class="form-row">
-        <label class="checkbox-label">
-          <input type="checkbox" id="remember" name="remember">
-          <span>Lembrar por 30 dias</span>
-        </label>
-        <a href="#" class="link-forgot">Esqueci a senha</a>
-      </div>
+    </main>
 
-      <button type="submit" class="btn-primary">
-        <span>Entrar</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-      </button>
-
-      <!-- 2FA (aparece depois do login) -->
-      <div class="form-group tfa-group hidden" id="tfaGroup">
-        <label for="totp" class="form-label">
-          Código 2FA
-          <span class="badge-info">Google Authenticator</span>
-        </label>
-        <input
-          type="text"
-          id="totp"
-          name="totp"
-          class="form-input form-input-mono"
-          placeholder="000000"
-          maxlength="6"
-          pattern="[0-9]{6}"
-          autocomplete="one-time-code"
-          inputmode="numeric"
-        >
-        <p class="form-hint">Abra o app e digite o código de 6 dígitos</p>
-      </div>
-
-    </form>
-
-    <!-- Footer -->
-    <footer class="login-footer">
-      <p class="footer-text">
-        🔒 Acesso protegido · Cloudflare + 2FA + Audit Log
-      </p>
-      <p class="footer-version">v1.0.0 · DM Hub</p>
-    </footer>
-
-  </main>
+  </div>
 
   <script src="app.js"></script>
 </body>
