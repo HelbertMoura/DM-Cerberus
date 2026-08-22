@@ -8,7 +8,7 @@ status: ativo
 # 🧠 Dev Maniac's — Segundo Cérebro Central Global (DM-Cerebro)
 > **Propriedade Intelectual:** Dev Maniac's Systems (Helbert Moura)
 > **Localização Central:** `C:\Users\Helbert\Desktop\DM-Cerebro\`
-> **Tríade Autorizada:** ♊ **Gemini** (Orquestrador) ·  **MiniMax M3** (Builder) · 🧠 **Z.AI Hermes** (Deep Reasoning)
+> **Tríade Autorizada:** ♊ **Gemini** (Orquestrador + Engenheiro Chefe) · 🚀 **MiniMax M3** (Heavy Builder) · 🧠 **Z.AI GLM 5.3 / Hermes** (Deep Reasoning Specialist)
 > **Versão:** 2.0 · 22 de Agosto de 2026
 
 ---
@@ -36,8 +36,8 @@ status: ativo
    status: ativo | deprecated | draft
    ---
    ```
-4. **Toda IA lê este BRAIN.md antes de agir** + `AGENTS.md` para regras operacionais.
-5. **Toda IA atualiza o cérebro ao concluir tarefa** (ver `AGENTS.md`).
+4. **Toda IA lê este BRAIN.md antes de agir** + `projects/_shared/TRIADE_PROTOCOLO.md` para regras operacionais + `projects/_shared/CONTRATO_AGENTES.md` para contrato obrigatório.
+5. **Toda IA atualiza o cérebro ao concluir tarefa** (ver `CONTRATO_AGENTES.md` — sempre commitar + pushar).
 6. **`raw/` é gaveta temporária** — após ingestão, mover para `raw/processed/AAAA-MM-DD/`.
 
 ---
