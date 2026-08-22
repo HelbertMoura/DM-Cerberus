@@ -136,3 +136,75 @@ Salvei também em `prompts/SYSTEM_PROMPT_PADRAO_M3.md` pra você só copiar e co
 ---
 
 **Última atualização:** 22/08/2026 · **Owner:** Helbert Moura · Dev Maniac's Systems
+
+---
+
+## 🧬 Estratégia Git Multi-Agente (ADR-004)
+
+**Regra de ouro:** Gemini é o **ÚNICO** que faz merge no `main`. M3 e Z.AI nunca consolidam.
+
+| Camada | Estratégia | Por quê |
+|---|---|---|
+| **DM-Cerebro** | 1 remote, 1 branch `main`, push só via Gemini | Cérebro único, sem conflito |
+| **Projetos (dm-erp, etc.)** | 1 remote + **3 worktrees** + branches `agent/<nome>/<modulo>-<fase>` | Paralelismo real, sem pisar no pé |
+| **Merge no main** | Só Gemini, com testes automatizados | Segurança + rastreabilidade |
+| **HANDOVER.md** | Cada agente registra lock/release | Visibilidade do fluxo |
+
+### � Estrutura de Worktrees (por projeto)
+
+```
+dm-erp/
+├── .git/
+├── worktrees/
+│   ├── wt-m3/        ← M3: scaffold, código bulk, telas
+│   ├── wt-zai/       ← Z.AI: algoritmos, ADRs, matemática
+│   └── wt-gemini/    ← Gemini: integração, testes, deploy, cérebro
+└── main/             ← branch produção (somente Gemini)
+```
+
+### 🛠 Script Operacional
+
+Arquivo: `projects/_shared/agentes-workflow.sh`
+
+```bash
+# M3 ou Z.AI travam módulo (cria branch agent/*)
+./agentes-workflow.sh lock m3 rdo-m07-scaffold
+
+# Trabalham, commitam, abrem PR
+./agentes-workflow.sh release m3 "feat: motor offline r92"
+
+# Gemini (único) consolida
+./agentes-workflow.sh consolidar rdo-m07-scaffold
+
+# Status geral
+./agentes-workflow.sh status
+```
+
+**Convenção de branches:**
+- `agent/<nome>/<modulo>-<fase>` (ex: `agent/m3/rdo-m07-scaffold`)
+- Nunca force-push
+- Nunca merge direto — sempre via Gemini
+
+### 📱 Como Gerenciar do Celular
+
+| Canal | Comando | Status |
+|---|---|---|
+| **Telegram (este Hermes)** | `/dm-erp status` / `/cerebro` | ✅ Já funciona |
+| **GitHub Mobile** | App oficial, notifications em PRs | ✅ Setup manual |
+| **GitHub Actions → Telegram** | Relatórios automáticos de CI | ⚙️ Documentado em `projects/_shared/github-actions-telegram.md` (a criar) |
+
+**Fluxo mobile recomendado:**
+1. Você tá no canteiro → Telegram notifica: *"🔔 M3 terminou scaffold do RDO-m07"*
+2. Abre Telegram → vê resumo do PR + link GitHub
+3. Se OK → responde `/aprovar` → Gemini consolida + deploy
+4. Se não → responde `/revisar` → Z.AI refina
+
+---
+
+## 📌 Checklist Antes de Cada Tarefa
+
+- [ ] Leu BRAIN.md + TRIADE_PROTOCOLO.md + DECISIONS.md (top 5)
+- [ ] Leu README + status.md do produto envolvido
+- [ ] Rodou `./agentes-workflow.sh lock <eu> <modulo>` antes de codar
+- [ ] Commita + pusha na sua branch (nunca no main)
+- [ ] Avisa Gemini quando terminar (entrada no HANDOVER.md)
