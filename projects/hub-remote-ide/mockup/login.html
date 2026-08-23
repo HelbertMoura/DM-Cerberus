@@ -58,8 +58,6 @@
         </a>
       </div>
 
-      <p class="login-restrict">acesso exclusivo &middot; helbertcurcio@gmail.com</p>
-
       <div class="login-warn" id="authWarn" hidden>
         <span class="login-warn-dot"></span>
         <span>login google pendente &mdash; cole o client id/secret no <code>mockup/config.php</code></span>
@@ -127,9 +125,10 @@
       fetch('/auth/status', { cache: 'no-store' })
         .then(function (r) { return r.json(); })
         .then(function (d) {
+          // A tela de login é pública — não vaza arquitetura interna.
+          // O status real fica em /status.html (acesso restrito).
           setStat('sys-auth', d.google_configured ? 'ok' : 'warn',
-            d.google_configured ? 'OAuth configurado' : 'credenciais ausentes');
-          if (!d.google_configured) document.getElementById('authWarn').hidden = false;
+            d.google_configured ? 'login ok' : 'configuração pendente');
         })
         .catch(function () { setStat('sys-auth', 'warn', 'sem resposta'); });
 
