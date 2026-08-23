@@ -40,6 +40,25 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 10:15] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
+
+**Sessão:** Redesign do zero da tela de login (v1.3.0) + hardening de cache
+**Tarefa executada:**
+- Login reconstruído com conceito único de **console Dev Maniac's**: tela navy imersiva,
+  bandeira DM no topo, mascote sobrepondo cartão brutalista estilo terminal (barra
+  DM//ACESSO), linha de status mono ao vivo no rodapé ✅
+- CSS: seção LOGIN reescrita do zero, blocos legados removidos ✅
+- **Fix importante:** Cloudflare cacheava o `sw.js` e travava updates do PWA — o router
+  agora serve `/sw.js` com `no-cache` (cf-cache-status: BYPASS confirmado) ✅
+- SW bump dm-hub-v4; visão do projeto no README reescrita (Dev Maniac's como um todo) ✅
+- QA visual via browser não concluído (webview indisponível) — validação visual fica pro Helbert
+
+**Commits:** `15095de` (login v1.2) · `7806502` (login v1.3 console + fix sw.js cache)
+
+**Status:** ✅ concluído · Única pendência do hub: credenciais Google no `mockup/config.php`
+
+---
+
 ## [2026-08-23 09:30] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
 
 **Sessão:** Follow-up da auditoria — feedback do Helbert

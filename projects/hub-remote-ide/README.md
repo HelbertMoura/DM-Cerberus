@@ -46,11 +46,11 @@ autor: Hermes Agent (DM-Cerebro)
 Hub web único (em `hub.devmaniacs.com.br`) que serve como ponto central pra acessar 3 IDEs locais da Helbert (Antigravity 2.0, MiniMax Code, Z.AI) e um VSCode remoto (code-server), de qualquer lugar — PC, celular, tablet.
 
 ### Por que existe
-- Helbert trabalha em canteiro de obras, longe da máquina Windows
-- Precisa ver/controlar os 3 IDEs que rodam no Windows + Rocky
-- Quer **1 URL só** pra tudo (não 4 URLs separadas)
-- Quer **login único** (Google OAuth) e **SSO** entre Hub e code-server
-- Quer instalar como **PWA** no celular (ícone na tela inicial)
+- Produto da **Dev Maniac's Systems** (empresa como um todo — acesso remoto corporativo, não ligado a um contexto específico)
+- Centraliza em um só lugar o controle das IDEs da tríade (Gemini/Antigravity 2.0, MiniMax M3, Z.AI/Hermes) + VSCode Web no Rocky
+- **1 URL só** pra tudo (não 4 URLs separadas)
+- **Login único** (Google OAuth) e **SSO** entre Hub e code-server
+- **PWA** instalável (ícone na tela inicial, abre como app)
 
 ### Princípios
 - **Mobile-first** — toda tela é projetada pra celular antes do desktop
