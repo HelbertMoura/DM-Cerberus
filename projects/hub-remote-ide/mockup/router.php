@@ -278,6 +278,19 @@ if ($uri === '/auth/logout') {
     exit;
 }
 
+if ($uri === '/auth/status') {
+    // Estado público do auth (sem expor valores) — a tela de login usa
+    // pra avisar se as credenciais Google ainda não foram coladas.
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo json_encode([
+        'google_configured' => dm_creds_ok($config),
+        'sso_secret_set'    => !str_starts_with((string) ($config['sso_secret'] ?? 'PASTE'), 'PASTE-')
+                                && (string) ($config['sso_secret'] ?? '') !== '',
+    ]);
+    exit;
+}
+
 if ($uri === '/auth/me') {
     dm_session_start();
     header('Content-Type: application/json; charset=utf-8');

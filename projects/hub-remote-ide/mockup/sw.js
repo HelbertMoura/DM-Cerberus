@@ -1,9 +1,10 @@
 // Service Worker — Dev Maniac's Hub
-// Versão: 2.0.0 · 23/08/2026 (auditoria mobile/PWA)
+// Versão: 2.1.0 · 23/08/2026 (auditoria mobile/PWA + redesign login)
 // Estratégia: network-first pra HTML, cache-first pra assets estáticos,
 // rotas de auth/health SEMPRE na rede (nunca cache).
+// REGRA: qualquer mudança em styles.css/app.js/ícones exige bump do CACHE_VERSION.
 
-const CACHE_VERSION = 'dm-hub-v2';
+const CACHE_VERSION = 'dm-hub-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 

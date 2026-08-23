@@ -1101,10 +1101,18 @@ svg { display: block; flex-shrink: 0; }
    ============================================================ */
 @media (max-width: 960px) {
   .login-grid { grid-template-columns: 1fr; }
-  .login-aside { padding: 24px; min-height: 280px; }
-  .aside-mascot { display: none; }
+  /* Aside vira hero compacto — mascote CONTINUA visível no celular */
+  .login-aside { padding: 20px 24px; min-height: 0; }
+  .aside-mascot { flex: 0 1 auto; padding: 12px 0; }
+  .aside-mascot img { max-width: 180px; }
+  .login-main { padding: 32px 20px; }
   .header-nav { display: none; }
   .dual-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .aside-mascot img { max-width: 140px; }
+  .login-title { font-size: 26px; }
 }
 
 @media (max-width: 768px) {
@@ -1206,6 +1214,135 @@ svg { display: block; flex-shrink: 0; }
   width: 16px;
   height: 2px;
   background: var(--purple);
+}
+
+/* ---------- AVISO: CREDENCIAIS GOOGLE PENDENTES ---------- */
+.auth-warn {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 2px dashed var(--warning);
+  border-radius: var(--radius-sm);
+  background: rgba(184, 92, 72, 0.08);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--warning);
+}
+
+.auth-warn a {
+  color: var(--warning);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* ---------- STRIP DE STATUS DOS SISTEMAS ---------- */
+.system-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.sys-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-warm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  cursor: help;
+}
+
+.sys-chip .status-dot { background: var(--muted); opacity: 0.4; }
+
+.sys-chip.is-ok {
+  border-color: var(--success);
+  color: var(--success);
+}
+.sys-chip.is-ok .status-dot { background: var(--success); opacity: 1; }
+
+.sys-chip.is-warn {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+.sys-chip.is-warn .status-dot { background: var(--warning); opacity: 1; }
+
+/* ---------- DICA DE INSTALAÇÃO PWA ---------- */
+.install-hint {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 2px solid var(--navy);
+  border-radius: var(--radius-sm);
+  background: var(--paper-warm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.install-hint strong {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--purple);
+}
+
+.install-hint span {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.install-hint button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 18px;
+  background: var(--navy);
+  color: var(--paper);
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.install-hint button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* ---------- LOGIN: animações e estados ---------- */
+.login-shell {
+  animation: shell-in 0.5s ease both;
+}
+
+@keyframes shell-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.aside-mascot img {
+  animation: mascot-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.btn-google.is-loading {
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
