@@ -146,6 +146,12 @@ C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\
 ├── caddy/
 │   └── Caddyfile                      ← reverse proxy + CORS headers
 │
+├── scripts/
+│   └── rocky/                         ← watchdog do Rocky (versionado)
+│       ├── watchdog-rocky.sh          ← check healthz + recupera stack
+│       ├── dm-hub-watchdog.service    ← systemd unit (oneshot)
+│       └── dm-hub-watchdog.timer      ← systemd timer (5 min)
+│
 ├── postgres/
 │   └── init.sql                       ← schema (users, sessions, audit_log)
 │
@@ -683,7 +689,7 @@ audit_log (
 | Schema PostgreSQL | ✅ Criado |
 | **Google OAuth real** | ❌ Não implementado (botão é fake) |
 | **SSO Hub → Code-server** | ❌ Não implementado |
-| **Watchdog automático** | ❌ Script existe mas não está agendado |
+| **Watchdog automático** | ✅ Agendado (Task Scheduler "DM Hub Watchdog" + systemd timer no Rocky, 23/08) |
 
 ### Fase 2 — Controle de IDEs Desktop (📋 PLANEJADA)
 
@@ -738,6 +744,25 @@ curl -sI http://127.0.0.1:8766/login.html
 # Testar via Cloudflare
 curl -sI https://hub.devmaniacs.com.br/login.html
 curl -sI https://code.devmaniacs.com.br/login
+```
+
+### Watchdog (recuperação automática)
+
+```bash
+# Rodar o watchdog Windows na mão (só sobe o que faltar)
+bash /c/Users/Helbert/.cloudflared/watchdog-hub.sh
+
+# Disparar a tarefa agendada na hora
+powershell -NoProfile -Command "Start-ScheduledTask -TaskName 'DM Hub Watchdog'"
+
+# Ver últimos ticks
+tail -20 /c/Users/Helbert/.cloudflared/logs/watchdog.log
+
+# Rodar o watchdog do Rocky na hora
+ssh devmaniacs-vm "systemctl start dm-hub-watchdog.service"
+
+# Status do timer no Rocky
+ssh devmaniacs-vm "systemctl list-timers | grep dm-hub"
 ```
 
 ### Rocky Linux (via SSH)
@@ -816,9 +841,16 @@ cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" ru
 **Sintomas:**
 - `ssh -p 2222 root@127.0.0.1` → "Connection refused"
 
-**Solução:**
+**Solução:** o watchdog "DM Hub Watchdog" (Task Scheduler, a cada 5 min) re-sobe o proxy automaticamente. Pra forçar na hora:
+
 ```bash
-cloudflared access tcp --hostname ssh.devmaniacs.com.br --listener :2222 --destination 192.168.226.103:22
+cloudflared access tcp --hostname ssh.devmaniacs.com.br --listener 127.0.0.1:2222
+```
+
+**Alternativa (mais robusta):** SSH direto pela LAN, sem Cloudflare no caminho:
+
+```bash
+ssh devmaniacs-vm    # alias já em ~/.ssh/config → root@192.168.226.103
 ```
 
 ### � 3. CORS no status.html (Failed to fetch)
@@ -868,8 +900,8 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 
 - [ ] Implementar Google OAuth real no Hub (substituir botão fake)
 - [ ] SSO Hub → Code-server (token compartilhado)
-- [ ] Agendar watchdog automático (Task Scheduler Windows)
-- [ ] Watchdog no Rocky (systemd timer)
+- [x] Agendar watchdog automático (Task Scheduler Windows) — feito 23/08/2026
+- [x] Watchdog no Rocky (systemd timer) — feito 23/08/2026
 
 ### 🟡 Média prioridade (melhora experiência)
 
@@ -927,6 +959,6 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 
 ---
 
-**Última atualização:** 23/08/2026 10:15
+**Última atualização:** 23/08/2026 07:45 (watchdogs Windows + Rocky deployados e testados)
 **Owner:** Helbert Moura · Dev Maniac's Systems
 **Mantido por:** Hermes Agent (DM-Cerebro / Z.AI / GLM 5.3 fallback pra MiniMax M3)

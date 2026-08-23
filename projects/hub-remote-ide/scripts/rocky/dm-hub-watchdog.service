@@ -1,0 +1,6 @@
+[Unit]
+Description=DM Hub - watchdog da stack hub-remote (checa e recupera)
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/watchdog-rocky.sh

@@ -7,7 +7,7 @@ status: ativo
 
 # 🌐 Deploy Status — Hub Remoto
 
-> **Status:** ✅ Fase 1 deployada e funcionando · 22/08/2026 21:45
+> **Status:** ✅ Fase 1 deployada e funcionando · 22/08/2026 21:45 · watchdogs Windows+Rocky ativos em 23/08/2026
 
 ---
 
@@ -15,7 +15,7 @@ status: ativo
 
 | Serviço | URL | Backend |
 |---|---|---|
-| **Hub Login (mockup)** | https://hub.devmaniacs.com.br/login.html | Python http.server local :8766 |
+| **Hub Login (mockup)** | https://hub.devmaniacs.com.br/login.html | PHP built-in server local :8766 |
 | **Hub Dashboard** | https://hub.devmaniacs.com.br/dashboard.html | Mesmo |
 | **Code-server (VSCode web)** | https://code.devmaniacs.com.br/login | Rocky Linux :8766 (Caddy + code-server) |
 | **Code-server direto** | https://code.devmaniacs.com.br/ | Redireciona pra /login |
