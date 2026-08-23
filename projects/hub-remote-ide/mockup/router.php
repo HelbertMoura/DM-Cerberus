@@ -357,6 +357,19 @@ if ($uri === '/sw.js') {
     }
 }
 
+// login.css — folha isolada do login (v2.0+). Carregada APENAS pelo
+// login.html. Cache curto pra iterar rápido sem purgar Cloudflare.
+if ($uri === '/login.css') {
+    $f = __DIR__ . '/login.css';
+    if (is_file($f)) {
+        header('Content-Type: text/css; charset=utf-8');
+        header('Cache-Control: public, max-age=300');
+        header('Content-Length: ' . (string) filesize($f));
+        readfile($f);
+        exit;
+    }
+}
+
 if ($uri !== '' && $uri !== '/') {
     $file = realpath(__DIR__ . $uri);
     $root = realpath(__DIR__);

@@ -40,6 +40,81 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 11:20] Hermes/M3 (DM Agent) → próximo agente (Hub interno)
+
+**Sessão:** Retrabalho 100% do zero da tela de login do `hub-remote-ide`, após o Helbert ver no celular que a v1.4 estava "toda quebrada" (na verdade ele abriu `hub.html`, não `login.html` — diagnóstico confirmado via `curl` em produção).
+
+**Diagnóstico do bug original:**
+- `https://hub.devmaniacs.com.br/login.html` em produção retornava a v1.4 corretamente (0 ocorrências de `app-header` ou `ANTIGRAVITY` no HTML retornado).
+- O Helbert abriu `hub.html` (página interna do dashboard pós-login) e achou que era o login.
+- Mas o pedido de retrabalho foi mantido: ele queria ver o login refeito também.
+
+**Tarefa executada:** Login v2.0 → v2.1 — redesenho completo, mobile-first, arquivo CSS isolado.
+1. Criado `mockup/login.css` (446 linhas) — folha **isolada**, carregada SÓ pelo login.html. Tokens próprios, zero dependência do `styles.css` compartilhado. Protege contra regressões visuais em dashboard/hub.
+2. Reescrito `mockup/login.html` (172 linhas) — mobile-first com wrappers `.login-left` (marca + avatar) e `.login-right` (copy + CTA + status).
+3. Adicionada rota `/login.css` no `mockup/router.php` com `Cache-Control: public, max-age=300`.
+4. Avatar circular 80px (mobile) / 220px (desktop) com `border-radius: 50%` em **todos** viewports + `object-fit: cover` + `object-position: center 18%` pra esconder o fundo bege do asset.
+5. CTA "Entrar com Google" continua dominante (paper branco + sombra cyan brutalista), 56px altura no mobile / 64px no desktop.
+6. Warn de "login google pendente" reduzido (fonte 11px, dot 6px, background sutil).
+7. Validação visual: Playwright headless em 3 viewports (390×844 mobile, 768×1024 tablet, 1280×800 desktop) — screenshots em `C:\Users\Helbert\AppData\Local\Temp\login2-{mobile,tablet,desktop}.png`. Hierarquia confirmada: olho vai pro CTA depois do avatar.
+
+**Arquivos criados/alterados:**
+- `projects/hub-remote-ide/mockup/login.html` (v2.1, reescrito do zero)
+- `projects/hub-remote-ide/mockup/login.css` (v2.1, NOVO, isolado)
+- `projects/hub-remote-ide/mockup/router.php` (rota `/login.css` adicionada)
+- `DM-Cerebro/HANDOVER.md` (esta entrada)
+- `DM-Cerebro/LEARNINGS.md` (LEARN-008 adicionado)
+- `DM-Cerebro/DECISIONS.md` (ADR-010 atualizado + ADR-011 adicionado)
+
+**Decisão técnica (ADR-011):** CSS isolado por página crítica. O `styles.css` compartilhado vazava regras (toolbar do dashboard, classes de status) pra dentro do login. Princípio novo: páginas com identidade visual forte (login, offline, error) ganham folha própria + breakpoint próprio. Outras páginas continuam compartilhando o `styles.css`.
+
+**Aprendizado (LEARN-008):** Crop agressivo de asset vertical com fundo bege (`object-position: center 18%`) + `border-radius: 50%` resolve o problema do "mascote esticado num cartão paper". A regra é: asset vertical ≠ crop central; é crop no TOPO onde fica o rosto.
+
+**Status:** ✅ concluído, validado visualmente, **aguardando deploy + commit** no próximo round.
+**Pendente:** Deploy no Rocky Linux, commit+push no GitHub (DM-Cerebro/hub-remote-ide), e bump do SW (`dm-hub-v5`) + purge Cloudflare. Depois disso: retomar Fase 2 (refazer `hub.html` do zero, mesma estratégia de CSS isolado).
+
+## [2026-08-23 10:25] Z.AI GLM 5.3 (DM Agent · Hermes) → Helbert
+
+**Sessão:** Redesign da tela de login do zero (v1.4.0) a pedido do Helbert
+**Tarefa executada:**
+- Login **reconstruído do zero** sob o conceito "Hub, apenas." — sem reaproveitar a
+  estrutura da v1.3 (que Helbert disse "não está legal" no Telegram).
+- **Decisão de conceito:** 2 colunas no desktop (marca + mascote | cartão de acesso
+  + CTA), 1 coluna no mobile. Mascote em pé, full body, sem sobrepor nada. CTA
+  claramente dominante (paper com sombra cyan brutalista). Status como chips
+  arredondados discretos, não no rodapé. Zero gimmicks (fora stripe decorativo,
+  `DM//ACESSO` imitando janela de SO, mascote espiando, grade de pixels).
+- **Bug encontrado e corrigido durante a validação:** o asset do mascote tem
+  proporção 700×1400 (1:2, vertical full body) — primeira tentativa deixou
+  `width: 100%; height: auto` e o mascote esticou verticalmente dentro do
+  `align-items: center` do grid. Corrigido com `height: clamp(280px, 56vh, 460px)`
+  + `width: auto` pra preservar a proporção natural do asset. Ver LEARN-007.
+- **Validação visual:** Playwright headless capturando PNG em 3 viewports
+  (1280×800 desktop, 768×1024 tablet, 390×844 mobile) servindo `php -S` local.
+  Confirmado: mascote proporcional em todos os3; CTA dominante; chips de status
+  legíveis; nenhum texto cortado; safe-areas mobile respeitadas.
+- **Nada do CSS compartilhado foi tocado** — só a seção `.login-page` … `.login-footer`
+  do `styles.css` foi substituída (linhas 145-424). Tokens, dashboard, hub, status
+  e offline permanecem intactos.
+
+**Arquivos alterados:**
+- `projects/hub-remote-ide/mockup/login.html` (reescrito do zero — 174 → 174 linhas,
+  mas estrutura HTML completamente nova: `login-shell` + `login-brand-col` + `login-access-col`)
+- `projects/hub-remote-ide/mockup/styles.css` (bloco LOGIN substituído: 280 linhas
+  removidas, 257 linhas novas, mantendo a sintaxe `#061637`/`#08b9ca` oficial)
+- `DM-Cerebro/LEARNINGS.md` (+ LEARN-007 sobre aspect-ratio de mascote vertical)
+- `DM-Cerebro/DECISIONS.md` (+ ADR-010: redesign do login sob princípio "Hub, apenas.")
+- `DM-Cerebro/HANDOVER.md` (esta entrada)
+
+**Status:** ✅ concluído — aguardando OK visual do Helbert (enviei os3 screenshots)
+antes de qualquer deploy no Rocky/Cloudflare. Como o Helbert disse "antes de seguir
+com esse projeto", **não fiz deploy** — a versão v1.4 está só no mockup local.
+
+**Próximo passo:**
+1. Helbert: validar visual (screenshots em /tmp/login-{desktop,tablet,mobile}.png)
+2. Se aprovado: deploy no Rocky (`ssh devmaniacs-vm …`) + bump do SW (`dm-hub-v5`)
+3. Depois: retomar Fase 2 (bridges Antigravity/M3/Z.AI no hub)
+
 ## [2026-08-23 10:15] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
 
 **Sessão:** Redesign do zero da tela de login (v1.3.0) + hardening de cache

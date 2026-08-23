@@ -1,0 +1,447 @@
+/* ============================================================
+   DM HUB · LOGIN — Folha isolada (v2.0 · mobile-first, do zero)
+   --------------------------------------------------------------
+   Carregada APENAS pelo login.html. Não toca dashboard/hub/
+   status/offline. Conceito: "Hub, apenas." aplicado pro bolso.
+
+   Hierarquia única:
+     1. Logo + nome Dev Maniac's (mínuto, identidade)
+     2. Avatar 80px (cara do mascote, circular, decorativo)
+     3. Eyebrow "HUB · ACESSO"
+     4. Título H1 (1 linha)
+     5. Sub (1 linha, secundário)
+     6. CTA paper com sombra cyan (DOMINANTE)
+     7. Acesso restrito (1 linha mono)
+     8. Chips de status (3 máx, lado a lado)
+     9. Install PWA (botão secundário, ou iOS hint)
+   ============================================================ */
+
+/* Tokens mínimos — sem dependência do styles.css */
+:root {
+  /* Cores da marca (oficial) */
+  --dm-navy:        #061637;
+  --dm-navy-2:      #0b1f4b;
+  --dm-paper:       #faf6ed;
+  --dm-cyan:        #08b9ca;
+  --dm-purple:      #6b4c9a;
+  --dm-coral:       #f4796b;
+  --dm-yellow:      #f3c623;
+  --dm-text:        #0a1733;
+  --dm-text-muted:  #6b7894;
+  --dm-border-soft: rgba(250, 246, 237, 0.12);
+  --dm-success:     #34d399;
+  --dm-warn:        #f3c623;
+
+  /* Espaçamento (modular scale 8) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+
+  /* Tipografia */
+  --font-sans: "Inter", system-ui, -apple-system, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+
+  /* Raio */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+
+  /* Sombra brutalista */
+  --shadow-paper: 8px 8px 0 0 var(--dm-cyan);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+}
+
+body {
+  /* Bg navy oficial com vignette sutil */
+  background:
+    radial-gradient(1200px 800px at 100% 0%, rgba(8, 185, 202, 0.08), transparent 60%),
+    radial-gradient(900px 700px at 0% 100%, rgba(107, 76, 154, 0.08), transparent 60%),
+    var(--dm-navy);
+  color: var(--dm-paper);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  /* Safe area iOS/Android */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============================================================
+   LAYOUT — shell vertical mobile-first
+   ============================================================ */
+.login-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--s-5) var(--s-4);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Brand no topo */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  text-decoration: none;
+  color: var(--dm-paper);
+  margin-bottom: var(--s-6);
+}
+.login-brand-mark {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+.login-brand-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--dm-paper);
+}
+
+/* Avatar: SEMPRE circular (mobile + desktop). Crop focado no rosto
+   do asset 700×1400 — `object-position: center 18%` joga fora o fundo
+   bege e o corpo do mascote. */
+.login-avatar {
+  margin: 0 auto var(--s-5);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--dm-cyan);
+  box-shadow: 0 0 0 4px rgba(8, 185, 202, 0.18);
+  background: var(--dm-navy-2);
+  flex-shrink: 0;
+}
+.login-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+/* Conteúdo principal: eyebrow → título → sub → CTA */
+.login-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.login-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-2);
+}
+.login-eyebrow-bar {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--dm-cyan);
+  border-radius: 1px;
+}
+.login-eyebrow-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dm-cyan);
+  font-weight: 600;
+}
+
+.login-title {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--dm-paper);
+  letter-spacing: -0.01em;
+}
+
+.login-sub {
+  font-size: 14px;
+  color: rgba(250, 246, 237, 0.65);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   CTA — botão Google paper com sombra cyan brutalista
+   ============================================================ */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--s-4) var(--s-5);
+  background: var(--dm-paper);
+  color: var(--dm-text);
+  text-decoration: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  border: 2px solid var(--dm-paper);
+  box-shadow: var(--shadow-paper);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  margin-top: var(--s-3);
+  position: relative;
+}
+.btn-google:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0 0 var(--dm-cyan);
+}
+.btn-google:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 0 var(--dm-cyan);
+}
+.btn-google.is-loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+.btn-google svg {
+  flex-shrink: 0;
+}
+
+.login-restrict {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 237, 0.4);
+  margin: var(--s-3) 0 var(--s-5);
+  text-align: center;
+}
+
+/* ============================================================
+   WARN — aviso inline (não vira cartão gigante).
+   Aparece SÓ se config ausente. Sutil.
+   ============================================================ */
+.login-warn {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: rgba(243, 198, 35, 0.06);
+  border: 1px solid rgba(243, 198, 35, 0.3);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  color: rgba(243, 198, 35, 0.85);
+  margin-bottom: var(--s-4);
+  line-height: 1.4;
+}
+.login-warn[hidden] { display: none; }
+.login-warn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dm-yellow);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(243, 198, 35, 0.18);
+}
+.login-warn a {
+  margin-left: auto;
+  color: rgba(243, 198, 35, 0.7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}
+.login-warn code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ============================================================
+   STATUS — chips horizontais
+   ============================================================ */
+.login-status {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--s-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.st-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 6px 10px;
+  border: 1.5px solid var(--dm-border-soft);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(250, 246, 237, 0.7);
+  background: rgba(11, 31, 75, 0.4);
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(250, 246, 237, 0.4);
+  flex-shrink: 0;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.st-item.is-ok {
+  border-color: rgba(52, 211, 153, 0.5);
+  color: var(--dm-success);
+}
+.st-item.is-ok .status-dot {
+  background: var(--dm-success);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+}
+.st-item.is-warn {
+  border-color: rgba(243, 198, 35, 0.5);
+  color: var(--dm-warn);
+}
+.st-item.is-warn .status-dot {
+  background: var(--dm-warn);
+  box-shadow: 0 0 6px rgba(243, 198, 35, 0.6);
+}
+
+/* ============================================================
+   INSTALL PWA
+   ============================================================ */
+.install-compact {
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  background: transparent;
+  color: var(--dm-cyan);
+  border: 1.5px solid var(--dm-cyan);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: var(--s-3);
+}
+.install-compact[hidden] { display: none; }
+.install-compact:active {
+  background: rgba(8, 185, 202, 0.1);
+}
+.install-compact-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(250, 246, 237, 0.5);
+  text-align: center;
+  margin: 0 0 var(--s-4);
+  line-height: 1.5;
+}
+.install-compact-hint[hidden] { display: none; }
+
+/* ============================================================
+   FOOTER — sutil, 1 linha
+   ============================================================ */
+.login-footer {
+  margin-top: auto;
+  padding-top: var(--s-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(250, 246, 237, 0.3);
+}
+.login-footer[hidden] { display: none; }
+
+/* ============================================================
+   TABLET (≥640px) — afrouxa, dá mais ar
+   ============================================================ */
+@media (min-width: 640px) {
+  .login-shell {
+    padding: var(--s-7) var(--s-5);
+  }
+  .login-title {
+    font-size: 32px;
+  }
+  .btn-google {
+    min-height: 60px;
+  }
+}
+
+/* ============================================================
+   DESKTOP (≥1024px) — 2 colunas com flexbox. Coluna 1 = brand +
+   avatar (lados, vertical). Coluna 2 = main + resto do fluxo.
+   Não usamos grid-template-areas pra evitar conflitos.
+   ============================================================ */
+@media (min-width: 1024px) {
+  body {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+  .login-shell {
+    max-width: 1040px;
+    padding: var(--s-7);
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-7);
+  }
+  /* Wrapper esquerda */
+  .login-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+    flex: 0 0 280px;
+    align-items: flex-start;
+  }
+  .login-left .login-brand { margin-bottom: 0; }
+  /* Avatar circular GRANDE no desktop — mantém 50%, escala pra 220px
+     pra preencher a coluna esquerda sem esticar o asset. */
+  .login-avatar {
+    margin: 0;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+  }
+  .login-avatar img { object-position: center 22%; }
+  /* Wrapper direita: main + tudo do fluxo */
+  .login-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    flex: 1;
+    min-width: 0;
+  }
+  .login-main { margin-bottom: 0; }
+  .login-restrict { text-align: left; margin: 0; }
+  .login-warn { margin: 0; }
+  .login-title { font-size: 42px; }
+  .login-sub { font-size: 16px; }
+  .btn-google { min-height: 64px; font-size: 17px; }
+  .login-restrict { font-size: 11px; }
+  .st-item { font-size: 12px; padding: 7px 12px; }
+}

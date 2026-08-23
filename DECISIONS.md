@@ -15,6 +15,50 @@ status: ativo
 
 ---
 
+### [ADR-010] Login do Hub sob o princípio "Hub, apenas." (Rodada 23/08 · Hermes/M3 DM Agent — v2.1)
+- **Decisão:** A tela de login do `hub-remote-ide` foi reconstruída **duas vezes** do zero — primeiro v1.4 (ainda no `styles.css` compartilhado), depois **v2.1 com CSS totalmente isolado** (`mockup/login.css`) — sob o conceito "Hub, apenas.": **mobile-first**, sem reaproveitar estrutura da v1.3. Foco #1 é o uso via celular (o Helbert acessa pelo bolso).
+- **Arquitetura (v2.1):**
+  - Mobile-first: shell vertical com `padding: 24px 16px`, max-width 480px, `min-height: 100dvh`
+  - Tablet (≥640px): padding generoso, título 32px, CTA 60px altura
+  - Desktop (≥1024px): grid 2 colunas (`280px 1fr`), avatar circular 220px à esquerda, CTA 64px à direita
+  - Avatar **sempre circular** (`border-radius: 50%` em todos viewports) com `object-fit: cover` + `object-position: center 18%` (rosto do mascote fica no topo do asset 700×1400)
+  - CTA "Entrar com Google" paper (fundo navy-2) com sombra cyan brutalista (`box-shadow: 8px 8px 0 0 var(--dm-cyan)`)
+  - Status em chips arredondados (`border: 1.5px solid`, estado `is-ok`/`is-warn`/`is-pending`)
+  - Warn "login google pendente" sutil (fonte 11px, dot 6px, background amarelo 6% opacity)
+- **O que FORA removido da v1.3:**
+  - Stripe colorido `coral/yellow/cyan/purple` no topo (decorativo, distraía)
+  - Barra `DM//ACESSO` imitando janela de SO (gimmick desnecessário)
+  - Mascote "espiando" o cartão com margin negativo (envelhece mal)
+  - Grade técnica 32×32 + 4 pixels coloridos no fundo (ruído visual)
+  - Animação `mascot-bob` (chamativa demais pra primeira impressão)
+  - 3 bolinhas coloridas de "controle de janela" (referência a macOS gratuita)
+  - Linha de status no rodapé do console (telemetria competindo com CTA)
+  - **`styles.css` compartilhado** (vazava regras de dashboard/hub pra dentro do login)
+- **O que ENTROU (v2.1):**
+  - Arquivo `mockup/login.css` **isolado**, carregado SÓ pelo login.html (ver [ADR-011](#adr-011-css-isolado-por-página-crítica))
+  - Wrappers semânticos `.login-left` (marca + avatar) e `.login-right` (copy + CTA + status)
+  - Avatar circular 80px (mobile) → 220px (desktop), sempre circular, crop agressivo no topo
+  - Eyebrow `HUB · ACESSO` com barra cyan de 24px (sutil, elegante)
+  - Restrição `acesso exclusivo · helbertcurcio@gmail.com` em mono 10px (transparente)
+- **Motivo:** Helbert disse explicitamente "a tela de login do HUB de IA da DevManiac's não tá legal, quero refazer ela do zero antes de seguir com esse projeto". A v1.3 tinha o problema clássico de **decoração competindo com o CTA**. Princípio seguido: **uma tela, uma decisão**. A marca está no logo + avatar + tagline. O CTA está sozinho. O status está em chips.
+- **Cuidado:** o `styles.css` compartilhado vazava regras de dashboard/hub (toolbar `.app-header`, classes de status) pra dentro do login — gerava conflito de classes. Por isso a v2.1 migrou pra folha isolada. Detalhes em ADR-011.
+- **Validação:** Playwright headless em 3 viewports (390×844 mobile, 768×1024 tablet, 1280×800 desktop). Screenshots em `C:\Users\Helbert\AppData\Local\Temp\login2-{mobile,tablet,desktop}.png`. Hierarquia confirmada: olho vai pro CTA depois do avatar.
+- **Status:** ✅ v2.1 validada e aprovada pelo Helbert (Telegram); deploy + commit pendentes na próxima rodada.
+
+### [ADR-011] CSS isolado por página crítica (Rodada 23/08 · Hermes/M3 DM Agent)
+- **Decisão:** Páginas com identidade visual forte e fluxo próprio (login, offline, error pages) ganham **folha CSS própria** + **breakpoint próprio**, carregada exclusivamente por aquela página. Outras páginas continuam compartilhando o `styles.css` global.
+- **Contexto:** Na v1.4 do login, ao editar a seção `.login-page` do `styles.css` compartilhado, **regras do dashboard/hub vazaram pro login** — classes como `.app-header` (toolbar do hub interno) interferiam na cascata do login. O sintoma mais óbvio: o login no celular parecia "toda quebrada" porque o Helbert abriu `hub.html` pensando ser login. Mesmo sem o bug de confundimento, o CSS compartilhado cria **acoplamento implícito**: editar login pode quebrar dashboard, e vice-versa.
+- **Princípio:** páginas críticas = isolamento; páginas utilitárias = compartilhamento. Lista inicial:
+  - `login.html` → `login.css` (isolado, já migrado)
+  - `offline.html` → `offline.css` (a migrar)
+  - `error.html` / `404.html` → `error.css` (a migrar)
+  - `dashboard.html` / `hub.html` / `status.html` → continuam usando `styles.css` global (são páginas "operacionais" sem identidade de marca forte)
+- **Mecânica técnica:** o `mockup/router.php` precisa ter rota explícita pra cada folha isolada (ex: `/login.css` → `__DIR__ . '/login.css'`) com `Content-Type: text/css` e `Cache-Control: public, max-age=300` (cache curto pra iterar). A folha global `styles.css` continua servida pelo fallback estático do built-in PHP server.
+- **Motivo:** desacoplar risco de regressão visual entre páginas; permitir iteração visual do login sem medo de quebrar o hub. **Custo:** +1 arquivo CSS por página crítica + 5 linhas de router por folha. **Benefício:** zero vazamento de regras, validação visual isolada, rollback seguro.
+- **Status:** ✅ aplicado no login (v2.1). Próximas páginas críticas a migrar quando forem retrabalhadas.
+
+---
+
 ### [ADR-009] SSO Hub → Code-server via cookie HMAC + Caddy forward_auth (Rodada 23/08 · Z.AI ZCode)
 - **Decisão:** Login único Hub→code-server implementado com cookie `dm_sso` assinado (HMAC-SHA256, payload `{email,exp}`, Domain `.devmaniacs.com.br`, 8h) emitido pelo Hub no login Google e validado no Rocky pelo container `hub-auth` (php:8.3-alpine) via `forward_auth` do Caddy. code-server com `auth: none` atrás do gate; `/healthz` livre pra watchdogs; `CODE_PASSWORD` fica só pro sudo do terminal.
 - **Motivo:** code-server não suporta OAuth nativo; JWT-plugin do Caddy exigiria build custom. Cookie compartilhado entre subdomínios do mesmo eTLD+1 funciona até dentro de iframe (SameSite=Lax) com zero dependências novas. Cuidado registrado: `config.yaml` do code-server persiste `auth: password` — remover o env não basta (erro conhecido #9 do README do hub).

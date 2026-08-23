@@ -79,6 +79,29 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 - **Bônus:** descobri junto que o output de `echo` num router é DESCARTADO quando ele termina com `return false` (o built-in server assume a resposta inteira).
 - **Aplicar em:** Qualquer uso de `php -S <host:port> router.php` em DevManiacs.
 
+### [LEARN-007] Aspect-ratio de mascote vertical dentro de CSS Grid (1:2)
+> **Data:** 23/08/2026 · **Contexto:** hub-remote-ide · **Agente:** Z.AI DM Agent · **ADR:** ADR-010
+
+- **Problema:** Asset do mascote (`dev-maniacs-mascot.webp`) tem proporção natural 700×1400 (1:2, vertical, full body). Primeira tentativa de CSS: `.login-mascot img { width: 100%; height: auto; max-width: 360px }`. Resultado: o mascote renderizou com **360×720** (esticado verticalmente) porque o `align-items: center` do grid deu altura sobrando e o browser esticou a imagem pra preencher.
+- **Causa raiz:** `width: 100%; height: auto` em imagem dentro de grid com `align-items: center` (que dá altura sobrando) faz o navegador manter `width` mas esticar `height` até preencher — distorcendo a proporção. Não é bug do asset; é armadilha do layout.
+- **Solução:** inverter a abordagem — **limitar pela altura, deixar largura fluir**: `height: clamp(280px, 56vh, 460px); width: auto; max-width: 100%`. Agora a imagem respeita o aspect-ratio natural (700/1400 = 1/2) e o `clamp()` impede que ela domine o viewport em telas pequenas nem fique minúscula em telas grandes.
+- **Bônus:** validação visual automatizada com Playwright headless (`render-login.js`) tirando screenshot em 3 viewports (1280/768/390). Descobri o bug em segundos porque comparei `naturalWidth` vs `clientWidth` no console do Playwright (`naturalWidth: 700, clientWidth: 360, clientHeight: 720` ← proporção errada).
+- **Aplicar em:** Qualquer mascote/ilustração vertical em layout CSS Grid. **Regra:** pra asset não-quadrado, sempre limitar pela dimensão que NÃO distorce (a "estreita"), nunca pela "larga".
+
+---
+
+### [LEARN-008] Crop agressivo de asset vertical com fundo bege (object-position + border-radius circular)
+> **Data:** 2026-08-23 · **Contexto:** hub-remote-ide/login v2.1 · **Agente:** Hermes/M3 (DM Agent) · **ADR:** [ADR-011](#adr-011-css-isolado-por-página-crítica)
+
+- **Problema:** O mascote `dev-maniacs-mascot.webp` (700×1400, vertical full body) tem **fundo bege quadrado que aparece como moldura** quando o asset é recortado. Na v1.4 ficou num "cartão paper" parecendo PowerPoint 2010. Na v2.0 desktop ficou num retângulo 280×320 com o fundo bege aparecendo inteiro (porque o `border-radius: var(--r-lg)` no desktop só arredondava cantos, não escondia fundo).
+- **Causa raiz:** Crop central (`object-fit: cover` + `object-position: center`) pega o **meio** do asset, que é o corpo do mascote + fundo bege. O rosto fica no TOPO do asset (uns 18% da altura).
+- **Solução:** Duas mudanças combinadas:
+  1. `object-position: center 18%` (era 22%, depois 50% implícito) — puxa o crop pro topo
+  2. `border-radius: 50%` em **todos** viewports (não só mobile) — força circular mesmo no desktop, eliminando a moldura retangular onde o bege aparece
+- **Bônus:** removendo o `border-radius: var(--r-lg)` (cantos suaves) do desktop, o bege some porque o círculo + `overflow: hidden` cortam tudo fora do rosto.
+- **Aplicar em:** Qualquer asset vertical com fundo indesejado quando renderizado em container retangular. **Regra:** asset vertical com fundo "sujo" → sempre circular (`50%`) + crop no topo (`object-position: center 10-20%`), nunca crop central. E se precisar retangular (ex: cards), limpar o fundo do asset (gerar nova versão PNG/WebP com alpha) ANTES de usar.
+- **Validação visual:** screenshots em `C:\Users\Helbert\AppData\Local\Temp\login2-{mobile,desktop}.png` (v2.1) — rosto limpo, sem sliver bege.
+
 ---
 
 ## 🔄 Template Para Novas Entradas
@@ -95,4 +118,4 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 
 ---
 
-**Última atualização:** 22 de Agosto de 2026 · **Total de lições:** 5
+**Última atualização:** 23 de Agosto de 2026 · **Total de lições:** 7

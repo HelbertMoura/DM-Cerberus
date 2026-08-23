@@ -16,36 +16,36 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/login.css">
   <title>Entrar · Hub DM</title>
 </head>
 <body class="login-page">
 
-  <div class="login-wrap">
+  <main class="login-shell">
 
-    <!-- Marca -->
-    <div class="login-brand">
-      <img src="../assets/brand/dev-maniacs-mark.png?v=2026-08-23" alt="Dev Maniac's" class="brand-mark" width="60" height="60">
-      <span class="brand-word">Dev Maniac's Systems</span>
+    <!-- Coluna esquerda: marca + avatar -->
+    <div class="login-left">
+      <a class="login-brand" href="/status.html" aria-label="Dev Maniac's Systems">
+        <img src="/assets/brand/dev-maniacs-mark.png?v=2026-08-23" alt="" class="login-brand-mark" width="32" height="32">
+        <span class="login-brand-name">Dev Maniac&rsquo;s Systems</span>
+      </a>
+
+      <figure class="login-avatar" aria-hidden="true">
+        <img src="/assets/brand/dev-maniacs-mascot.webp?v=2026-08-23" alt="">
+      </figure>
     </div>
 
-    <!-- Mascote (sobe e "espia" o cartão) -->
-    <div class="login-mascot">
-      <img src="../assets/brand/dev-maniacs-mascot.webp?v=2026-08-23" alt="Helbert Moura, fundador da Dev Maniac's" width="148" height="148">
-    </div>
+    <!-- Coluna direita: copy + CTA + status -->
+    <div class="login-right">
 
-    <!-- Cartão console -->
-    <section class="login-card" aria-label="Acesso ao Hub">
-
-      <div class="login-card-bar">
-        <i></i><i></i><i></i>
-        <span>DM//ACESSO</span>
-      </div>
-
-      <div class="login-card-body">
+      <div class="login-main">
+        <header class="login-eyebrow">
+          <span class="login-eyebrow-bar"></span>
+          <span class="login-eyebrow-text">Hub &middot; acesso</span>
+        </header>
 
         <h1 class="login-title">Hub Remoto de IDEs</h1>
-        <p class="login-sub">Gemini, MiniMax M3, Z.AI e VSCode Web — do canteiro pro bolso, com um login.</p>
+        <p class="login-sub">Gemini, MiniMax M3, Z.AI e VSCode Web — um login, do canteiro pro bolso.</p>
 
         <a href="/auth/google" class="btn-google" id="googleLogin" role="button">
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
@@ -56,35 +56,35 @@
           </svg>
           <span id="googleLoginLabel">Entrar com Google</span>
         </a>
-
-        <p class="login-restrict">acesso exclusivo · helbertcurcio@gmail.com</p>
-
-        <p class="auth-warn" id="authWarn" hidden>
-          login google pendente — cole o client id/secret no mockup/config.php
-          <a href="/status.html">diagnóstico</a>
-        </p>
-
-        <button type="button" class="install-compact" id="installBtn" hidden>Instalar como app</button>
-        <p class="install-compact-hint" id="installHintIos" hidden>
-          Safari &rarr; compartilhar &rarr; Adicionar &agrave; Tela de In&iacute;cio
-        </p>
-
       </div>
-    </section>
 
-    <!-- Linha de status do console -->
-    <div class="login-statusline" aria-label="Status dos sistemas">
-      <span class="st-item is-pending" id="sys-code"><i class="status-dot"></i>code-server</span>
-      <span class="st-item is-pending" id="sys-auth"><i class="status-dot"></i>login google</span>
-      <span class="st-item is-pending" id="sys-sw"><i class="status-dot"></i>pwa</span>
+      <p class="login-restrict">acesso exclusivo &middot; helbertcurcio@gmail.com</p>
+
+      <div class="login-warn" id="authWarn" hidden>
+        <span class="login-warn-dot"></span>
+        <span>login google pendente &mdash; cole o client id/secret no <code>mockup/config.php</code></span>
+        <a href="/status.html">diagnóstico</a>
+      </div>
+
+      <ul class="login-status" aria-label="Status dos sistemas">
+        <li class="st-item is-pending" id="sys-auth"><i class="status-dot"></i><span>login google</span></li>
+        <li class="st-item is-pending" id="sys-code"><i class="status-dot"></i><span>code-server</span></li>
+        <li class="st-item is-pending" id="sys-sw"><i class="status-dot"></i><span>pwa</span></li>
+      </ul>
+
+      <button type="button" class="install-compact" id="installBtn" hidden>Instalar como app</button>
+      <p class="install-compact-hint" id="installHintIos" hidden>
+        Safari &rarr; compartilhar &rarr; Adicionar &agrave; Tela de In&iacute;cio
+      </p>
+
     </div>
 
-    <footer class="login-footer">
-      <span>DM//HUB v1.3.0 &middot; build 23.08.2026</span>
-      <span>Mateus Leme &middot; MG &middot; Brasil</span>
-    </footer>
+  </main>
 
-  </div>
+  <footer class="login-footer" hidden>
+    <span>DM//HUB v2.0</span>
+    <span>Mateus Leme &middot; MG &middot; Brasil</span>
+  </footer>
 
   <script>
     // Service Worker do PWA
@@ -99,7 +99,6 @@
     (function () {
       'use strict';
 
-      // Botão Google: feedback ao toque
       var googleBtn = document.getElementById('googleLogin');
       var googleLabel = document.getElementById('googleLoginLabel');
       googleBtn.addEventListener('click', function () {
@@ -107,12 +106,14 @@
         googleLabel.textContent = 'Redirecionando pro Google...';
       });
 
-      // Linha de status
       function setStat(id, state, title) {
         var el = document.getElementById(id);
+        if (!el) return;
         el.classList.remove('is-pending', 'is-ok', 'is-warn');
         el.classList.add('is-' + state);
         if (title) el.title = title;
+        var label = el.querySelector('span');
+        if (label && title) label.textContent = title.split(' → ')[0].split(' · ')[0];
       }
 
       fetch('/health.php?target=code', { cache: 'no-store' })
@@ -127,20 +128,19 @@
         .then(function (r) { return r.json(); })
         .then(function (d) {
           setStat('sys-auth', d.google_configured ? 'ok' : 'warn',
-            d.google_configured ? 'OAuth configurado' : 'credenciais ausentes no config.php');
+            d.google_configured ? 'OAuth configurado' : 'credenciais ausentes');
           if (!d.google_configured) document.getElementById('authWarn').hidden = false;
         })
         .catch(function () { setStat('sys-auth', 'warn', 'sem resposta'); });
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistration().then(function (reg) {
-          setStat('sys-sw', reg ? 'ok' : 'warn', reg ? 'registrado' : 'ainda não registrou');
+          setStat('sys-sw', reg ? 'ok' : 'warn', reg ? 'pwa ativo' : 'pwa inativo');
         });
       } else {
         setStat('sys-sw', 'warn', 'navegador sem suporte');
       }
 
-      // Instalação PWA contextual
       var btn = document.getElementById('installBtn');
       var iosHint = document.getElementById('installHintIos');
       var standalone = matchMedia('(display-mode: standalone)').matches
