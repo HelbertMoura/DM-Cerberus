@@ -148,3 +148,37 @@ Substituir Google OAuth por auth local:
 ### Reversibilidade
 Trocar `dm_pg_connect()` em `db.php` por versão Postgres é trivial (interface idêntica). Se um dia Helbert adicionar mais usuários ou quiser HA, migrar de SQLite pra Postgres é trocar 1 arquivo.
 
+---
+
+## ADR-013 — Hub Remoto de IDEs: Descomissionamento e Remoção Completa
+
+> **Status:** Descontinuada / Removida · **Data:** 2026-08-23 · **Decisor:** Helbert Moura
+
+### Decisão de Descomissionamento
+Por decisão estratégica do fundador Helbert Moura em 23/08/2026, o projeto do Hub Remoto de IDEs foi **completamente desativado e removido**:
+1. **Infraestrutura:** Túneis Cloudflare `dm-hub` e `dm-code` excluídos; processos locais de backend e proxy finalizados.
+2. **Automação:** Tarefa agendada do Windows (`DM Hub Watchdog`) e scripts associados em `~/.cloudflared/` removidos.
+3. **Código:** Diretório `projects/hub-remote-ide` removido do repositório local.
+4. **Isolamento:** Nenhum outro projeto (CanteiroHUB, Biolar, HelpDev, DM-PDV, túneis corporativos) foi alterado ou impactado.
+
+### Decisão
+Reconstruir completamente o Hub Remoto como uma estação central de comando operacional (Single Page Application com CSS e JS isolados sob a ADR-011):
+1. **Workspaces Integrados:**
+   - **VSCode Web:** Iframe dinâmico para `https://code.devmaniacs.com.br` com suporte a tela cheia, reload assíncrono e SSO automático via `dm_sso`.
+   - **Gemini (Orquestrador):** Estação de planejamento de rodadas, arquitetura e auditoria com templates de prompt prontos.
+   - **MiniMax M3 (Heavy Builder):** Construtor de código Django REST e React com gerador de prompts integrado ao `SYSTEM_PROMPT_PADRAO_M3.md`.
+   - **Z.AI Hermes (Deep Reasoning):** Estação matemática e criptográfica (BDI TCU, Curva S, SEFAZ A1 XMLDSig).
+   - **Monitor de Infraestrutura:** Monitoramento em tempo real do Servidor Rocky Linux 10.2 (`192.168.226.103`), contêineres Docker (Biolar, Teenus Dev/Prod, HelpDev) e Túneis Cloudflare.
+2. **Design System Solid-State (Chumbo & Vermelho):**
+   - Paleta oficial sólida: Chumbo escuro (`#090D16`, `#111827`, `#151F30`), Vermelho Dev Maniac's (`#DC2626`, `#EF4444`).
+   - Zero transparência difusa, zero neon, zero halos de brilho ou animações piscantes.
+   - Ícones oficiais vetoriais de cada ferramenta (VSCode ribbon, Google Gemini 4-pointed star, MiniMax neural M, Z.AI monogram, Rocky Linux geometric mountain).
+   - Layout `100dvh` com safe-areas iOS e alvos de toque mínimos de 44px (`min-h-[44px]`).
+   - Rodapé com identificação oficial: `© Dev Maniac’s Systems · 2026` e `Desenvolvido à base de ☕ e ⚡ por Dev Maniac's`.
+3. **Segurança & Gestão de Acesso:**
+   - **Auth Guard Server-Side (Zero Flash):** Redirecionamento HTTP 302 direto no `router.php` para `/login` ao acessar `/hub.html` ou `/hub` sem sessão ativa (o browser nunca recebe HTML sem estar autenticado).
+   - Validação contínua de sessão via `/auth/me`.
+   - Modal de Perfil com formulário de alteração de senha segura (`/auth/change-password`).
+   - Service Worker bump para `dm-hub-v13`.
+
+

@@ -40,6 +40,79 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 17:50] Gemini (Orquestrador & Arquiteto Sênior) → Helbert
+
+**Sessão:** Encerramento e descomissionamento total do projeto Hub Remoto de IDEs (`hub-remote-ide`), com remoção de recursos de infraestrutura (Cloudflare Tunnels, DNS, rotinas agendadas e diretório de projeto), mantendo todos os demais sistemas intactos e operacionais.
+
+**Ações Executadas:**
+1. **Exclusão de Túneis Cloudflare:** Túneis `dm-hub` e `dm-code` excluídos do Cloudflare com sucesso (`cloudflared tunnel delete -f`). Túnel principal corporativo (`devmaniacs-tunnel` / `a0c5bea6-1a4b-4ffe-a041-da8cb18f419a`), SSH (`devmaniacs-vm-ssh`), Biolar, Teenus e HelpDev continuam 100% ativos e intocados.
+2. **Finalização de Processos Locais:** Processos `php.exe` (:8766) e executáveis `cloudflared` associados ao Hub encerrados.
+3. **Remoção de Agendamento Windows:** Tarefa `DM Hub Watchdog` desregistrada do Agendador de Tarefas do Windows e scripts (`watchdog-hub*.{vbs,cmd,sh}`, `config.dm-*.yml`) removidos de `~/.cloudflared/`.
+4. **Limpeza de Diretórios:** Pasta `projects/hub-remote-ide` removida.
+5. **Atualização Documental:** `MEMORY.md` e `DECISIONS.md` (ADR-013) atualizados para refletir o status de projeto descontinuado.
+
+**Status:** ✅ Descomissionamento 100% finalizado e seguro.
+
+---
+
+## [2026-08-23 17:45] Gemini (Orquestrador & Arquiteto Sênior) → Helbert
+
+**Sessão:** Refinamento arquitetural da Central de Orquestração de IA Dev Maniac's (Tríade Desktop: Antigravity 2.0, MiniMax Code Desktop, Z.AI ZCode Desktop + VSCode Web), harmonização do rodapé oficial no login, avatar oficial e eliminação do CMD piscando no Windows.
+
+**Entregas Realizadas:**
+1. **Conceito Real do Hub Alinhado (AI Orchestration Hub Multi-Projetos):**
+   - O Hub é a central operacional de orquestração das 3 Desktop IDEs de IA do Helbert para **qualquer projeto** (`dm-erp / CanteiroHUB`, `Biolar`, `HelpDev`, `DM-PDV`, `hub-remote-ide`, etc.).
+   - **Antigravity 2.0 (Gemini 3.7 Flash High)** como workspace principal com **Dispatcher da Tríade** (seletor de projeto + geração instantânea de prompts para MiniMax M3 e Z.AI Hermes com 1-clique).
+   - **MiniMax Code (M3)** como Construtor Pesado de Código (Backend Django & Frontend React).
+   - **Z.AI ZCode (Hermes GLM-5.3)** como Especialista em Raciocínio Profundo, Cálculos Matemáticos e Criptografia.
+   - **VSCode Web** com SSO via `dm_sso` para edição remota.
+   - Aba "Infra Rocky" removida da barra de navegação conforme solicitado.
+2. **Avatar Oficial & Identidade Visual:**
+   - Avatar real do Helbert Moura (`/assets/brand/dev-maniacs-icon-180.png`) integrado no topo e modal de perfil (substituindo o placeholder `HM`).
+   - Logo aprimorada com badge oficial `DEV MANIAC'S` e `AI ORCHESTRATION HUB`.
+3. **Harmonização do Rodapé Oficial na Tela de Login:**
+   - Login Astro v2 (`login.astro` / `login-built/`) e fallback `login.html` atualizados com o rodapé oficial: `© Dev Maniac’s Systems · 2026` + `Desenvolvido à base de ☕ e ⚡ por Dev Maniac's` (link ativo).
+4. **Causa Raiz & Solução do "CMD piscando na tela":**
+   - O Task Scheduler executava `watchdog-hub.cmd` a cada 5 min, abrindo um console `cmd.exe` interativo visível no desktop.
+   - Criado `C:\Users\Helbert\.cloudflared\watchdog-hub-silent.vbs` executado via `wscript.exe` em segundo plano 100% invisível (zero janelas popup).
+5. **Limpeza do Projeto:**
+   - Removido arquivo de rascunho `qr-test.svg` (284 KB) e bump de Service Worker para `dm-hub-v14`.
+
+**Decisão técnica:** ADR-013 refinada.
+**Status:** ✅ 100% concluído, testado e validado.
+
+---
+
+## [2026-08-23 17:30] Gemini (Orquestrador & Arquiteto Sênior) → Helbert / Próximos Agentes
+
+**Sessão:** Reconstrução 100% completa do Hub Remoto de IDEs (`hub.html`, `hub.css`, `hub.js`) para resolver quebras no desktop/mobile pós-login, unificando a Tríade de IA e o monitoramento de infraestrutura da Dev Maniac's.
+
+**Problemas identificados:**
+- `hub.html` anterior era legado, sem CSS isolado, com sidebar do VSCode distorcendo o viewport, botões sem estilo consistente e sem suporte mobile.
+- Falta de integração com os outros motores (Gemini, MiniMax M3, Z.AI Hermes) e sem visualização de status do servidor Rocky Linux (`192.168.226.103`).
+- Ausência do rodapé oficial exigido.
+
+**Tarefa executada:** Hub Remoto v3.0 completo, industrial e multi-workspace:
+1. **`mockup/hub.html`** reconstruído do zero com 5 workspaces integrados:
+   - **Workspace 1: VSCode Web / Code-Server** (`code.devmaniacs.com.br`) em iframe responsivo com toolbar, reload assíncrono, fullscreen, abertura externa e feedback de SSO.
+   - **Workspace 2: Gemini 3.7 Flash High (Orquestrador & Arquiteto)** com atalhos de repositórios e gerador de prompts estruturados para arquitetura e QA.
+   - **Workspace 3: MiniMax M3 (Heavy Builder Engine)** com construtor rápido de tarefas injetando o contrato de agentes (`SYSTEM_PROMPT_PADRAO_M3.md`) e templates para Django REST e React.
+   - **Workspace 4: Z.AI Hermes (Deep Reasoning & Math)** com templates cirúrgicos de BDI TCU, Criptografia SEFAZ A1 (XMLDSig), Curva S e Rateio Matricial.
+   - **Workspace 5: Monitor de Infraestrutura Rocky Linux (`192.168.226.103`)** exibindo KPIs de hardware reais (16 vCPUs, 32GB RAM, 1TB NVMe) e tabela de serviços com healthchecks em tempo real (CanteiroHUB Dev/Prod, Biolar, HelpDev, SQLite, Postgres).
+2. **`mockup/hub.css`** (folha isolada sob a ADR-011): tokens oficiais Navy `#061637`, Cyan `#08B9CA`, Purple `#6B4C9A`, Paper `#FAF6ED`, layout `100dvh`, alvos de toque mínimos de 44px (`min-h-[44px]`), safe-areas iOS e banimento total de emojis (Lucide SVG vetorial).
+3. **`mockup/hub.js`** com checagem automática de auth (`/auth/me`), switcher de abas com persistência no `localStorage`, geradores de prompts com cópia em 1-clique, monitor de health checks assíncronos e modal de alteração de senha (`/auth/change-password`).
+4. **`mockup/health.php`** atualizado para suportar múltiplos targets (`code`, `sso`, `teenus_dev`, `teenus_prod`, `helpdev`).
+5. **`mockup/router.php`** atualizado com rotas para `/hub.css`, `/hub.js` e redirect amigável `/hub` → `/hub.html`.
+6. **`mockup/sw.js`** bump de versão para `dm-hub-v12` incluindo `/hub.css` e `/hub.js` no cache estático.
+7. **Rodapé Oficial:** `© 2026 Dev Maniac's · Game & Systems Development` + `Desenvolvido à base de ☕️ e ⚡️ por Dev Maniac's` + chip de ping e SSL TLS 1.3.
+
+**Decisão técnica:** ADR-013 (Hub Remoto de IDEs v3.0 Multi-Workspace e Monitor de Infraestrutura).
+**Aprendizado:** LEARN-012 (Layout 100dvh + CSS isolado para iframes de IDEs remotas).
+
+**Status:** ✅ 100% concluído, testado e validado localmente (HTTP 200 em todas as rotas e health checks ativos).
+
+---
+
 ## [2026-08-23 11:20] Hermes/M3 (DM Agent) → próximo agente (Hub interno)
 
 **Sessão:** Retrabalho 100% do zero da tela de login do `hub-remote-ide`, após o Helbert ver no celular que a v1.4 estava "toda quebrada" (na verdade ele abriu `hub.html`, não `login.html` — diagnóstico confirmado via `curl` em produção).

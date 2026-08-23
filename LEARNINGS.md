@@ -161,3 +161,14 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 - **Por que não detectei antes:** rodei validação via `php -l` (lint) que só checa syntax — não checa redeclaração entre arquivos. Redeclaração só explode em runtime quando ambos são required no **mesmo request**.
 - **Aplicar em:** qualquer projeto PHP multi-arquivo. Centralizar helpers em `_common.php` é a forma mais limpa; senão, sempre wrap em `function_exists`.
 
+---
+
+### [LEARN-012] Layout 100dvh + CSS isolado para iframes de IDEs remotas
+> **Data:** 2026-08-23 · **Contexto:** hub-remote-ide/mockup (v3.0) · **Agente:** Gemini (Orquestrador & Arquiteto Sênior)
+
+- **Problema:** Ao embutir o VSCode Web (`code.devmaniacs.com.br`) dentro de um iframe em layout fluido sem altura fixa e isolamento CSS, ocorriam barras de rolagem duplas, quebras de proporção em telas mobile e sobreposição de toolbars.
+- **Causa raiz:** O VSCode Web calcula a área do canvas e das sidebars com base no viewport do iframe (`100%`). Se o container pai não tiver `100dvh`, `overflow: hidden` e `flex: 1; min-height: 0;`, o browser cria scrollboxes indesejadas e distorce o editor.
+- **Solução:** Estrutura flex column com `height: 100dvh`, container do iframe com `min-height: 0; flex: 1; position: relative;` e folha de estilos dedicada `hub.css` (ADR-011) sem regras compartilhadas vazando.
+- **Aplicar em:** Todo dashboard ou hub que embute aplicações web ricas (VSCode, Grafana, Portainer, Nextcloud) via iframe.
+
+
