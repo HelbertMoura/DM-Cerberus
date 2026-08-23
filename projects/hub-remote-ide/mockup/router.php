@@ -232,6 +232,24 @@ if ($uri === '/api/auth/callback/google' && $method === 'GET') {
     ];
     dm_audit('login_google', ['email' => $email]);
 
+    // SSO Hub → Code-server: emite cookie assinado (HMAC-SHA256) válido
+    // pra *.devmaniacs.com.br — o Caddy do Rocky valida via forward_auth.
+    $ssoSecret = (string) ($config['sso_secret'] ?? '');
+    if ($ssoSecret !== '' && !str_starts_with($ssoSecret, 'PASTE-')) {
+        $exp     = time() + 8 * 3600;
+        $payload = rtrim(strtr(base64_encode(json_encode(['email' => $email, 'exp' => $exp])), '+/', '-_'), '=');
+        $sig     = rtrim(strtr(base64_encode(hash_hmac('sha256', $payload, $ssoSecret, true)), '+/', '-_'), '=');
+        setcookie('dm_sso', $payload . '.' . $sig, [
+            'expires'  => $exp,
+            'path'     => '/',
+            'domain'   => '.devmaniacs.com.br', // vale pro code.devmaniacs.com.br
+            'secure'   => true,
+            'httponly' => true,
+            'samesite' => 'Lax',               // mesmo site (eTLD+1) → enviado no iframe
+        ]);
+        dm_audit('sso_cookie_issued', ['email' => $email, 'exp' => $exp]);
+    }
+
     header('Location: /hub.html');
     exit;
 }
@@ -245,6 +263,16 @@ if ($uri === '/auth/logout') {
         setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
     }
     session_destroy();
+
+    // Derruba também o cookie SSO do code-server (*.devmaniacs.com.br)
+    setcookie('dm_sso', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => '.devmaniacs.com.br',
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
     dm_audit('logout', ['email' => $email]);
     header('Location: /login.html');
     exit;
@@ -257,7 +285,19 @@ if ($uri === '/auth/me') {
         http_response_code(401);
         echo json_encode(['authenticated' => false]);
     } else {
-        echo json_encode(['authenticated' => true, 'user' => $_SESSION['user']]);
+        // sso_code: indica se o cookie assinado pro code-server está ativo
+        $ssoActive = false;
+        $ssoSecret = (string) (($config['sso_secret'] ?? ''));
+        $cookie    = (string) ($_COOKIE['dm_sso'] ?? '');
+        if ($ssoSecret !== '' && substr_count($cookie, '.') === 1) {
+            [$payload, $sig] = explode('.', $cookie, 2);
+            $expect = hash_hmac('sha256', $payload, $ssoSecret, true);
+            if (hash_equals($expect, base64_decode(strtr($sig, '-_', '+/')))) {
+                $d = json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
+                $ssoActive = is_array($d) && ($d['exp'] ?? 0) > time();
+            }
+        }
+        echo json_encode(['authenticated' => true, 'user' => $_SESSION['user'], 'sso_code' => $ssoActive]);
     }
     exit;
 }

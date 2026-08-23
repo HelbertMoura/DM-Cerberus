@@ -120,6 +120,29 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+    .toolbar-user {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      border: 1px solid var(--purple);
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: rgba(107, 76, 154, 0.15);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .toolbar-user img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--cyan);
+      flex-shrink: 0;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -137,7 +160,8 @@
         <button data-ide="zai">Z.AI</button>
       </div>
       <button id="btn-fullscreen">Tela cheia</button>
-      <a href="/login.html">Sair</a>
+      <span class="toolbar-user" id="userChip" hidden></span>
+      <a href="/login.html" id="authLink">Entrar</a>
     </div>
   </header>
 
@@ -163,6 +187,28 @@
     iframe.addEventListener('load', () => {
       loading.style.display = 'none';
     });
+
+    // Usuário logado (via /auth/me do router.php) — chip Dev Maniac's
+    (async () => {
+      const chip = document.getElementById('userChip');
+      const link = document.getElementById('authLink');
+      try {
+        const res = await fetch('/auth/me', { credentials: 'same-origin' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.authenticated) return;
+        if (data.user.picture) {
+          const img = document.createElement('img');
+          img.src = data.user.picture;
+          img.alt = '';
+          chip.appendChild(img);
+        }
+        chip.appendChild(document.createTextNode(data.user.email || 'DM//USER'));
+        chip.hidden = false;
+        link.textContent = 'Sair';
+        link.href = '/auth/logout';
+      } catch (e) { /* offline/mock: mantém "Entrar" */ }
+    })();
 
     // Switcher de IDE (placeholder pra Fase 2/3)
     document.querySelectorAll('.ide-switch button').forEach(btn => {

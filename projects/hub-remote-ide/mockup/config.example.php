@@ -16,6 +16,11 @@ return [
     // Redirect URI EXATAMENTE igual ao cadastrado no Google Cloud:
     'redirect_uri'         => 'https://hub.devmaniacs.com.br/api/auth/callback/google',
 
+    // Secret compartilhado do SSO Hub → Code-server.
+    // Gere com: openssl rand -hex 32
+    // Use o MESMO valor no SSO_SECRET do .env do Rocky.
+    'sso_secret'           => 'PASTE-SSO-SECRET-HERE',
+
     // Allowlist — só estas contas Google podem entrar.
     // Hub é público na internet: NÃO remover.
     'allowed_emails'       => [

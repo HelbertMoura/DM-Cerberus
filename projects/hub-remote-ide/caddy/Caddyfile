@@ -1,30 +1,45 @@
 # =============================================================
-# Caddy — reverse proxy do code-server
+# Caddy — reverse proxy do code-server COM SSO
 # TLS termina no Cloudflare Tunnel (não precisa daqui)
-# CORS liberado para o Hub (mesma zona devmaniacs.com.br)
+#
+# SSO: cookie `dm_sso` assinado pelo Hub (login Google) é validado
+# pelo serviço `auth` via forward_auth. Sem cookie → 302 pro Hub.
+# /healthz fica livre (watchdog Windows + Rocky usam).
 # =============================================================
 
 :8080 {
-    reverse_proxy code-server:8443 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
-    }
+    route {
+        # CORS — permite o Hub embutir o code-server via fetch/iframe
+        header {
+            Access-Control-Allow-Origin "https://hub.devmaniacs.com.br"
+            Access-Control-Allow-Methods "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+            Access-Control-Allow-Credentials "true"
+            # Libera iframe embedding (substitui X-Frame-Options)
+            X-Frame-Options "ALLOW-FROM https://hub.devmaniacs.com.br"
+            # Habilita SharedArrayBuffer (necessário para VSCode)
+            Cross-Origin-Embedder-Policy "require-corp"
+            Cross-Origin-Opener-Policy "same-origin"
+            Cross-Origin-Resource-Policy "cross-origin"
+        }
 
-    # CORS — permite o Hub embutir o code-server via fetch/iframe
-    header {
-        Access-Control-Allow-Origin "https://hub.devmaniacs.com.br"
-        Access-Control-Allow-Methods "GET, POST, OPTIONS"
-        Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-        Access-Control-Allow-Credentials "true"
-        # Libera iframe embedding (substitui X-Frame-Options)
-        # Content-Security-Policy removido pra permitir iframe do Hub
-        X-Frame-Options "ALLOW-FROM https://hub.devmaniacs.com.br"
-        # Habilita SharedArrayBuffer (necessário para VSCode)
-        Cross-Origin-Embedder-Policy "require-corp"
-        Cross-Origin-Opener-Policy "same-origin"
-        Cross-Origin-Resource-Policy "cross-origin"
+        # Health check do watchdog — sem auth
+        @healthz path /healthz
+        reverse_proxy @healthz code-server:8443 {
+            header_up X-Real-IP {remote_host}
+        }
+
+        # SSO: tudo que não é healthz exige cookie dm_sso válido
+        forward_auth auth:8081 {
+            uri /auth
+        }
+
+        reverse_proxy code-server:8443 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 
     encode gzip zstd

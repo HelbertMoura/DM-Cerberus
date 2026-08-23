@@ -40,6 +40,39 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 08:45] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
+
+**Sessão:** SSO Hub → Code-server (continuidade das entregas 3a5acec/24d9605)
+**Tarefa executada:**
+- SSO completo: login Google no Hub emite cookie `dm_sso` assinado (HMAC); Caddy do
+  Rocky valida via `forward_auth` num novo container `hub-auth`; code-server com
+  `auth: none` atrás do gate ✅
+- `hub.html`: chip do usuário logado (foto Google + e-mail, identidade Dev Maniac's) +
+  botão Entrar/Sair dinâmico via `/auth/me` ✅
+- `/healthz` livre de auth — watchdogs Windows e Rocky validados pós-deploy ✅
+- Testes: sem cookie → 302 pro login; cookie válido → 200 VSCode sem senha; cookie
+  adulterado → barrado ✅
+
+**Arquivos criados/alterados:**
+- `projects/hub-remote-ide/auth/auth.php` (novo — validador SSO)
+- `projects/hub-remote-ide/caddy/Caddyfile` (forward_auth + healthz exempt)
+- `projects/hub-remote-ide/docker-compose.yml` (service `auth`; code-server sem PASSWORD)
+- `projects/hub-remote-ide/mockup/router.php` (emissão/limpeza do dm_sso; /auth/me com sso_code)
+- `projects/hub-remote-ide/mockup/hub.html` (chip de usuário DM)
+- `DECISIONS.md` (ADR-008 OAuth PHP + ADR-009 SSO cookie/forward_auth)
+
+**Deploy:** Rocky `/opt/sistemas/hub-remote` (auth/ + compose + Caddyfile + SSO_SECRET no
+.env) — code-server config.yaml setado `auth: none` (ver erro conhecido #9 do README).
+
+**Status:** ✅ concluído — SSO no ar. 🟡 OAuth Google ainda aguarda Client ID/Secret do Helbert
+(sem isso o fluxo SSO inteiro fica em espera — o botão mostra página de setup).
+
+**Próximo passo:**
+1. Helbert cola credenciais Google no `mockup/config.php` → teste real do fluxo completo no navegador
+2. Fase 2: bridges pros IDEs desktop (Antigravity/M3/Z.AI via Guacamole ou CDP)
+
+---
+
 ## [2026-08-23 08:30] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão (Gemini ou Hermes)
 
 **Sessão:** Suporte direto ao Helbert no hub-remote-ide (continuidade do commit f0419cb do Hermes Agent)

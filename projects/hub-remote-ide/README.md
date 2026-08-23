@@ -623,6 +623,29 @@ o servidor agora sobe com roteador (`php -S 127.0.0.1:8766 router.php`).
 `https://hub.devmaniacs.com.br/api/auth/callback/google`. Testado com creds fake em 23/08:
 redirect, state, troca de token e tratamento de erro (`invalid_client`) todos OK.
 
+### SSO Hub → Code-server (✅ IMPLEMENTADO — 23/08/2026)
+
+Login único de verdade: logou no Hub (Google), o VSCode web abre **sem pedir senha**.
+
+```
+1. Login Google OK no Hub (router.php)
+2. Hub emite cookie `dm_sso` = base64url({email,exp}) + HMAC-SHA256
+   · Domain=.devmaniacs.com.br · HttpOnly/Secure/SameSite=Lax · 8h
+3. Browser envia o cookie pro code.devmaniacs.com.br (mesmo site/eTLD+1,
+   inclusive dentro do iframe do hub.html)
+4. Caddy (Rocky) exige o cookie via forward_auth → container `hub-auth`
+   (php:8.3-alpine, auth/auth.php) valida a assinatura com SSO_SECRET
+5. Válido → proxy pro code-server (auth: none). Inválido → 302 pro login do Hub
+6. /auth/logout derruba sessão E cookie dm_sso
+```
+
+- Secret compartilhado: `sso_secret` no `mockup/config.php` = `SSO_SECRET` no `.env` do Rocky
+- `healthz` é a única rota livre de auth (watchdogs Windows e Rocky)
+- A senha antiga do code-server (`CODE_PASSWORD`) ficou só pro `sudo` do terminal web
+- Detalhe: o `config.yaml` do code-server **persiste** `auth: password` no volume —
+  remover o env `PASSWORD` não bastou; foi preciso `auth: none` no
+  `code-server/config/.config/code-server/config.yaml` (ver erro conhecido #9)
+
 ### 2FA com TOTP (futuro)
 
 - `speakeasy.generateSecret()` cria secret único
@@ -702,7 +725,7 @@ audit_log (
 | Docker Compose completo | ✅ Funcionando |
 | Schema PostgreSQL | ✅ Criado |
 | **Google OAuth real** | 🟡 Código deployado 23/08 (PHP puro, router.php) — falta colar Client ID/Secret no `mockup/config.php` |
-| **SSO Hub → Code-server** | ❌ Não implementado |
+| **SSO Hub → Code-server** | ✅ Implementado 23/08 (cookie dm_sso assinado + Caddy forward_auth) |
 | **Watchdog automático** | ✅ Agendado (Task Scheduler "DM Hub Watchdog" + systemd timer no Rocky, 23/08) |
 
 ### Fase 2 — Controle de IDEs Desktop (📋 PLANEJADA)
@@ -906,6 +929,20 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 
 **Não é erro crítico** — significa que o serviço está rodando mas o "heartbeat" interno expirou. O serviço continua respondendo normalmente.
 
+### ❌ 9. Remover `PASSWORD` do code-server não desativa o login
+
+**Causa:** o `config.yaml` persistido no volume (`code-server/config/.config/code-server/config.yaml`) guarda `auth: password` da primeira subida — o env só vale quando o config ainda não existe.
+
+**Solução:** editar o config na mão e reiniciar:
+
+```bash
+ssh devmaniacs-vm "sed -i 's/^auth: password/auth: none/; /^password:/d' \
+  /opt/sistemas/hub-remote/code-server/config/.config/code-server/config.yaml && \
+  docker restart hub-code-server"
+```
+
+⚠️ Com `auth: none`, a única barreira do code-server é o SSO do Caddy — nunca exponha a porta do code-server direto (só via Caddy/tunnel).
+
 ---
 
 ## 15. Backlog
@@ -913,7 +950,7 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 ### 🔴 Alta prioridade (bloqueia uso real)
 
 - [ ] Implementar Google OAuth real no Hub — 🟡 código deployado 23/08, falta colar credenciais no `mockup/config.php`
-- [ ] SSO Hub → Code-server (token compartilhado)
+- [x] SSO Hub → Code-server (token compartilhado) — feito 23/08/2026
 - [x] Agendar watchdog automático (Task Scheduler Windows) — feito 23/08/2026
 - [x] Watchdog no Rocky (systemd timer) — feito 23/08/2026
 
@@ -973,6 +1010,6 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 
 ---
 
-**Última atualização:** 23/08/2026 07:45 (watchdogs Windows + Rocky deployados e testados)
+**Última atualização:** 23/08/2026 08:45 (SSO Hub→Code-server no ar: cookie assinado + forward_auth)
 **Owner:** Helbert Moura · Dev Maniac's Systems
 **Mantido por:** Hermes Agent (DM-Cerebro / Z.AI / GLM 5.3 fallback pra MiniMax M3)

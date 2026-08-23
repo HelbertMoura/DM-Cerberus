@@ -27,8 +27,8 @@ status: ativo
 ### Code-server (https://code.devmaniacs.com.br)
 
 ```
-Usuário: (não tem usuário — só senha)
-Senha:   stnkPHjZIi9A@RSB
+Login:   SSO do Hub (cookie dm_sso) — logou no Hub, entra sem senha
+Senha:   stnkPHjZIi9A@RSB — só pro `sudo` do terminal web (SUDO_PASSWORD)
 ```
 
 ### PostgreSQL (Hub audit log)
