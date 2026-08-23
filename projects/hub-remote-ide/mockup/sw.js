@@ -4,7 +4,7 @@
 // rotas de auth/health SEMPRE na rede (nunca cache).
 // REGRA: qualquer mudança em styles.css/app.js/ícones exige bump do CACHE_VERSION.
 
-const CACHE_VERSION = 'dm-hub-v6';
+const CACHE_VERSION = 'dm-hub-v7';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -19,11 +19,12 @@ const STATIC_ASSETS = [
   '/styles.css',
   '/app.js',
   '/manifest.webmanifest',
-  '/assets/brand/dev-maniacs-mark.png',
-  '/assets/brand/dev-maniacs-mark-512.png',
-  '/assets/brand/dev-maniacs-mark-maskable-512.png',
-  '/assets/brand/dev-maniacs-mark-180.png',
-  '/assets/brand/dev-maniacs-mascot.webp',
+  '/assets/brand/dev-maniacs-mark.png',         // logo DM interno
+  '/assets/brand/dev-maniacs-mascot.webp',      // asset avatar login
+  '/assets/brand/dev-maniacs-icon-32.png',      // favicon
+  '/assets/brand/dev-maniacs-icon-180.png',     // apple touch icon
+  '/assets/brand/dev-maniacs-icon-192.png',     // PWA padrão
+  '/assets/brand/dev-maniacs-icon-512.png',     // PWA maskable
 ];
 
 // Nunca cachear (sessão/health/oauth mudam a cada request)
@@ -108,8 +109,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/assets/brand/dev-maniacs-mark-512.png',
-      badge: '/assets/brand/dev-maniacs-mark-180.png',
+      icon: '/assets/brand/dev-maniacs-icon-192.png',
+      badge: '/assets/brand/dev-maniacs-icon-32.png',
       tag: 'dm-hub-notification',
       requireInteraction: false,
     })
