@@ -104,3 +104,47 @@ status: ativo
 ### [ADR-007] Painel de Configurações da Empresa e Padronização Formal v1.0.0-ALPHA (Rodada 153 · Tríade)
 - **Decisão:** Criado o módulo oficial de 'Configurações da Empresa' para o cliente gerenciar sua própria equipe, identidade visual, SMTP próprio e políticas de 2FA. A versão de release em toda a aplicação (login, footer, topbar e changelog) foi unificada formalmente como 'v1.0.0-ALPHA (Build 2026.08)'.
 - **Motivo:** Dá total autonomia de gestão para o cliente fundador (Teenus) e alinha governança e transparência técnica durante a fase de homologação.
+
+---
+
+## ADR-012 — Auth local email+senha+2FA (sem Google OAuth) · SQLite · dm_sso HMAC mantido
+
+> **Status:** Aceita · **Data:** 2026-08-23 · **Decisor:** Helbert Moura (input) + Hermes/M3 (DM Agent)
+
+### Contexto
+Login era via Google OAuth (Client ID/Secret no `config.php`). Helbert precisava de: email `helbert.moura@devmaniacs.com.br`, senha pessoal, 2FA TOTP, sem depender do Google Cloud Console.
+
+### Decisão
+Substituir Google OAuth por auth local:
+- **Stack:** PHP 8.3 (nativo) + SQLite (pdo_sqlite nativo) + bcrypt nativo (`password_hash`/`password_verify`) + TOTP RFC 6238 (custom PHP, validado contra pyotp)
+- **Schema:** 3 tabelas no SQLite (`users`, `sessions`, `audit_log`) — mesmo modelo do Postgres do Rocky, mas em arquivo local
+- **Cookie SSO:** `dm_sso` HMAC-SHA256 (mantido 100% — `hub-auth` no Rocky continua validando sem mudança)
+- **2FA:** TOTP 6 dígitos, janela ±1 (3 codes válidos), QR code provisioning via otpauth:// URI (futuro)
+- **Anti-brute-force:** bloqueio após 5 tentativas erradas em 15 min
+- **Remember me:** opcional 30 dias, só com 2FA ativo
+- **Audit:** `audit_log` table + fallback JSONL (`logs/audit-fallback.jsonl`) se DB cair
+
+### Trade-offs
+- ✅ Zero infra (não precisa container Postgres nem network)
+- ✅ Funciona offline
+- ✅ Compatível com Rocky (cookie SSO mesmo formato)
+- ✅ Backup trivial (`cp hub.sqlite backup.db`)
+- ❌ SQLite = 1 writer (não escala pra >100 usuários)
+- ❌ Sem replicação (1 servidor só)
+- ❌ `function_exists` guards necessários em PHP multi-arquivo (LEARN-011)
+
+### Por que NÃO Postgres do Rocky
+- Postgres só acessível dentro da rede Docker (`172.29.0.2:5432`), sem `ports:` mapping no docker-compose
+- SSH tunnel funciona mas **autenticação scram-sha-256 rejeita a senha** quando vem via Windows (LEARN-009 tentativa)
+- 3 instâncias Postgres locais conflitando na porta 5432 da2222
+- 1 usuário (Helbert) não justifica overhead de Postgres
+
+### Por que NÃO Go
+- gcc não disponível nativamente no Windows (WinLibs winget instalou parcialmente, false positive)
+- Pure-Go SQLite (`modernc.org/sqlite`) precisa Go 1.21+ (temos 1.20)
+- `mattn/go-sqlite3` (gold standard) precisa CGO+gcc
+- PHP+SQLite já validado em produção em <1 iteração
+
+### Reversibilidade
+Trocar `dm_pg_connect()` em `db.php` por versão Postgres é trivial (interface idêntica). Se um dia Helbert adicionar mais usuários ou quiser HA, migrar de SQLite pra Postgres é trocar 1 arquivo.
+

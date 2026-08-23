@@ -138,3 +138,26 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 ---
 
 **Última atualização:** 23 de Agosto de 2026 · **Total de lições:** 7
+
+---
+
+### [LEARN-010] TOTP custom: valide contra pyotp ANTES de assumir que tá errado
+> **Data:** 2026-08-23 · **Contexto:** hub-remote-ide/auth · **Agente:** Hermes/M3 (DM Agent) · **ADR:** ADR-012
+
+- **Problema:** Implementei TOTP RFC 6238 do zero em PHP pra login com 2FA. Código parecia certo (HMAC-SHA1, pack N*8 bytes BE, dynamic truncation). Gerei código TOTP em **Python** pra comparar — divergia do PHP. Achei que PHP tava errado. Reescrevi 3 vezes. Perdi horas.
+- **Causa raiz:** Meu **Python de comparação** tava errado, não o PHP. Eu passava `time` direto pro HMAC em vez de `time / 30` (o counter do TOTP). Quando corrigi o Python (`counter = time // 30`), PHP bateu com `pyotp` (biblioteca referência, 11 anos em produção) **no primeiro teste**.
+- **Diagnóstico definitivo:** comparar implementação custom com biblioteca de referência (pyotp, otplib, etc) usando o **mesmo secret + RFC test vectors** (time=59, time=1111111109). Se bate com pyotp → tá certo**. Não com código custom meu.
+- **Lição:** Pra qualquer RFC crypto (TOTP, JWT, OIDC, etc), **sempre valide contra biblioteca de referência antes de assumir bug**. Implementar RFC do zero pra produção é pedir pra sofrer — prefira libs testadas (chillerlan/php-totp, otplib, pyotp).
+- **Aplicar em:** qualquer implementação futura de crypto/auth/protocolo. Antes de debugar por horas, gaste5 minutos rodando o test vector da RFC na lib de referência.
+
+---
+
+### [LEARN-011] PHP `require` em ambos router.php e auth.php = conflito de funções
+> **Data:** 2026-08-23 · **Contexto:** hub-remote-ide/mockup · **Agente:** Hermes/M3 (DM Agent)
+
+- **Problema:** Tinha `dm_session_start()` declarada em **router.php** E em **auth.php** (cópia durante refactor). PHP built-in server deu `Fatal error: Cannot redeclare dm_session_start()` em cada request — fail-safe do PHP travou o login inteiro.
+- **Causa raiz:** copiei o helper de sessão pro novo `auth.php` sem verificar se já existia no `router.php` que faz `require` dele. PHP **não tem** `ifndef`/`#pragma once` como C — funções同名 em arquivos diferentes ambos required = erro fatal.
+- **Solução:** wrap cada helper compartilhado em `if (!function_exists('name')) { function name() {...} }` em **todos os arquivos** que podem ser required juntos. Alternative: pôr helpers em arquivo `_common.php` e fazer require_once em ambos.
+- **Por que não detectei antes:** rodei validação via `php -l` (lint) que só checa syntax — não checa redeclaração entre arquivos. Redeclaração só explode em runtime quando ambos são required no **mesmo request**.
+- **Aplicar em:** qualquer projeto PHP multi-arquivo. Centralizar helpers em `_common.php` é a forma mais limpa; senão, sempre wrap em `function_exists`.
+

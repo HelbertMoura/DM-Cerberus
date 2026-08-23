@@ -379,3 +379,50 @@ assets/brand/{512,180,maskable}, auditoria-ui-ux-2026-08-23.md, LEARNINGS.md, RE
 ---
 
 **Última atualização:** 22/08/2026 · **Owner:** Helbert Moura · Dev Maniac's Systems
+
+---
+
+## [2026-08-23 17:25] Hermes/M3 (DM Agent) → Helbert
+
+**Sessão:** Substituir Google OAuth por login local email+senha+2FA TOTP (ADR-012).
+
+**Trigger:** Helbert quer login com email da empresa (`helbert.moura@devmaniacs.com.br`), senha pessoal, 2FA TOTP, sem depender do Google Cloud Console.
+
+### Decisões
+
+- **Stack:** PHP 8.3 + SQLite (`pdo_sqlite` nativo, zero infra)
+- **Senha:** bcrypt 12 rounds (nativo PHP, validado contra Python `bcrypt`)
+- **TOTP:** RFC 6238 custom PHP — validado contra `pyotp` (LEARN-010: bug era no Python de comparação, não no PHP)
+- **Cookie:** `dm_sso` HMAC-SHA256 mantido (compatível com `hub-auth` no Rocky)
+- **Schema:** 3 tabelas (`users`, `sessions`, `audit_log`) em `mockup/data/hub.sqlite`
+- **Brute-force:** bloqueio após 5 tentativas em 15 min
+- **Remember me:** opcional 30 dias (só com 2FA ativo)
+- **Tela:** form email + senha → form 2FA → redirect hub.html. Sem chips de status, sem link diagnóstico, sem CTA Google
+
+### Entregas (commit `f40b1bd` pushed)
+
+- **Novos:** `mockup/auth.php` (12KB), `mockup/db.php` (5KB SQLite helper + migrations)
+- **Modificados:** `router.php` (Google OAuth removido, ~140 linhas), `login.html` (form), `login.css` (estilos), `sw.js` (v8→v9), `.gitignore` (SQLite + .env.db)
+- **Validado em produção:** `/auth/login` retorna `{"ok":true,"next":"2fa"}`, `/auth/2fa` retorna `{"ok":true,"redirect":"/hub.html"}`, `/auth/me` retorna `{"authenticated":true}`
+
+### Credenciais iniciais
+
+- Email: `helbert.moura@devmaniacs.com.br`
+- Senha: `Acesso.2026#` (trocar via `/auth/change-password` após login)
+- TOTP secret: `V7DUS5C5X7DWTP5AJ23CJNNHI4KDOFYI`
+- Backup codes: salvos em `C:\Users\Helbert\AppData\Local\Temp\dm-credentials.txt`
+
+### Lições registradas
+
+- **LEARN-010** — TOTP custom: validar contra pyotp ANTES de assumir erro (perdi horas debugando PHP certo)
+- **LEARN-011** — PHP `require` em múltiplos arquivos = `Cannot redeclare`. Wrap em `function_exists` ou centralizar em `_common.php`
+
+### ADR registrada
+
+- **ADR-012** — Auth local email+senha+2FA + SQLite + dm_sso HMAC mantido (decisão completa)
+
+### Pendente
+
+- Helbert: testar login no celular (limpar dados do Chrome → reinstalar PWA → email/senha/2FA)
+- Próxima: redesign `hub.html` (mesma estratégia de CSS isolado do login) — Fase 2
+
