@@ -110,17 +110,16 @@ Hub web único (em `hub.devmaniacs.com.br`) que serve como ponto central pra ace
 ```
 Usuário acessa hub.devmaniacs.com.br/login.html
         ↓
-Vê: mascote Dev Maniac's + botão Google + form e-mail/senha
+Vê: mascote Dev Maniac's + botão Google (único método — form e-mail/senha removido 23/08)
         ↓
 Botão Google → /auth/google → Google consent → /api/auth/callback/google
 (🟡 implementado; liga de vez ao preencher mockup/config.php)
-[Alternativa mock] Submit do form → TOTP fake → dashboard.html
         ↓
-hub.html abre iframe apontando pra code.devmaniacs.com.br
+Só helbertcurcio@gmail.com passa (allowlist do config.php — demais contas: página de acesso negado + audit)
+        ↓
+hub.html abre iframe do code.devmaniacs.com.br SEM senha (cookie SSO dm_sso)
         ↓
 iframe carrega VSCode com tema Dev Maniac's Dark
-        ↓
-Code-server pede senha → Helbert digita → entra no VSCode
 ```
 
 ---

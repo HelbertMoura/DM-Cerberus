@@ -40,6 +40,20 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 09:30] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
+
+**Sessão:** Follow-up da auditoria — feedback do Helbert
+**Tarefa executada:**
+- Login agora é **Google-only**: form e-mail/senha + TOTP mock removidos do login.html;
+  nota "Acesso exclusivo · helbertcurcio@gmail.com" no lugar ✅
+- Imagens de marca com cache-buster `?v=2026-08-23` + **purge total do cache Cloudflare**
+  (Helbert ainda via quebrado — servidor/edge estavam OK; era cache) ✅
+- Allowlist validada: só o e-mail autorizado entra; outros → "acesso negado" + audit ✅
+
+**Status:** ✅ concluído · Helbert deve fazer hard-refresh (Ctrl+Shift+R) ou reinstalar o PWA
+
+---
+
 ## [2026-08-23 09:10] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
 
 **Sessão:** Auditoria UI/UX + mobile + PWA do hub-remote-ide (pré-Fase 2)

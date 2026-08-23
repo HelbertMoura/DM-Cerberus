@@ -1190,6 +1190,24 @@ svg { display: block; flex-shrink: 0; }
   padding: 0 16px;
 }
 
+/* ---------- NOTA DE ACESSO RESTRITO (login Google-only) ---------- */
+.login-restrict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.login-restrict .eyebrow-bar {
+  width: 16px;
+  height: 2px;
+  background: var(--purple);
+}
+
 @media (max-width: 768px) {
   .btn-google {
     min-height: 52px;   /* mantém alvo de toque confortável no dedão */

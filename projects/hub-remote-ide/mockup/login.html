@@ -36,7 +36,7 @@
     <!-- Coluna esquerda: mascote + brand -->
     <aside class="login-aside" aria-label="Dev Maniac's">
       <header class="aside-brand">
-        <img src="../assets/brand/dev-maniacs-mark.png" alt="Dev Maniac's" class="brand-mark" width="56" height="56">
+        <img src="../assets/brand/dev-maniacs-mark.png?v=2026-08-23" alt="Dev Maniac's" class="brand-mark" width="56" height="56">
         <div class="brand-copy">
           <strong>DEV MANIAC'S</strong>
           <small>HUB REMOTO DE IDEs</small>
@@ -44,7 +44,7 @@
       </header>
 
       <div class="aside-mascot">
-        <img src="../assets/brand/dev-maniacs-mascot.webp" alt="Helbert Moura, fundador da Dev Maniac's" width="320" height="320">
+        <img src="../assets/brand/dev-maniacs-mascot.webp?v=2026-08-23" alt="Helbert Moura, fundador da Dev Maniac's" width="320" height="320">
       </div>
 
       <footer class="aside-meta">
@@ -66,7 +66,7 @@
         <h1 class="login-title">Hub Remoto de IDEs</h1>
         <p class="login-subtitle">Gerencie Gemini, MiniMax M3 e Z.AI Code de qualquer lugar.</p>
 
-        <!-- Google OAuth (atalho mobile — 1 toque) -->
+        <!-- Google OAuth — único método de login -->
         <div class="oauth-row">
           <a href="/auth/google" class="btn-google" id="googleLogin" role="button">
             <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
@@ -77,86 +77,11 @@
             </svg>
             <span>Entrar com Google</span>
           </a>
+          <p class="login-restrict">
+            <span class="eyebrow-bar"></span>
+            Acesso exclusivo · helbertcurcio@gmail.com
+          </p>
         </div>
-
-        <div class="divider"><span>ou use e-mail</span></div>
-
-        <form class="login-form" id="loginForm" novalidate>
-
-          <label class="field">
-            <span class="field-label">E-mail</span>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="field-input"
-              placeholder="helbertcurcio@gmail.com"
-              autocomplete="email"
-              required
-            >
-          </label>
-
-          <label class="field">
-            <span class="field-label">Senha</span>
-            <div class="field-password">
-              <input
-                type="password"
-                id="password"
-                name="password"
-                class="field-input"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                required
-              >
-              <button type="button" class="field-toggle" aria-label="Mostrar senha" id="togglePassword">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
-          </label>
-
-          <div class="form-row">
-            <label class="checkbox">
-              <input type="checkbox" id="remember" name="remember">
-              <span>Lembrar por 30 dias</span>
-            </label>
-          </div>
-
-          <button type="submit" class="btn-primary" id="submitBtn">
-            <span>Entrar</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-
-          <!-- TOTP step (aparece após submit fake) -->
-          <div class="totp-step hidden" id="totpStep" aria-live="polite">
-            <div class="totp-divider">
-              <span>Confirme com 2FA</span>
-            </div>
-            <label class="field">
-              <span class="field-label">
-                Código TOTP
-                <span class="field-hint">Google Authenticator</span>
-              </span>
-              <input
-                type="text"
-                id="totp"
-                name="totp"
-                class="field-input field-input-mono"
-                placeholder="000000"
-                maxlength="6"
-                pattern="[0-9]{6}"
-                autocomplete="one-time-code"
-                inputmode="numeric"
-              >
-            </label>
-          </div>
-
-        </form>
 
         <footer class="login-footer">
           <small class="footer-meta">Mateus Leme · Minas Gerais · Brasil</small>
