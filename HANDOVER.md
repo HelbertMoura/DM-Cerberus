@@ -40,6 +40,44 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 08:30] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão (Gemini ou Hermes)
+
+**Sessão:** Suporte direto ao Helbert no hub-remote-ide (continuidade do commit f0419cb do Hermes Agent)
+**Tarefa executada:**
+- Diagnóstico e correção da queda da porta 2222 + deploy dos 2 watchdogs pendentes ✅
+- Bug crítico corrigido: processos filhos do console da tarefa agendada morriam ~60s após o
+  Task Scheduler concluir (CTRL_CLOSE) — provável causa raiz histórica das quedas; starts
+  agora via `Start-Process -WindowStyle Hidden` ✅
+- Google OAuth real implementado em PHP puro (`mockup/router.php`): /auth/google,
+  /api/auth/callback/google, /auth/logout, /auth/me — state anti-CSRF, allowlist de e-mail,
+  cookie de sessão HttpOnly/Secure, audit JSONL ✅ (🟡 falta colar Client ID/Secret no
+  `mockup/config.php` — só o Helbert pode)
+
+**Arquivos criados/alterados:**
+- `~/.cloudflared/watchdog-hub.sh` (v2 idempotente) + `watchdog-hub.cmd` + `register-watchdog-task.ps1`
+- `projects/hub-remote-ide/mockup/router.php` + `mockup/config.example.php` (config.php é gitignored)
+- `projects/hub-remote-ide/scripts/rocky/` (watchdog-rocky.sh + systemd service/timer — deployados no Rocky)
+- `projects/hub-remote-ide/README.md`, `DEPLOY-STATUS.md`, `watchdog-hub.md` (atualizados)
+
+**Decisão técnica relevante:**
+- OAuth em PHP puro em vez de NextAuth/Node (stack do mockup é PHP sem build step; Node
+  `serve.js` tem histórico de crash CSPNG nesta máquina) — candidato a ADR formal
+- Quirks de ambiente (PS 5.1 `.Count` escalar, S4U negado no domínio T2T3) registrados em
+  `~/Documents/Mgdata-cerebro/infra/ambiente-windows.md` (repo separado, commit de3debc)
+
+**Status:** ✅ concluído (OAuth aguardando credenciais do Helbert — 🟡 único item aberto)
+
+**Próximo passo:**
+1. Helbert cola Client ID/Secret no `mockup/config.php` → botão Google funciona de verdade
+2. SSO Hub → code-server (token compartilhado) — próximo item de alta prioridade do backlog
+3. Fase 2: bridges pros IDEs desktop (Guacamole/CDP)
+
+**Commits desta sessão:**
+- `3a5acec` — feat(hub-remote-ide): watchdogs Windows+Rocky deployados e testados
+- `24d9605` — feat(hub-remote-ide): Google OAuth real em PHP puro (router.php)
+
+---
+
 ## [2026-08-22 20:00] Z.AI Hermes (DM Agent) → Gemini (próxima sessão)
 
 **Sessão:** Finalização da estrutura 10/10 do DM-Cerebro + integração da Tríade
