@@ -4,7 +4,7 @@
 // rotas de auth/health SEMPRE na rede (nunca cache).
 // REGRA: qualquer mudança em styles.css/app.js/ícones exige bump do CACHE_VERSION.
 
-const CACHE_VERSION = 'dm-hub-v8';
+const CACHE_VERSION = 'dm-hub-v9';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 

@@ -104,153 +104,27 @@ function dm_creds_ok(?array $cfg): bool
 }
 
 // =============================================================
-// Rotas de autenticação
+// Rotas de autenticação (delegam pro auth.php que implementa
+// email + senha + 2FA TOTP — sem Google OAuth)
 // =============================================================
 
-if ($uri === '/auth/google' && $method === 'GET') {
-    dm_session_start();
-
-    if (!dm_creds_ok($config)) {
-        dm_page(503, 'DM//AUTH · SETUP PENDENTE', 'Google OAuth ainda não configurado',
-            '<p>As credenciais do Google Cloud Console não foram preenchidas.</p>'
-            . '<p>1. Copie <code>mockup/config.example.php</code> para <code>mockup/config.php</code> (se ainda não existir).<br>'
-            . '2. Preencha <code>google_client_id</code> e <code>google_client_secret</code>.</p>'
-            . '<p>Redirect URI que deve estar cadastrado no Google:<br>'
-            . '<code>https://hub.devmaniacs.com.br/api/auth/callback/google</code></p>'
-            . '<p><a href="/login.html">← Voltar ao login</a></p>');
-    }
-
-    // state anti-CSRF
-    $_SESSION['oauth_state'] = bin2hex(random_bytes(16));
-    dm_audit('oauth_start');
-
-    $params = [
-        'client_id'     => $config['google_client_id'],
-        'redirect_uri'  => $config['redirect_uri'],
-        'response_type' => 'code',
-        'scope'         => 'openid email profile',
-        'state'         => $_SESSION['oauth_state'],
-        'prompt'        => 'select_account',
-    ];
-    header('Location: https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params));
+if (in_array($uri, ['/auth/login', '/auth/2fa', '/auth/2fa/setup', '/auth/change-password', '/auth/regen-backup'], true)) {
+    require __DIR__ . '/auth.php';
     exit;
 }
 
-if ($uri === '/api/auth/callback/google' && $method === 'GET') {
-    dm_session_start();
-
-    // Google devolve ?error= quando o usuário cancela o consentimento
-    if (isset($_GET['error'])) {
-        dm_audit('oauth_denied_by_user', ['error' => (string) $_GET['error']]);
-        dm_page(400, 'DM//AUTH · CANCELADO', 'Login cancelado no Google',
-            '<p>O consentimento foi negado: <code>' . htmlspecialchars((string) $_GET['error']) . '</code></p>'
-            . '<p><a href="/login.html">← Tentar de novo</a></p>');
-    }
-
-    $code  = (string) ($_GET['code'] ?? '');
-    $state = (string) ($_GET['state'] ?? '');
-    if ($code === '' || $state === '' || !hash_equals((string) ($_SESSION['oauth_state'] ?? ''), $state)) {
-        dm_audit('oauth_state_mismatch');
-        dm_page(400, 'DM//AUTH · STATE INVÁLIDO', 'Sessão de login expirada',
-            '<p>O parâmetro <code>state</code> não confere (possível CSRF ou aba antiga).</p>'
-            . '<p><a href="/login.html">← Recomeçar o login</a></p>');
-    }
-    unset($_SESSION['oauth_state']);
-
-    if (!dm_creds_ok($config)) {
-        dm_page(503, 'DM//AUTH · SETUP PENDENTE', 'Credenciais ausentes no callback',
-            '<p>Preencha <code>mockup/config.php</code> e tente novamente.</p>');
-    }
-
-    // Troca code → tokens (backchannel server→Google via TLS)
-    $ch = curl_init('https://oauth2.googleapis.com/token');
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => http_build_query([
-            'code'          => $code,
-            'client_id'     => $config['google_client_id'],
-            'client_secret' => $config['google_client_secret'],
-            'redirect_uri'  => $config['redirect_uri'],
-            'grant_type'    => 'authorization_code',
-        ]),
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 15,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+/** GET /auth/status — estado público do auth (sem expor valores) */
+if ($uri === '/auth/status') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    // Auth local (Postgres) — não precisa checar credenciais Google.
+    // Retorna true pra manter compat com frontend.
+    echo json_encode([
+        'auth_method'   => 'password_totp',
+        'user_db_ready' => true,
+        'sso_secret_set'=> !str_starts_with((string) ($config['sso_secret'] ?? 'PASTE'), 'PASTE-')
+                            && (string) ($config['sso_secret'] ?? '') !== '',
     ]);
-    $raw  = curl_exec($ch);
-    $err  = curl_error($ch);
-    $http = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
-
-    if ($raw === false || $http !== 200) {
-        dm_audit('oauth_token_exchange_failed', ['http' => $http, 'curl_err' => $err]);
-        dm_page(502, 'DM//AUTH · FALHA NO TOKEN', 'Não foi possível trocar o código pelo token',
-            '<p>Google respondeu HTTP <code>' . $http . '</code>' . ($err ? ' · cURL: <code>' . htmlspecialchars($err) . '</code>' : '') . '</p>'
-            . '<p>Detalhe: <code>' . htmlspecialchars(mb_substr((string) $raw, 0, 300)) . '</code></p>'
-            . '<p><a href="/login.html">← Tentar de novo</a></p>');
-    }
-
-    $tokens  = json_decode((string) $raw, true);
-    $payload = dm_jwt_payload((string) ($tokens['id_token'] ?? ''));
-
-    // id_token veio direto do endpoint do Google via TLS — validamos campos-chave.
-    if (!is_array($payload)) {
-        dm_audit('oauth_idtoken_invalid');
-        dm_page(502, 'DM//AUTH · TOKEN INVÁLIDO', 'id_token não pôde ser lido', '<p>Tente novamente.</p>');
-    }
-    $issOk = in_array($payload['iss'] ?? '', ['accounts.google.com', 'https://accounts.google.com'], true);
-    $audOk = hash_equals((string) ($payload['aud'] ?? ''), (string) $config['google_client_id']);
-    if (!$issOk || !$audOk || ($payload['exp'] ?? 0) < time()) {
-        dm_audit('oauth_idtoken_checks_failed', ['iss_ok' => $issOk, 'aud_ok' => $audOk]);
-        dm_page(502, 'DM//AUTH · TOKEN REJEITADO', 'id_token falhou na validação (iss/aud/exp)', '<p>Tente novamente.</p>');
-    }
-
-    $email = strtolower((string) ($payload['email'] ?? ''));
-    if (empty($payload['email_verified']) || $email === '') {
-        dm_audit('oauth_email_not_verified', ['email' => $email]);
-        dm_page(403, 'DM//AUTH · E-MAIL', 'Conta Google sem e-mail verificado', '<p>Use uma conta com e-mail verificado.</p>');
-    }
-
-    // Allowlist — só entra quem está na lista do config.php
-    $allowed = array_map('strtolower', (array) ($config['allowed_emails'] ?? []));
-    if (!in_array($email, $allowed, true)) {
-        dm_audit('login_denied_not_in_allowlist', ['email' => $email]);
-        dm_page(403, 'DM//AUTH · ACESSO NEGADO', 'Esta conta não tem acesso ao Hub',
-            '<p>E-mail autenticado: <code>' . htmlspecialchars($email) . '</code></p>'
-            . '<p>Se deve ter acesso, adicione-o em <code>allowed_emails</code> no <code>mockup/config.php</code>.</p>');
-    }
-
-    // Sessão de sucesso
-    session_regenerate_id(true);
-    $_SESSION['user'] = [
-        'email'     => $email,
-        'name'      => $payload['name']      ?? $email,
-        'picture'   => $payload['picture']   ?? null,
-        'google_sub'=> $payload['sub']       ?? null,
-        'method'    => 'google',
-        'login_at'  => gmdate('c'),
-    ];
-    dm_audit('login_google', ['email' => $email]);
-
-    // SSO Hub → Code-server: emite cookie assinado (HMAC-SHA256) válido
-    // pra *.devmaniacs.com.br — o Caddy do Rocky valida via forward_auth.
-    $ssoSecret = (string) ($config['sso_secret'] ?? '');
-    if ($ssoSecret !== '' && !str_starts_with($ssoSecret, 'PASTE-')) {
-        $exp     = time() + 8 * 3600;
-        $payload = rtrim(strtr(base64_encode(json_encode(['email' => $email, 'exp' => $exp])), '+/', '-_'), '=');
-        $sig     = rtrim(strtr(base64_encode(hash_hmac('sha256', $payload, $ssoSecret, true)), '+/', '-_'), '=');
-        setcookie('dm_sso', $payload . '.' . $sig, [
-            'expires'  => $exp,
-            'path'     => '/',
-            'domain'   => '.devmaniacs.com.br', // vale pro code.devmaniacs.com.br
-            'secure'   => true,
-            'httponly' => true,
-            'samesite' => 'Lax',               // mesmo site (eTLD+1) → enviado no iframe
-        ]);
-        dm_audit('sso_cookie_issued', ['email' => $email, 'exp' => $exp]);
-    }
-
-    header('Location: /hub.html');
     exit;
 }
 

@@ -24,15 +24,12 @@
 
   <script>
     // Se já tem cookie SSO válido, pula direto pro Hub.
-    // PWA start_url = /login.html, então SEMPRE abre aqui primeiro.
-    // Esse redirect evita ter que ficar clicando "ENTRAR" toda vez.
     (function () {
       try {
         var has = document.cookie.split('; ').some(function (c) {
-          return c.indexOf('dm_sso=') === 0;
+          return c.indexOf('dm_sso=') === 0 || c.indexOf('DMHUBSESSID=') === 0;
         });
         if (has) {
-          // Cookie presente — assume válido (back valida em cada request)
           window.location.replace('/hub.html');
         }
       } catch (_) {}
@@ -53,7 +50,7 @@
       </figure>
     </div>
 
-    <!-- Coluna direita: copy + CTA + status -->
+    <!-- Coluna direita: form de login -->
     <div class="login-right">
 
       <div class="login-main">
@@ -65,28 +62,66 @@
         <h1 class="login-title">Hub Remoto de IDEs</h1>
         <p class="login-sub">Seu painel unificado — acesso único a partir de qualquer lugar.</p>
 
-        <a href="/auth/google" class="btn-google" id="googleLogin" role="button">
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span id="googleLoginLabel">Entrar com Google</span>
-        </a>
-      </div>
+        <!-- ============ STEP 1: EMAIL + SENHA ============ -->
+        <form id="formStep1" class="login-form" autocomplete="on">
+          <label class="login-field">
+            <span class="login-field-label">E-mail</span>
+            <input type="email" name="email" required autocomplete="username"
+                   placeholder="seu@email.com" id="email">
+          </label>
+          <label class="login-field">
+            <span class="login-field-label">Senha</span>
+            <input type="password" name="password" required autocomplete="current-password"
+                   placeholder="••••••••" minlength="8" id="password">
+          </label>
+          <label class="login-check">
+            <input type="checkbox" name="remember" id="remember">
+            <span>manter conectado por 30 dias</span>
+          </label>
+          <button type="submit" class="login-btn" id="btnStep1">
+            <span>Continuar</span>
+          </button>
+        </form>
 
-      <div class="login-warn" id="authWarn" hidden>
-        <span class="login-warn-dot"></span>
-        <span>login google pendente &mdash; cole o client id/secret no <code>mockup/config.php</code></span>
-        <a href="/status.html">diagnóstico</a>
-      </div>
+        <!-- ============ STEP 2: 2FA ============ -->
+        <form id="formStep2" class="login-form" hidden autocomplete="off">
+          <p class="login-2fa-hint">Digite o código de 6 dígitos do seu app autenticador.</p>
+          <label class="login-field">
+            <span class="login-field-label">Código 2FA</span>
+            <input type="text" name="code" required pattern="[0-9]{6}" maxlength="6"
+                   inputmode="numeric" placeholder="000000" autocomplete="one-time-code"
+                   id="code2fa" autofocus>
+          </label>
+          <button type="submit" class="login-btn" id="btnStep2">
+            <span>Entrar</span>
+          </button>
+          <button type="button" class="login-btn-secondary" id="btnBack">
+            <span>voltar</span>
+          </button>
+        </form>
 
-      <ul class="login-status" aria-label="Status dos sistemas">
-        <li class="st-item is-pending" id="sys-auth"><i class="status-dot"></i><span>login google</span></li>
-        <li class="st-item is-pending" id="sys-code"><i class="status-dot"></i><span>code-server</span></li>
-        <li class="st-item is-pending" id="sys-sw"><i class="status-dot"></i><span>pwa</span></li>
-      </ul>
+        <!-- ============ STEP 3: SETUP 2FA (primeira vez) ============ -->
+        <div id="stepSetup" class="login-form" hidden>
+          <p class="login-2fa-hint">Você ainda não configurou 2FA. Adicione este secret no seu app autenticador (Google Authenticator / Authy / 1Password):</p>
+          <div class="login-secret-box">
+            <code id="totpSecret"></code>
+          </div>
+          <p class="login-2fa-hint">Depois, digite o código de 6 dígitos pra confirmar:</p>
+          <form id="formStep2Setup">
+            <label class="login-field">
+              <span class="login-field-label">Código de confirmação</span>
+              <input type="text" name="code" required pattern="[0-9]{6}" maxlength="6"
+                     inputmode="numeric" placeholder="000000" autocomplete="one-time-code"
+                     id="codeSetup" autofocus>
+            </label>
+            <button type="submit" class="login-btn">
+              <span>Confirmar e entrar</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="login-error" id="loginError" hidden></div>
+      </div>
 
       <button type="button" class="install-compact" id="installBtn" hidden>Instalar como app</button>
       <p class="install-compact-hint" id="installHintIos" hidden>
@@ -97,13 +132,7 @@
 
   </main>
 
-  <footer class="login-footer" hidden>
-    <span>DM//HUB v2.0</span>
-    <span>Mateus Leme &middot; MG &middot; Brasil</span>
-  </footer>
-
   <script>
-    // Service Worker do PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
@@ -115,54 +144,132 @@
     (function () {
       'use strict';
 
-      var googleBtn = document.getElementById('googleLogin');
-      var googleLabel = document.getElementById('googleLoginLabel');
-      googleBtn.addEventListener('click', function () {
-        googleBtn.classList.add('is-loading');
-        googleLabel.textContent = 'Redirecionando pro Google...';
+      var form1 = document.getElementById('formStep1');
+      var form2 = document.getElementById('formStep2');
+      var stepSetup = document.getElementById('stepSetup');
+      var errorBox = document.getElementById('loginError');
+      var btnBack = document.getElementById('btnBack');
+
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.hidden = false;
+      }
+      function hideError() {
+        errorBox.hidden = true;
+        errorBox.textContent = '';
+      }
+
+      // STEP 1
+      form1.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideError();
+        var btn = document.getElementById('btnStep1');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'verificando...';
+        try {
+          var r = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: document.getElementById('email').value,
+              password: document.getElementById('password').value,
+              remember: document.getElementById('remember').checked
+            })
+          });
+          var data = await r.json();
+          if (!r.ok || !data.ok) {
+            showError(data.error || 'erro desconhecido');
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Continuar';
+            return;
+          }
+          // Senha OK — vai pra 2FA (ou setup 2FA se primeira vez)
+          if (data.next === '2fa_setup') {
+            // Busca secret novo
+            var sr = await fetch('/auth/2fa/setup', { credentials: 'same-origin' });
+            var sd = await sr.json();
+            if (sr.ok && sd.ok) {
+              document.getElementById('totpSecret').textContent = sd.secret;
+              form1.hidden = true;
+              stepSetup.hidden = false;
+            } else {
+              showError('falha ao gerar secret 2FA');
+              btn.disabled = false;
+              btn.querySelector('span').textContent = 'Continuar';
+            }
+          } else {
+            form1.hidden = true;
+            form2.hidden = false;
+            document.getElementById('code2fa').focus();
+          }
+        } catch (err) {
+          showError('falha de rede');
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Continuar';
+        }
       });
 
-      function setStat(id, state, title) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.classList.remove('is-pending', 'is-ok', 'is-warn');
-        el.classList.add('is-' + state);
-        if (title) el.title = title;
-        var label = el.querySelector('span');
-        if (label && title) label.textContent = title.split(' → ')[0].split(' · ')[0];
-      }
+      // STEP 2 (TOTP normal)
+      form2.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideError();
+        var btn = document.getElementById('btnStep2');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'verificando...';
+        try {
+          var r = await fetch('/auth/2fa', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: document.getElementById('code2fa').value })
+          });
+          var data = await r.json();
+          if (!r.ok || !data.ok) {
+            showError(data.error === 'invalid_2fa' ? 'código incorreto' : (data.error || 'erro'));
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Entrar';
+            document.getElementById('code2fa').value = '';
+            document.getElementById('code2fa').focus();
+            return;
+          }
+          // Login OK → vai pro hub
+          window.location.href = data.redirect || '/hub.html';
+        } catch (err) {
+          showError('falha de rede');
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Entrar';
+        }
+      });
 
-      fetch('/health.php?target=code', { cache: 'no-store' })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          setStat('sys-code', d.status === 200 ? 'ok' : 'warn',
-            'code.devmaniacs.com.br → HTTP ' + d.status);
-        })
-        .catch(function () { setStat('sys-code', 'warn', 'sem resposta'); });
-
-      fetch('/auth/status', { cache: 'no-store' })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          // A tela de login é pública — não vaza arquitetura interna.
-          // O status real fica em /status.html (acesso restrito).
-          setStat('sys-auth', d.google_configured ? 'ok' : 'warn',
-            d.google_configured ? 'login ok' : 'configuração pendente');
-        })
-        .catch(function () { setStat('sys-auth', 'warn', 'sem resposta'); });
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistration().then(function (reg) {
-          setStat('sys-sw', reg ? 'ok' : 'warn', reg ? 'pwa ativo' : 'pwa inativo');
+      // STEP 2 SETUP (confirma 2FA depois de gerar secret)
+      document.getElementById('formStep2Setup').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideError();
+        var r = await fetch('/auth/2fa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: document.getElementById('codeSetup').value })
         });
-      } else {
-        setStat('sys-sw', 'warn', 'navegador sem suporte');
-      }
+        var data = await r.json();
+        if (!r.ok || !data.ok) {
+          showError('código incorreto — tente de novo');
+          document.getElementById('codeSetup').value = '';
+          document.getElementById('codeSetup').focus();
+          return;
+        }
+        window.location.href = data.redirect || '/hub.html';
+      });
 
+      // Voltar do step 2 pro step 1
+      btnBack.addEventListener('click', function () {
+        form2.hidden = true;
+        form1.hidden = false;
+        hideError();
+      });
+
+      // PWA install
       var btn = document.getElementById('installBtn');
       var iosHint = document.getElementById('installHintIos');
-      var standalone = matchMedia('(display-mode: standalone)').matches
-        || navigator.standalone === true;
-
+      var standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
       if (!standalone) {
         var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
         if (isIOS) {
@@ -177,10 +284,7 @@
           btn.addEventListener('click', function () {
             if (!deferred) return;
             deferred.prompt();
-            deferred.userChoice.then(function () {
-              deferred = null;
-              btn.hidden = true;
-            });
+            deferred.userChoice.then(function () { deferred = null; btn.hidden = true; });
           });
         }
       }
