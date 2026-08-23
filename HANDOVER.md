@@ -70,8 +70,24 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 **Aprendizado (LEARN-008):** Crop agressivo de asset vertical com fundo bege (`object-position: center 18%`) + `border-radius: 50%` resolve o problema do "mascote esticado num cartão paper". A regra é: asset vertical ≠ crop central; é crop no TOPO onde fica o rosto.
 
-**Status:** ✅ concluído, validado visualmente, **aguardando deploy + commit** no próximo round.
-**Pendente:** Deploy no Rocky Linux, commit+push no GitHub (DM-Cerebro/hub-remote-ide), e bump do SW (`dm-hub-v5`) + purge Cloudflare. Depois disso: retomar Fase 2 (refazer `hub.html` do zero, mesma estratégia de CSS isolado).
+**Status:** ✅ concluído, validado visualmente, **deployado em produção + commit + push** (commits `984006d` + `8610262`).
+**Pendente:** Nenhum crítico. Próxima etapa é retomar Fase 2 (refazer `hub.html` do zero, mesma estratégia de CSS isolado) — só quando você quiser.
+
+### Detalhes do deploy (rodada pós "pode fazer oq precisa")
+
+**Como o deploy aconteceu:**
+- O Cloudflare tunnel `dm-hub` aponta pra `service: http://127.0.0.1:8766` (config em `~/.cloudflared/config.dm-hub.yml`).
+- O `php -S 127.0.0.1:8766 router.php` é mantido no ar pelo `watchdog-hub.sh` (Task Scheduler a cada 5 min), com workdir `mockup/`.
+- **Por isso**: editar arquivos em `mockup/` É o deploy. Não tem rsync/scp/build/CI — o PHP lê do disco direto.
+- Único passo manual que precisei: **bump do Service Worker** (`dm-hub-v4` → `dm-hub-v5`) + adicionar `/login.css` em `STATIC_ASSETS` no `sw.js`. Força `skipWaiting()` + `clients.claim()` em todos os clients com SW v4 cacheado.
+
+**Validação em produção:**
+- `curl https://hub.devmaniacs.com.br/login.html` → HTTP 200, 7718 bytes, contém `.login-left` e `.login-right` ✓
+- `curl https://hub.devmaniacs.com.br/login.css` → HTTP 200, 11458 bytes, contém `border-radius: 50%` ✓
+- `curl https://hub.devmaniacs.com.br/sw.js` → contém `CACHE_VERSION = 'dm-hub-v5'` ✓
+- Playwright headless em produção, viewport 390×844 → `C:\Users\Helbert\AppData\Local\Temp\login-prod-prod-mobile.png`. Confirma v2.1 visualmente.
+
+**Não precisei purgar Cloudflare manualmente** — não tinha API token do CF na2222 (o `credentials-file.json` em `~/.cloudflared/` é só cred de tunnel, não API). O bump `v4→v5` + `skipWaiting()` resolve sozinho.
 
 ## [2026-08-23 10:25] Z.AI GLM 5.3 (DM Agent · Hermes) → Helbert
 
