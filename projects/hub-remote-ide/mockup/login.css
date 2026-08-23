@@ -92,27 +92,10 @@ body {
   margin: 0 auto;
 }
 
-/* Brand no topo */
+/* Brand no topo — ESCONDIDO no mobile, só aparece no desktop.
+   No mobile polui a tela sem agregar valor (avatar já é a marca). */
 .login-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  text-decoration: none;
-  color: var(--dm-paper);
-  margin-bottom: var(--s-6);
-}
-.login-brand-mark {
-  width: 32px;
-  height: 32px;
-  display: block;
-}
-.login-brand-name {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--dm-paper);
+  display: none;
 }
 
 /* Avatar: SEMPRE circular (mobile + desktop). Crop focado no rosto
@@ -120,8 +103,8 @@ body {
    bege e o corpo do mascote. */
 .login-avatar {
   margin: 0 auto var(--s-5);
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid var(--dm-cyan);
@@ -396,7 +379,24 @@ body {
     flex: 0 0 280px;
     align-items: flex-start;
   }
-  .login-left .login-brand { margin-bottom: 0; }
+  /* Brand aparece só no desktop (no mobile já tem avatar grande) */
+  .login-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    text-decoration: none;
+    color: var(--dm-paper);
+    margin-bottom: 0;
+  }
+  .login-brand-mark { width: 32px; height: 32px; display: block; }
+  .login-brand-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--dm-paper);
+  }
   /* Avatar circular GRANDE no desktop — mantém 50%, escala pra 220px
      pra preencher a coluna esquerda sem esticar o asset. */
   .login-avatar {
