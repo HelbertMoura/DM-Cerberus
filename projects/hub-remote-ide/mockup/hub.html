@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#061637">
+  <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DM Hub">
+  <meta name="description" content="Hub unificado de IDEs Dev Maniac's — login único, SSO">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/brand/dev-maniacs-mark.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/dev-maniacs-mark.png">
+  <link rel="stylesheet" href="/styles.css">
+  <title>Hub · Dev Maniac's</title>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] SW:', reg.scope))
+          .catch(err => console.warn('[PWA] SW falhou:', err));
+      });
+    }
+  </script>
+  <style>
+    /* Layout específico do hub-unificado */
+    .hub-frame-wrap {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: var(--paper);
+      border: 3px solid var(--navy);
+      border-radius: 12px;
+      box-shadow: 8px 8px 0 var(--navy);
+      overflow: hidden;
+    }
+    .hub-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .hub-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--navy);
+      color: var(--paper);
+      border-bottom: 3px solid var(--purple);
+    }
+    .hub-toolbar .toolbar-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .hub-toolbar .toolbar-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .hub-toolbar .toolbar-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .hub-toolbar .toolbar-actions a,
+    .hub-toolbar .toolbar-actions button {
+      background: transparent;
+      color: var(--paper);
+      border: 1px solid var(--cyan);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .hub-toolbar .toolbar-actions a:hover,
+    .hub-toolbar .toolbar-actions button:hover {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+    .hub-toolbar .toolbar-actions .ide-switch {
+      display: flex;
+      gap: 4px;
+    }
+    .hub-toolbar .toolbar-actions .ide-switch button {
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+    .hub-toolbar .toolbar-actions .ide-switch button.active {
+      background: var(--purple);
+      color: var(--paper);
+    }
+    .hub-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--paper);
+      color: var(--navy);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .hub-loading .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--paper);
+      border-top-color: var(--cyan);
+      border-right-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="dashboard-page">
+
+  <!-- Toolbar do Hub (substitui header antigo) -->
+  <header class="hub-toolbar">
+    <span class="toolbar-brand">DM//HUB</span>
+    <span class="toolbar-title">Code-server · VSCode Web</span>
+    <div class="toolbar-actions">
+      <div class="ide-switch">
+        <button data-ide="code" class="active">Code</button>
+        <button data-ide="antigravity">Antigravity</button>
+        <button data-ide="m3">M3</button>
+        <button data-ide="zai">Z.AI</button>
+      </div>
+      <button id="btn-fullscreen">Tela cheia</button>
+      <a href="/login.html">Sair</a>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="hub-frame-wrap">
+      <div class="hub-loading" id="loading">
+        <div class="spinner"></div>
+        <div>Carregando Code-server · tema Dev Maniac's</div>
+      </div>
+      <iframe
+        id="vscode-frame"
+        src="https://code.devmaniacs.com.br"
+        allow="clipboard-read; clipboard-write; cross-origin-isolated"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads"
+      ></iframe>
+    </div>
+  </main>
+
+  <script>
+    // Esconde loading quando iframe carrega
+    const iframe = document.getElementById('vscode-frame');
+    const loading = document.getElementById('loading');
+    iframe.addEventListener('load', () => {
+      loading.style.display = 'none';
+    });
+
+    // Switcher de IDE (placeholder pra Fase 2/3)
+    document.querySelectorAll('.ide-switch button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ide-switch button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const ide = btn.dataset.ide;
+        if (ide === 'code') {
+          iframe.src = 'https://code.devmaniacs.com.br';
+        } else if (ide === 'antigravity') {
+          alert('Antigravity 2.0 — Fase 3 (em breve). Por enquanto use Code.');
+        } else if (ide === 'm3') {
+          alert('MiniMax M3 — Fase 2 (em breve). Por enquanto use Code.');
+        } else if (ide === 'zai') {
+          alert('Z.AI Code — Fase 2 (em breve). Por enquanto use Code.');
+        }
+      });
+    });
+
+    // Fullscreen
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      const wrap = document.querySelector('.hub-frame-wrap');
+      if (wrap.requestFullscreen) wrap.requestFullscreen();
+      else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+    });
+  </script>
+</body>
+</html>
