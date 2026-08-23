@@ -5,10 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#061637">
   <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DM Hub">
+  <meta name="description" content="Hub de IDEs remotos — 3 ambientes online">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/brand/dev-maniacs-mark.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/dev-maniacs-mark.png">
+  <link rel="stylesheet" href="/styles.css">
   <title>Hub · Dev Maniac's</title>
-  <link rel="icon" href="../assets/brand/dev-maniacs-mark.png" type="image/png">
-  <link rel="apple-touch-icon" href="../assets/brand/dev-maniacs-mark.png">
-  <link rel="stylesheet" href="styles.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] SW:', reg.scope))
+          .catch(err => console.warn('[PWA] SW falhou:', err));
+      });
+    }
+  </script>
 </head>
 <body class="dashboard-page">
 
