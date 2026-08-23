@@ -1,10 +1,10 @@
 // Service Worker — Dev Maniac's Hub
-// Versão: 3.0.0 · 23/08/2026 (migração login.html → /login Astro build)
-// Estratégia: network-first pra HTML, cache-first pra assets estáticos,
+// Versão: 3.1.0 · 23/08/2026 (fix: SW nao cacheava 2FA setup, forcar reload)
+// Estrategia: network-first pra HTML, cache-first pra assets estaticos,
 // rotas de auth/health SEMPRE na rede (nunca cache).
-// REGRA: qualquer mudança em styles.css/app.js/ícones exige bump do CACHE_VERSION.
+// REGRA: qualquer mudanca em styles.css/app.js/icones exige bump do CACHE_VERSION.
 
-const CACHE_VERSION = 'dm-hub-v10';
+const CACHE_VERSION = 'dm-hub-v11';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -20,20 +20,20 @@ const STATIC_ASSETS = [
   '/styles.css',
   '/app.js',
   '/manifest.webmanifest',
-  '/assets/brand/dev-maniacs-mark.png',         // logo DM interno
-  '/assets/brand/dev-maniacs-mascot.webp',      // asset avatar login
-  '/assets/brand/dev-maniacs-icon-32.png',      // favicon
-  '/assets/brand/dev-maniacs-icon-180.png',     // apple touch icon
-  '/assets/brand/dev-maniacs-icon-192.png',     // PWA padrão
-  '/assets/brand/dev-maniacs-icon-512.png',     // PWA maskable
+  '/assets/brand/dev-maniacs-mark.png',
+  '/assets/brand/dev-maniacs-mascot.webp',
+  '/assets/brand/dev-maniacs-icon-32.png',
+  '/assets/brand/dev-maniacs-icon-180.png',
+  '/assets/brand/dev-maniacs-icon-192.png',
+  '/assets/brand/dev-maniacs-icon-512.png',
 ];
 
-// Nunca cachear (sessão/health/oauth mudam a cada request)
+// Nunca cachear (sessao/health/oauth mudam a cada request)
 const NEVER_CACHE = ['/auth/', '/api/', '/health.php'];
 
 // ========== INSTALL ==========
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v2...');
+  console.log('[SW] Installing v11...');
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_ASSETS))
   );
@@ -42,7 +42,7 @@ self.addEventListener('install', (event) => {
 
 // ========== ACTIVATE ==========
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating v2...');
+  console.log('[SW] Activating v11...');
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -60,13 +60,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Só mesmo origin; ignora Google Fonts, code-server etc
+  // So mesmo origin; ignora Google Fonts, code-server etc
   if (url.origin !== location.origin) return;
 
-  // Rotas dinâmicas: sempre rede (sem cache, sem fallback offline)
+  // Rotas dinamicas: sempre rede (sem cache, sem fallback offline)
   if (NEVER_CACHE.some((p) => url.pathname.startsWith(p))) return;
 
-  // ========== HTML: network-first com fallback offline ==========
+  // HTML: network-first com fallback offline
   if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {
     event.respondWith(
       fetch(request)
@@ -82,7 +82,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ========== Assets: cache-first ==========
+  // Assets: cache-first
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
@@ -106,7 +106,7 @@ self.addEventListener('sync', (event) => {
 
 // ========== PUSH (futuro) ==========
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : { title: 'DM Hub', body: 'Nova notificação' };
+  const data = event.data ? event.data.json() : { title: 'DM Hub', body: 'Nova notificacao' };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
