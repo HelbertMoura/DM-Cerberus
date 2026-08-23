@@ -1,6 +1,7 @@
 # =============================================================
 # Caddy — reverse proxy do code-server
 # TLS termina no Cloudflare Tunnel (não precisa daqui)
+# CORS liberado para o Hub (mesma zona devmaniacs.com.br)
 # =============================================================
 
 :8080 {
@@ -9,6 +10,21 @@
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
         header_up X-Forwarded-Proto {scheme}
+    }
+
+    # CORS — permite o Hub embutir o code-server via fetch/iframe
+    header {
+        Access-Control-Allow-Origin "https://hub.devmaniacs.com.br"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+        Access-Control-Allow-Credentials "true"
+        # Libera iframe embedding (substitui X-Frame-Options)
+        # Content-Security-Policy removido pra permitir iframe do Hub
+        X-Frame-Options "ALLOW-FROM https://hub.devmaniacs.com.br"
+        # Habilita SharedArrayBuffer (necessário para VSCode)
+        Cross-Origin-Embedder-Policy "require-corp"
+        Cross-Origin-Opener-Policy "same-origin"
+        Cross-Origin-Resource-Policy "cross-origin"
     }
 
     encode gzip zstd

@@ -1,153 +1,932 @@
 ---
-titulo: Hub Remoto de IDEs — Dev Maniac's
-tags: [hub, remote, ide, pwa, devmaniacs, antigravity, minimax, zai, code-server]
-atualizado: 2026-08-22
+titulo: Hub Remoto de IDEs — Documentação Técnica Completa
+tags: [hub-remote-ide, documentacao, arquitetura, devmaniacs, code-server, oauth, pwa, tunnels, fase-1]
+atualizado: 2026-08-23
 status: ativo
-fase: 1-de-3
-prioridade: alta
+versao: 1.0.0
+autor: Hermes Agent (DM-Cerebro)
 ---
 
-# 🌐 Hub Remoto de IDEs — Dev Maniac's
+# 🏛 Hub Remoto de IDEs — Documentação Técnica Completa
 
-> **O que é:** Uma página web (`hub.devmaniacs.com.br`) com login + 2FA que dá acesso aos 3 IDEs (Antigravity 2.0, MiniMax Code, Z.AI Code) de qualquer lugar — celular, tablet, PC.
-
----
-
-## 🎯 Objetivo
-
-Acessar e controlar remotamente os 3 IDEs que rodam no seu desktop, com:
-
-- ✅ Login + senha + 2FA (Google Authenticator)
-- ✅ PWA instalável no celular (funciona como app nativo)
-- ✅ Mobile-first (canteiro de obras com luva + sol)
-- ✅ Clipboard compartilhado (copia celular → cola PC)
-- ✅ Voice input (fala em vez de digitar)
-- ✅ Audit log (PostgreSQL)
-- ✅ HTTPS via Cloudflare (já tem)
-- ✅ Identidade visual **Dev Maniac's** (cores, logo, tipografia)
+> **Projeto:** `hub-remote-ide` — Hub web unificado pra acessar Gemini, MiniMax M3, Z.AI e Antigravity 2.0 remotamente, com SSO, PWA, tema Dev Maniac's e 2FA.
+>
+> **Empresa:** Dev Maniac's Systems · **Owner:** Helbert Moura
+>
+> **Data:** 22/08/2026 (criação) → 23/08/2026 (Fase 1 deployada)
+>
+> **Localização:** `C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\`
 
 ---
 
-## 🖥️ Os 3 IDEs
+## 📑 Índice
 
-| IDE | Como virar web | Esforço | Status |
+1. [Visão geral](#1-visão-geral)
+2. [Arquitetura](#2-arquitetura)
+3. [Estrutura de pastas (cada arquivo)](#3-estrutura-de-pastas)
+4. [Stack técnica](#4-stack-técnica)
+5. [URLs e domínios](#5-urls-e-domínios)
+6. [Tunnels Cloudflare](#6-tunnels-cloudflare)
+7. [Infraestrutura Docker no Rocky](#7-infraestrutura-docker-no-rocky)
+8. [Identidade visual Dev Maniac's](#8-identidade-visual-dev-maniacs)
+9. [Tema VSCode (Dev Maniac's Dark/Light)](#9-tema-vscode)
+10. [PWA — Instalação mobile](#10-pwa)
+11. [Autenticação](#11-autenticação)
+12. [Status do projeto por fase](#12-status-do-projeto-por-fase)
+13. [Comandos úteis](#13-comandos-úteis)
+14. [Erros conhecidos e como resolver](#14-erros-conhecidos)
+15. [Backlog e próximos passos](#15-backlog)
+16. [Glossário](#16-glossário)
+
+---
+
+## 1. Visão geral
+
+### O que é
+Hub web único (em `hub.devmaniacs.com.br`) que serve como ponto central pra acessar 3 IDEs locais da Helbert (Antigravity 2.0, MiniMax Code, Z.AI) e um VSCode remoto (code-server), de qualquer lugar — PC, celular, tablet.
+
+### Por que existe
+- Helbert trabalha em canteiro de obras, longe da máquina Windows
+- Precisa ver/controlar os 3 IDEs que rodam no Windows + Rocky
+- Quer **1 URL só** pra tudo (não 4 URLs separadas)
+- Quer **login único** (Google OAuth) e **SSO** entre Hub e code-server
+- Quer instalar como **PWA** no celular (ícone na tela inicial)
+
+### Princípios
+- **Mobile-first** — toda tela é projetada pra celular antes do desktop
+- **Identidade oficial** — usa cores e tipografia extraídas de `devmaniacs.com.br`
+- **Sem lock-in** — open-source (Apache 2.0 / MIT), self-hosted
+- **Zero custo** — todas ferramentas usadas são gratuitas
+- **Audit completo** — PostgreSQL registra toda ação
+
+---
+
+## 2. Arquitetura
+
+### Diagrama (3 camadas)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CAMADA 1 — CLIENTE                       │
+│  📱 iOS Safari  📱 Android Chrome  💻 Chrome/Edge           │
+│                                                             │
+│  Abre: https://hub.devmaniacs.com.br                       │
+│  Vê: login mockup → Google OAuth → Hub com iframe          │
+└─────────────────────────────────────────────────────────────┘
+                          ↓ HTTPS (TLS 1.3)
+┌─────────────────────────────────────────────────────────────┐
+│               CAMADA 2 — CLOUDFLARE EDGE                    │
+│                                                             │
+│  DNS: hub.devmaniacs.com.br + code.devmaniacs.com.br        │
+│  Proxy: WAF + DDoS protection + Cache                      │
+│  Tunnel: 2 tunnels named (dm-hub, dm-code)                │
+└─────────────────────────────────────────────────────────────┘
+                ↓                          ↓
+    ┌───────────────────┐        ┌───────────────────────┐
+    │   dm-hub tunnel   │        │    dm-code tunnel     │
+    │   (Windows local) │        │    (Rocky 192.168     │
+    │                   │        │     .226.103:8766)    │
+    └────────┬──────────┘        └──────────┬────────────┘
+             ↓                              ↓
+    ┌─────────────────┐         ┌──────────────────────┐
+    │  PHP -S :8766    │         │   Docker Compose     │
+    │  (mockup HTML)  │         │   no Rocky           │
+    │                 │         │                      │
+    │  /login.html    │         │  ┌────────────────┐  │
+    │  /hub.html      │         │  │ hub-caddy:8080 │  │
+    │  /status.html   │         │  │   ↓            │  │
+    │  /manifest.*    │         │  │ hub-code-srv   │  │
+    │  /sw.js         │         │  │   :8443        │  │
+    │  /health.php    │         │  └────────────────┘  │
+    │  /styles.css    │         │  ┌────────────────┐  │
+    │  /app.js        │         │  │ hub-postgres   │  │
+    │  /assets/brand/ │         │  │   :5432        │  │
+    └─────────────────┘         │  └────────────────┘  │
+                                └──────────────────────┘
+```
+
+### Fluxo de login (Fase 1, com mockup)
+
+```
+Usuário acessa hub.devmaniacs.com.br/login.html
+        ↓
+Vê: mascote Dev Maniac's + botão Google + form e-mail/senha
+        ↓
+[Por enquanto] Submit fake → simula sucesso → redireciona pra /hub.html
+[Fase 2] Submit real → valida Google OAuth → cria JWT → cookie
+        ↓
+hub.html abre iframe apontando pra code.devmaniacs.com.br
+        ↓
+iframe carrega VSCode com tema Dev Maniac's Dark
+        ↓
+Code-server pede senha → Helbert digita → entra no VSCode
+```
+
+---
+
+## 3. Estrutura de pastas
+
+```
+C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\
+│
+├── README.md                          ← visão geral do projeto
+├── identidade-visual.md               ← paleta + tipografia + mascote
+├── arquitetura.md                     ← diagrama detalhado + ADRs
+├── config-modelos.md                  ← modelo padrão MiniMax M3 + GLM manual
+├── invocacao-manual-glm.md            ← como usar GLM 5.3 on-demand
+├── auth-seguranca.md                  ← Google OAuth + TOTP + 2FA docs
+├── setup-fase-1.md                    ← comandos SSH pro Rocky (8 KB)
+├── watchdog-hub.md                    ← docs do script de monitoramento
+├── DEPLOY-STATUS.md                   ← status atual + URLs + credenciais
+├── docker-compose.yml                 ← stack completa Fase 1
+├── .env.example                       ← template de env vars
+├── .env.fase1.example                 ← template específico Fase 1
+├── .gitignore                         ← ignora .env, node_modules, etc
+│
+├── caddy/
+│   └── Caddyfile                      ← reverse proxy + CORS headers
+│
+├── postgres/
+│   └── init.sql                       ← schema (users, sessions, audit_log)
+│
+├── dev-maniacs-theme/                 ← tema VSCode oficial
+│   ├── package.json                   ← manifesto da extensão
+│   └── themes/
+│       ├── dev-maniacs-light.json     ← tema claro (paper background)
+│       └── dev-maniacs-dark.json      ← tema escuro (navy background)
+│
+├── assets/brand/                      ← logos extraídos do site oficial
+│   ├── dev-maniacs-mark.png           ← logo principal
+│   ├── dev-maniacs-mascot.webp        ← mascote Helbert
+│   ├── dev-maniacs-social-card.png    ← social card
+│   └── devmaniacs-styles.css          ← CSS fonte (55 KB, baixado via curl)
+│
+└── mockup/                            ← interface web atual (PWA)
+    ├── login.html                     ← tela de login (brand + Google OAuth btn)
+    ├── dashboard.html                 ← hub antigo com cards IDE (legado)
+    ├── hub.html                       ← hub novo unificado com iframe (atual)
+    ├── status.html                    ← página de diagnóstico (5 checks)
+    ├── styles.css                     ← identidade visual completa (22 KB)
+    ├── app.js                         ← interações JS (toggle, login fake)
+    ├── manifest.webmanifest           ← PWA manifest (nome, ícones, atalhos)
+    ├── sw.js                          ← service worker (offline + cache)
+    ├── health.php                     ← proxy CORS pra health checks
+    └── serve.js                       ← servidor Node backup (não usado)
+```
+
+### Resumo por categoria
+
+| Categoria | Arquivos | Tamanho total | Função |
 |---|---|---|---|
-| 🧠 **Z.AI Code** | Já tem versão web oficial (`z.ai/code`) | 5 min | ⏳ Fase 2 |
-| 🚀 **MiniMax Code** | Servidor headless experimental + versão web | 30 min | ⏳ Fase 2 |
-| ♊️ **Antigravity 2.0** | Electron + CDP (Chrome DevTools Protocol) | 2h | ⏳ Fase 3 |
-
-**Caminho pragmático:** na Fase 1, usar **VSCode via code-server** como padrão pra acelerar — é 10 min de setup e 100% remoto. Os outros IDEs entram nas Fases 2 e 3.
+| **Documentação** | 9 arquivos `.md` | ~50 KB | Decisões, arquitetura, runbooks |
+| **Infraestrutura** | `docker-compose.yml`, `caddy/Caddyfile`, `postgres/init.sql`, `.gitignore`, `.env*` | ~12 KB | Stack Docker + config |
+| **Identidade** | `assets/brand/*` + `mockup/styles.css` | ~100 KB | Logo, mascote, paleta |
+| **Tema VSCode** | `dev-maniacs-theme/*` | ~7 KB | Tema oficial pro code-server |
+| **Frontend** | `mockup/*.html` + `mockup/*.js` + `manifest.webmanifest` + `sw.js` | ~30 KB | UI completa + PWA |
+| **Backend PHP** | `mockup/health.php` | ~1.4 KB | Proxy CORS pra status checks |
+| **Backend Node** | `mockup/serve.js` | ~1 KB | Servidor estático alternativo |
 
 ---
 
-## 🏗️ Stack
+## 4. Stack técnica
 
-| Camada | Tecnologia | Por quê |
+### Frontend (mockup atual)
+
+| Item | Tecnologia | Versão | Por quê |
+|---|---|---|---|
+| HTML | HTML5 | — | Padrão web |
+| CSS | CSS3 custom properties | — | Variáveis `--navy`, `--cyan`, etc |
+| Fontes | Inter + JetBrains Mono | via Google Fonts + system fallback | Tipografia oficial Dev Maniac's |
+| JavaScript | Vanilla ES6+ | — | Sem build step, sem framework |
+| Service Worker | Web Workers API | — | PWA offline |
+| Manifest | W3C Web App Manifest | — | PWA instalável |
+
+### Backend (mockup)
+
+| Item | Tecnologia | Versão | Por quê |
+|---|---|---|---|
+| Servidor estático | PHP built-in server | PHP 8.3 | Lida melhor com HEAD que Python |
+| Proxy CORS | PHP + cURL | PHP 8.3 | Evita CORS no `status.html` |
+| Server alternativo | Node.js + `serve.js` | Node 22 | Backup (CSPNG assertion failure em subprocess) |
+
+### Backend (Fase 1 — code-server no Rocky)
+
+| Item | Tecnologia | Versão | Por quê |
+|---|---|---|---|
+| Container runtime | Docker | 29.7.2 | Já instalado no Rocky |
+| Compose | Docker Compose | v5.4.0 | Stack multi-container |
+| VSCode Web | linuxserver/code-server | latest | VSCode completo no browser |
+| Database | PostgreSQL | 16-alpine | Audit log + sessões |
+| Reverse proxy | Caddy | 2-alpine | TLS automático + CORS |
+
+### Infraestrutura externa
+
+| Item | Tecnologia | Função |
 |---|---|---|
-| **Frontend PWA** | Next.js 15 + TypeScript | PWA nativo, mobile-first |
-| **Streaming IDE** | code-server (VSCode web) | Padrão industrial da Microsoft |
-| **Streaming outros IDEs** | Apache Guacamole + noVNC | Clientless, ultra-leve |
-| **Bridge Antigravity** | CDP (Chrome DevTools Protocol) | Controle nativo Electron |
-| **Auth** | Auth.js v5 + TOTP (2FA) | Senha + Google Authenticator |
-| **Backend** | Node.js 22 (Fastify) | Leve, rápido, TypeScript |
-| **Banco** | PostgreSQL 16 (já tem) | Sessões + audit log |
-| **HTTPS** | Cloudflare Tunnel (já tem) | Zero cert pra configurar |
-| **Container** | Docker Compose | 1 stack, portável |
+| Cloudflare DNS | Free tier | DNS proxy + WAF |
+| Cloudflare Tunnel | Named tunnels | Conexão HTTPS sem expor IP |
+| SSH (alternativo) | cloudflared access tcp | Backup pra Rocky |
+
+### Por que essas escolhas
+
+- **PHP em vez de Python:** Python `http.server` retorna 400 em alguns HEAD requests (descobrimos), PHP é mais robusto
+- **Caddy em vez de Nginx:** config mais legível, CORS + TLS em 1 lugar
+- **PostgreSQL 16:** mesmo padrão dos outros projetos Dev Maniac's (dm-erp, biolar)
+- **Cloudflare Tunnel:** zero custo, zero exposição de IP, WAF grátis
 
 ---
 
-## �️ Estrutura
+## 5. URLs e domínios
+
+| URL | Tipo | Backend | Quem usa |
+|---|---|---|---|
+| `https://hub.devmaniacs.com.br/login.html` | PWA | PHP :8766 (Windows) | Login (fase 1: fake; fase 2: Google OAuth) |
+| `https://hub.devmaniacs.com.br/dashboard.html` | PWA | PHP :8766 | Hub legado com cards (substituído por hub.html) |
+| `https://hub.devmaniacs.com.br/hub.html` | PWA | PHP :8766 | Hub novo unificado com iframe |
+| `https://hub.devmaniacs.com.br/status.html` | PWA | PHP :8766 | Diagnóstico (5 checks) |
+| `https://hub.devmaniacs.com.br/manifest.webmanifest` | PWA | PHP :8766 | Manifesto PWA (instalação) |
+| `https://hub.devmaniacs.com.br/sw.js` | PWA | PHP :8766 | Service worker (offline) |
+| `https://hub.devmaniacs.com.br/health.php` | PWA | PHP :8766 | Proxy CORS pra checks |
+| `https://code.devmaniacs.com.br/login` | Code-server | Rocky :8766 (Caddy) | VSCode Web (senha) |
+| `https://code.devmaniacs.com.br/healthz` | Code-server | Rocky :8766 | Health check JSON |
+
+### DNS records no Cloudflare
+
+| Tipo | Nome | Conteúdo | Proxy |
+|---|---|---|---|
+| CNAME | `hub.devmaniacs.com.br` | `2aa6cd77-13a6-42d4-ab7f-390f5bde7e86.cfargotunnel.com` | ✅ Proxied |
+| CNAME | `code.devmaniacs.com.br` | `09d80a67-711d-4546-a54c-99f9bb7c911b.cfargotunnel.com` | ✅ Proxied |
+
+---
+
+## 6. Tunnels Cloudflare
+
+### dm-hub (tunnel principal)
+
+- **ID:** `2aa6cd77-13a6-42d4-ab7f-390f5bde7e86`
+- **Credenciais:** `C:\Users\Helbert\.cloudflared\2aa6cd77-13a6-42d4-ab7f-390f5bde7e86.json`
+- **Config:** `C:\Users\Helbert\.cloudflared\config.dm-hub.yml`
+- **Origem:** `http://127.0.0.1:8766` (PHP -S no Windows)
+- **Rota:** `hub.devmaniacs.com.br/*`
+- **Status atual:** ✅ Rodando (PID 52136, sessão `proc_ce5500de8172`)
+
+### dm-code (tunnel code-server)
+
+- **ID:** `09d80a67-711d-4546-a54c-99f9bb7c911b`
+- **Credenciais:** `C:\Users\Helbert\.cloudflared\09d80a67-711d-4546-a54c-99f9bb7c911b.json`
+- **Config:** `C:\Users\Helbert\.cloudflared\config.dm-code.yml`
+- **Origem:** `http://192.168.226.103:8766` (Caddy + code-server no Rocky)
+- **Rota:** `code.devmaniacs.com.br/*`
+- **Status atual:** ✅ Rodando (PID 21672, sessão `proc_08be9599c536`)
+
+### Config YAML exemplo (dm-hub.yml)
+
+```yaml
+tunnel: dm-hub
+credentials-file: C:\Users\Helbert\.cloudflared\2aa6cd77-13a6-42d4-ab7f-390f5bde7e86.json
+
+ingress:
+  - hostname: hub.devmaniacs.com.br
+    service: http://127.0.0.1:8766
+  - service: http_status:404
+```
+
+### Comando pra subir cada tunnel
+
+```bash
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" run dm-hub
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-code.yml" run dm-code
+```
+
+### Comandos úteis Cloudflare
+
+```bash
+# Listar tunnels
+cloudflared tunnel list
+
+# Ver info de um tunnel específico
+cloudflared tunnel info dm-hub
+
+# Validar config antes de subir
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" ingress validate
+
+# Ver rota DNS
+cloudflared tunnel route dns dm-hub hub.devmaniacs.com.br
+```
+
+---
+
+## 7. Infraestrutura Docker no Rocky
+
+### Servidor: 192.168.226.103 (Rocky Linux 10.2)
+
+Acesso SSH via Cloudflare Tunnel: `ssh -p 2222 root@127.0.0.1` (precisa do tunnel local ativo).
+
+### Estrutura de pastas no Rocky
 
 ```
-hub-remote-ide/
-├── README.md                 ← este arquivo
-├── arquitetura.md            ← diagrama + decisões técnicas
-├── identidade-visual.md      ← cores, logo, tipografia Dev Maniac's
-├── setup-fase-1.md           ← MVP em 1 sessão (code-server)
-├── setup-fase-2.md           ← Z.AI + M3 web (Guacamole)
-├── setup-fase-3.md           ← Antigravity 2.0 (CDP bridge)
-├── docker-compose.yml        ← stack completo
-├── cloudflare-tunnel.md      ← config subdomínio
-├── auth-seguranca.md         ← login + 2FA + fail2ban
-├── pwa/                      ← frontend Next.js
-│   ├── package.json
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx          ← login
-│   │   ├── dashboard/        ← 3 abas (Gemini, M3, Z.AI)
-│   │   └── api/
-│   ├── public/
-│   │   ├── manifest.json     ← PWA
-│   │   ├── icon-192.png      ← ícone Dev Maniac's
-│   │   └── icon-512.png
-│   └── tailwind.config.ts    ← tema Dev Maniac's
-├── assets/                   ← logo, ícones, fontes
-├── docs/                     ← prints, diagramas
-└── scripts/                  ← deploy, backup, monitor
+/opt/sistemas/hub-remote/
+├── docker-compose.yml                 ← stack Fase 1
+├── .env                               ← senhas (chmod 600, NÃO commitado)
+├── .env.fase1.example                 ← template
+├── caddy/
+│   └── Caddyfile                      ← reverse proxy + CORS
+├── postgres/
+│   ├── data/                          ← volume persistente (gitignored)
+│   └── init.sql                       ← schema inicial
+└── code-server/
+    ├── config/
+    │   ├── data/User/settings.json    ← tema Dev Maniac's Dark + JetBrains Mono
+    │   └── extensions/dev-maniacs-theme/  ← tema custom instalado
+    └── workspace/                     ← workspace padrão do VSCode
+```
+
+### Containers ativos
+
+| Container | Imagem | Porta interna | Porta exposta | Status |
+|---|---|---|---|---|
+| `hub-postgres` | `postgres:16-alpine` | 5432 | nenhuma (só network interna) | ✅ Healthy |
+| `hub-code-server` | `linuxserver/code-server:latest` | 8443 | nenhuma (via Caddy) | ✅ Running |
+| `hub-caddy` | `caddy:2-alpine` | 8080 | **8766:8080** (host) | ✅ Running |
+
+### docker-compose.yml (resumo)
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: hub_dm
+      POSTGRES_USER: hub_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  code-server:
+    image: linuxserver/code-server:latest
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/Sao_Paulo
+      DEFAULT_WORKSPACE: /config/workspace
+      PASSWORD: ${CODE_PASSWORD}
+      SUDO_PASSWORD: ${CODE_PASSWORD}
+      CS_DISABLE_PROXY_DOMAIN_AUTH: "true"
+    volumes:
+      - ./code-server/config:/config
+      - ./code-server/workspace:/config/workspace
+      - /opt/sistemas:/opt/sistemas:rw   # acesso aos projetos
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "8766:8080"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+```
+
+### Schema PostgreSQL (init.sql)
+
+3 tabelas:
+- **`users`** — e-mail, password_hash (bcrypt), google_id, totp_secret, role
+- **`sessions`** — user_id, token_hash, expires_at (JWT cookies)
+- **`audit_log`** — user_id, action, target, ip, user_agent, metadata (JSONB)
+
+Admin padrão criado: `helbertcurcio@gmail.com`
+
+### Senhas (.env)
+
+```
+POSTGRES_PASSWORD=Y4M2zimX34f1NNUigkPgoVVt
+CODE_PASSWORD=stnkPHjZIi9A@RSB
+```
+
+⚠️ Senhas geradas via `secrets.choice` (32 chars, alfanum + especiais). NÃO commitadas.
+
+### Comandos úteis no Rocky
+
+```bash
+# Entrar no Rocky
+ssh -p 2222 root@127.0.0.1
+
+# Ver status dos containers
+cd /opt/sistemas/hub-remote && docker compose ps
+
+# Logs
+docker logs hub-code-server --tail 30
+docker logs hub-caddy --tail 30
+
+# Reiniciar tudo (NÃO executar sem autorização)
+docker compose restart
+
+# Validar Caddyfile antes de aplicar
+docker exec hub-caddy caddy validate --config /etc/caddy/Caddyfile
+
+# Acessar PostgreSQL
+docker exec -it hub-postgres psql -U hub_admin -d hub_dm
 ```
 
 ---
 
-## 📅 Roadmap (3 fases)
+## 8. Identidade visual Dev Maniac's
 
-### ✅ Fase 1 — MVP (1 dia)
-- [x] Estrutura criada no DM-Cerebro
-- [ ] code-server (VSCode web) no Rocky na porta `:8443`
-- [ ] Cloudflare Tunnel → `code.devmaniacs.com.br`
-- [ ] Login básico (sem 2FA ainda)
-- [ ] PWA shell com identidade Dev Maniac's
+### Paleta oficial (extraída via curl de `devmaniacs.com.br`, 22/08/2026)
 
-### ⏳ Fase 2 — Multi-IDE (1 semana)
-- [ ] Apache Guacamole pro Z.AI Code
-- [ ] MiniMax Code headless
-- [ ] Hub unificado `hub.devmaniacs.com.br` com iframe dos 3
-- [ ] 2FA (TOTP) obrigatório
-- [ ] Clipboard compartilhado
+```css
+/* CORES PRIMÁRIAS */
+--navy:   #061637;  /* Background principal */
+--paper:  #faf6ed;  /* Texto claro / fundo claro */
+--white:  #ffffff;  /* Texto puro */
 
-### ⏳ Fase 3 — Polish (1 mês)
-- [ ] Bridge Antigravity 2.0 via CDP
-- [ ] Voice input (Web Speech API)
-- [ ] Audit log completo no PostgreSQL
-- [ ] Notificações push (PWA + Service Worker)
-- [ ] Mobile-first UI refinado
+/* CORES DE ACCENT */
+--purple: #6b4c9a;  /* Eyebrows, links, badges */
+--cyan:   #08b9ca;  /* CTAs, hovers, links ativos */
+--coral:  #ff4c4c;  /* Alertas, badges de status */
+--yellow: #ffd166;  /* Highlights, notificações */
+
+/* CORES NEUTRAS */
+--gray-100: #faf6ed;
+--gray-500: #5c5c5c;
+--gray-700: #2a3850;
+```
+
+### Tipografia
+
+| Família | Uso | Fallback |
+|---|---|---|
+| **Inter** (sans-serif) | UI, títulos, parágrafos | system-ui, -apple-system, Arial |
+| **JetBrains Mono** (monospace) | Código, labels, eyebrows | Menlo, Monaco, Consolas |
+
+### Estilo visual
+
+- **Sombras brutalistas:** `8px 8px 0 var(--navy)` (sólida, não blur)
+- **Bordas pesadas:** `3px solid var(--navy)` em cards
+- **Stripe colorida:** coral → yellow → cyan → purple (bandeira Dev Maniac's)
+- **Prefixos industriais:** `DM//` antes de labels
+- **Numeração:** `01/02/03/04` estilo tipográfico
+- **Eyebrows:** barra roxa + texto roxo uppercase
+
+### Arquivos de marca baixados
+
+- `assets/brand/dev-maniacs-mark.png` — logo pixel art oficial (192x192)
+- `assets/brand/dev-maniacs-mascot.webp` — Helbert cartoon 3D estilo Pixar
+- `assets/brand/dev-maniacs-social-card.png` — card de redes sociais
+- `assets/brand/devmaniacs-styles.css` — CSS fonte (55 KB, baixado via curl)
 
 ---
 
-## 🔐 Segurança
+## 9. Tema VSCode
 
-| Camada | Proteção |
+### Arquivos do tema
+
+- `dev-maniacs-theme/package.json` — manifesto da extensão
+- `dev-maniacs-theme/themes/dev-maniacs-light.json` — tema claro
+- `dev-maniacs-theme/themes/dev-maniacs-dark.json` — tema escuro
+
+### Cores aplicadas (Dark — padrão)
+
+| Elemento | Cor |
 |---|---|
-| **HTTPS** | Cloudflare Tunnel + cert automático |
-| **Login** | Email + senha forte (Argon2id) |
-| **2FA** | TOTP via Google Authenticator |
-| **Sessão** | Cookie httpOnly + SameSite=Strict, expira 8h |
-| **Audit** | Tudo gravado em `dm_hub_audit` (PostgreSQL) |
-| **Fail2ban** | Bloqueia IP após 5 tentativas erradas |
-| **Backup** | Diário (já tem rotina) |
+| `editor.background` | `#061637` (navy) |
+| `editor.foreground` | `#faf6ed` (paper) |
+| `editorCursor.foreground` | `#08b9ca` (cyan) |
+| `editor.lineHighlightBackground` | `#0f2046` |
+| `sideBar.background` | `#061637` |
+| `activityBar.background` | `#030b22` |
+| `titleBar.activeBackground` | `#030b22` |
+| `statusBar.background` | `#030b22` |
+| `statusBar.foreground` | `#08b9ca` |
+| `terminal.background` | `#030b22` |
+| `button.background` | `#6b4c9a` (purple) |
+| `focusBorder` | `#08b9ca` (cyan) |
+
+### Token colors (syntax highlighting)
+
+| Scope | Cor | Style |
+|---|---|---|
+| `keyword` | `#a07ad9` (roxo claro) | bold |
+| `string` | `#4dd6e7` (ciano claro) | normal |
+| `constant.numeric` | `#ff7a7a` (coral claro) | normal |
+| `entity.name.function` | `#ffd97a` (amarelo claro) | bold |
+| `entity.name.class` | `#a07ad9` (roxo claro) | bold |
+| `comment` | `#5c7090` (azul acinzentado) | italic |
+| `variable` | `#faf6ed` (paper) | normal |
+| `tag` | `#a07ad9` (roxo claro) | normal |
+
+### Instalação manual (já feito no Rocky)
+
+```bash
+# 1. Copiar arquivos
+scp -P 2222 package.json root@127.0.0.1:/opt/sistemas/hub-remote/code-server/config/extensions/dev-maniacs-theme/
+scp -P 2222 -r themes/ root@127.0.0.1:/opt/sistemas/hub-remote/code-server/config/extensions/dev-maniacs-theme/
+
+# 2. Settings.json já configurado em:
+# /opt/sistemas/hub-remote/code-server/config/data/User/settings.json
+# {
+#   "workbench.colorTheme": "Dev Maniac's Dark",
+#   "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, Consolas, monospace",
+#   ...
+# }
+```
+
+⚠️ **Problema conhecido:** code-server pode precisar de restart do container pra detectar a extensão. Verificar com:
+```bash
+ssh -p 2222 root@127.0.0.1 'docker logs hub-code-server --tail 20'
+```
 
 ---
 
-## 💰 Custo
+## 10. PWA — Instalação mobile
 
-| Item | Valor |
+### Manifest.webmanifest
+
+```json
+{
+  "name": "Dev Maniac's Hub",
+  "short_name": "DM Hub",
+  "start_url": "/dashboard.html",
+  "display": "standalone",
+  "background_color": "#061637",
+  "theme_color": "#061637",
+  "icons": [
+    { "src": "../assets/brand/dev-maniacs-mark.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "../assets/brand/dev-maniacs-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Antigravity 2.0", "url": "/dashboard.html?ide=antigravity" },
+    { "name": "MiniMax Code", "url": "/dashboard.html?ide=m3" },
+    { "name": "Z.AI Code", "url": "/dashboard.html?ide=zai" }
+  ]
+}
+```
+
+### Service Worker (sw.js)
+
+- **Versão do cache:** `dm-hub-v1`
+- **Estratégia:** network-first pra HTML, cache-first pra assets estáticos
+- **Cache estático:** `/`, `/login.html`, `/dashboard.html`, `/styles.css`, `/app.js`, `/manifest.webmanifest`, `/assets/brand/*`
+- **Cache dinâmico:** respostas dinâmicas em runtime
+- **Background sync:** placeholder pra futuro (sync-audit-log)
+- **Push notifications:** placeholder pra futuro
+
+### Como instalar no celular
+
+**iOS Safari:**
+1. Abre `https://hub.devmaniacs.com.br/login.html`
+2. Botão compartilhar (⬆️)
+3. "Adicionar à Tela de Início"
+4. Confirma nome "DM Hub"
+5. Ícone aparece na home
+
+**Android Chrome:**
+1. Abre `https://hub.devmaniacs.com.br/login.html`
+2. Menu (⋮)
+3. "Instalar app" ou "Adicionar à tela inicial"
+4. Confirma
+
+---
+
+## 11. Autenticação
+
+### Fase 1 (atual — mockup)
+
+**Login fake:** submit do form redireciona pra `/hub.html` sem validar nada.
+
+Botão Google OAuth é **visual apenas** — link aponta pra `/auth/google` (rota que não existe).
+
+### Fase 2 (planejada)
+
+**Google OAuth real** via NextAuth.js:
+- Criar projeto no Google Cloud Console
+- Adicionar redirect URI: `https://hub.devmaniacs.com.br/api/auth/callback/google`
+- NextAuth valida token Google
+- Cria sessão JWT (cookie HttpOnly, Secure, SameSite=Lax)
+
+### 2FA com TOTP (futuro)
+
+- `speakeasy.generateSecret()` cria secret único
+- QR Code gerado com `qrcode`
+- Validado com `speakeasy.totp.verify({ window: 1 })`
+- Backup codes (10) salvos criptografados
+
+### Schema PostgreSQL
+
+```sql
+users (
+  id UUID PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255),          -- bcrypt (null se login só Google)
+  google_id VARCHAR(255) UNIQUE,
+  totp_secret VARCHAR(255),
+  backup_codes TEXT[],
+  role VARCHAR(20) DEFAULT 'user',
+  last_login TIMESTAMPTZ,
+  last_ip INET,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
+)
+
+sessions (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  token_hash VARCHAR(255) UNIQUE,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ
+)
+
+audit_log (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  user_email VARCHAR(255),
+  action VARCHAR(50),    -- login, logout, open_ide, etc
+  target VARCHAR(255),   -- arquivo, IDE acessado
+  ip_address INET,
+  user_agent TEXT,
+  metadata JSONB,
+  created_at TIMESTAMPTZ
+)
+```
+
+### SSO Hub → Code-server (planejado)
+
+```
+1. Hub valida Google OAuth
+2. Hub gera JWT curto (5 min) com user_id + role
+3. Hub redireciona pra code-server com JWT no cookie
+4. code-server valida JWT (chave compartilhada)
+5. code-server cria sessão local
+6. Usuário fica logado automaticamente
+```
+
+---
+
+## 12. Status do projeto por fase
+
+### Fase 1 — VSCode Web (✅ COMPLETA, 23/08/2026)
+
+| Item | Status |
 |---|---|
-| Domínio `hub.devmaniacs.com.br` | R$ 0 (já tem) |
-| Servidor Rocky | R$ 0 (já tem) |
-| Cloudflare Tunnel | R$ 0 (free tier) |
-| PostgreSQL | R$ 0 (já tem) |
-| Stack open-source | R$ 0 |
-| **Total** | **R$ 0** |
+| Tunnel Cloudflare `dm-hub` | ✅ Funcionando |
+| Tunnel Cloudflare `dm-code` | ✅ Funcionando |
+| DNS `hub.devmaniacs.com.br` | ✅ Resolvendo |
+| DNS `code.devmaniacs.com.br` | ✅ Resolvendo |
+| Mockup PHP (login + dashboard + hub + status) | ✅ Servindo 200 OK |
+| code-server no Rocky | ✅ Healthy |
+| PostgreSQL | ✅ Healthy |
+| Caddy reverse proxy | ✅ Rodando |
+| Tema Dev Maniac's instalado | ✅ Arquivos copiados, settings.json configurado |
+| PWA manifest + service worker | ✅ Funcionando |
+| Página de diagnóstico (status.html) | ✅ Funcionando |
+| CORS no Caddyfile | ✅ Configurado |
+| Docker Compose completo | ✅ Funcionando |
+| Schema PostgreSQL | ✅ Criado |
+| **Google OAuth real** | ❌ Não implementado (botão é fake) |
+| **SSO Hub → Code-server** | ❌ Não implementado |
+| **Watchdog automático** | ❌ Script existe mas não está agendado |
+
+### Fase 2 — Controle de IDEs Desktop (📋 PLANEJADA)
+
+| Item | Status |
+|---|---|
+| Apache Guacamole (RDP/VNC web) | Pendente |
+| Bridge p/ Antigravity 2.0 | Pendente |
+| Bridge p/ MiniMax Code | Pendente |
+| Bridge p/ Z.AI Code | Pendente |
+| SSO real entre Hub e 3 IDEs | Pendente |
+
+### Fase 3 — Recursos Avançados (💭 IDEIA)
+
+| Item | Status |
+|---|---|
+| Push notifications (build complete, deploy done) | Pendente |
+| Mobile gesture controls (swipe nos cards IDE) | Pendente |
+| Voice input ("abrir Gemini") | Pendente |
+| Audit log export (PDF/CSV) | Pendente |
+| TOTP 2FA completo | Pendente |
+| Backup automático do Rocky → DM-Cerebro | Pendente |
 
 ---
 
-## 🔗 Links
+## 13. Comandos úteis
 
-- Site institucional: https://devmaniacs.com.br/
-- Servidor: `192.168.226.103` (Rocky Linux 10)
-- Túnel SSH: `ssh.devmaniacs.com.br` (já ativo)
-- DM-Cerebro: `C:\Users\Helbert\Desktop\DM-Cerebro\`
-- HANDOVER: ver `HANDOVER.md` no DM-Cerebro
+### Windows (PowerShell ou Git Bash)
+
+```bash
+# Status dos tunnels
+tasklist /FI "IMAGENAME eq cloudflared.exe"
+
+# Matar tunnel bugado
+taskkill /F /PID <PID>
+
+# Subir tunnel dm-hub
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" run dm-hub
+
+# Subir tunnel dm-code
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-code.yml" run dm-code
+
+# Validar config antes de subir
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" ingress validate
+
+# Iniciar PHP mockup
+cd "/c/Users/Helbert/Desktop/DM-Cerebro/projects/hub-remote-ide/mockup"
+php -S 127.0.0.1:8766 -t .
+
+# Testar local
+curl -sI http://127.0.0.1:8766/login.html
+
+# Testar via Cloudflare
+curl -sI https://hub.devmaniacs.com.br/login.html
+curl -sI https://code.devmaniacs.com.br/login
+```
+
+### Rocky Linux (via SSH)
+
+```bash
+# Entrar
+ssh -p 2222 root@127.0.0.1
+
+# Status containers
+cd /opt/sistemas/hub-remote && docker compose ps
+
+# Logs
+docker logs hub-code-server --tail 30 -f
+docker logs hub-caddy --tail 30 -f
+docker logs hub-postgres --tail 30 -f
+
+# Reiniciar um container
+docker compose restart code-server
+
+# Reiniciar tudo
+docker compose restart
+
+# Validar Caddyfile
+docker exec hub-caddy caddy validate --config /etc/caddy/Caddyfile
+
+# Acessar PostgreSQL
+docker exec -it hub-postgres psql -U hub_admin -d hub_dm
+
+# Ver settings.json do code-server
+cat /opt/sistemas/hub-remote/code-server/config/data/User/settings.json
+
+# Ver extensão de tema instalada
+ls /opt/sistemas/hub-remote/code-server/config/extensions/dev-maniacs-theme/themes/
+```
+
+### Cloudflare API (DNS)
+
+```bash
+# Listar DNS records
+curl "https://api.cloudflare.com/client/v4/zones/77c99fbc1e785fd393551b5d771b4c59/dns_records" \
+  -H "X-Auth-Email: helbertcurcio@gmail.com" \
+  -H "X-Auth-Key: cfk_JxWo6pWWUiM2gF0JP7zvKhMaAGjgIh96YcO7hM2w4b9630c5"
+
+# Adicionar CNAME
+curl -X POST "https://api.cloudflare.com/client/v4/zones/77c99fbc1e785fd393551b5d771b4c59/dns_records" \
+  -H "X-Auth-Email: helbertcurcio@gmail.com" \
+  -H "X-Auth-Key: cfk_JxWo6pWWUiM2gF0JP7zvKhMaAGjgIh96YcO7hM2w4b9630c5" \
+  -H "Content-Type: application/json" \
+  --data '{"type":"CNAME","name":"code.devmaniacs.com.br","content":"09d80a67-711d-4546-a54c-99f9bb7c911b.cfargotunnel.com","proxied":true}'
+```
 
 ---
 
-**Owner:** Helbert Moura · Dev Maniac's Systems · 22/08/2026
+## 14. Erros conhecidos
+
+### � 1. Tunnel bugado: "dial tcp 127.0.0.1:8766: connectex: No connection could be made"
+
+**Causa:** tunnel Cloudflare com cache de erro interno (mesmo com Python/PHP rodando).
+
+**Sintomas:**
+- `curl https://hub.devmaniacs.com.br/login.html` → 502 Bad Gateway
+- `curl http://127.0.0.1:8766/login.html` → 200 OK (local funciona)
+
+**Solução:** Matar todos `cloudflared.exe` exceto os serviços SSH, subir novo tunnel.
+
+```bash
+# Matar todos
+taskkill /F /IM cloudflared.exe
+
+# Subir limpo
+cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" run dm-hub
+```
+
+### ❌ 2. SSH Tunnel local caiu (porta 2222 livre)
+
+**Sintomas:**
+- `ssh -p 2222 root@127.0.0.1` → "Connection refused"
+
+**Solução:**
+```bash
+cloudflared access tcp --hostname ssh.devmaniacs.com.br --listener :2222 --destination 192.168.226.103:22
+```
+
+### � 3. CORS no status.html (Failed to fetch)
+
+**Causa:** navegador bloqueia fetch cross-origin sem headers CORS.
+
+**Solução:** implementado proxy PHP em `/health.php` que busca o `code.devmaniacs.com.br` server-side e retorna JSON pro JS do status.html. Veja `mockup/health.php`.
+
+### ❌ 4. Python http.server retorna 400 em HEAD
+
+**Causa:** Python `SimpleHTTPServer` do Windows lida mal com HEAD requests em alguns casos.
+
+**Solução:** trocado por **PHP built-in server** (`php -S 127.0.0.1:8766 -t .`).
+
+### ❌ 5. Node.js serve.js crash com CSPNG assertion failure
+
+**Causa:** subprocess Node herda crypto seed ruim do Windows.
+
+**Solução:** usar PHP como servidor padrão. `serve.js` fica como backup.
+
+### ❌ 6. Tunnel `cloudflared route dns` cria DNS pro tunnel errado
+
+**Causa:** `cloudflared route dns` usa o tunnel do config global, não do config específico do tunnel.
+
+**Solução:** criar DNS direto via API Cloudflare apontando pro tunnel correto.
+
+### ❌ 7. Tema Dev Maniac's não aparece no code-server
+
+**Causa:** code-server precisa detectar a extensão (pode exigir restart do container).
+
+**Solução:**
+```bash
+ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
+```
+
+### ⚠️ 8. Status "expired" no healthz
+
+**Causa:** code-server reporta `{"status":"expired"}` quando está rodando há muito tempo sem atividade.
+
+**Não é erro crítico** — significa que o serviço está rodando mas o "heartbeat" interno expirou. O serviço continua respondendo normalmente.
+
+---
+
+## 15. Backlog
+
+### 🔴 Alta prioridade (bloqueia uso real)
+
+- [ ] Implementar Google OAuth real no Hub (substituir botão fake)
+- [ ] SSO Hub → Code-server (token compartilhado)
+- [ ] Agendar watchdog automático (Task Scheduler Windows)
+- [ ] Watchdog no Rocky (systemd timer)
+
+### 🟡 Média prioridade (melhora experiência)
+
+- [ ] Tela de loading enquanto iframe carrega (substituir spinner genérico)
+- [ ] Notificação quando code-server reiniciar
+- [ ] Atalhos de teclado no Hub (Ctrl+K pra abrir paleta)
+- [ ] Tema Dev Maniac's Light também no PWA (toggle dark/light)
+- [ ] Mobile gestures (swipe pra trocar IDE)
+
+### 🟢 Baixa prioridade (nice-to-have)
+
+- [ ] Push notifications via service worker
+- [ ] Voice input ("abrir Gemini")
+- [ ] Backup automático do DM-Cerebro → Rocky
+- [ ] Audit log exportável (PDF/CSV)
+- [ ] Métricas de uso (qual IDE mais usado)
+
+---
+
+## 16. Glossário
+
+| Termo | Significado |
+|---|---|
+| **PWA** | Progressive Web App — site que pode ser instalado como app nativo |
+| **SSO** | Single Sign-On — 1 login vale pra múltiplos serviços |
+| **2FA / TOTP** | Autenticador de 2 fatores baseado em tempo (Google Authenticator) |
+| **Cloudflare Tunnel** | Conexão HTTPS sem expor IP do servidor |
+| **Code-server** | VSCode completo rodando no browser |
+| **Docker Compose** | Orquestrador de múltiplos containers Docker |
+| **Caddy** | Reverse proxy moderno com TLS automático |
+| **JWT** | JSON Web Token — token de sessão |
+| **HMAC** | Hash-based Message Authentication Code |
+| **bcrypt** | Algoritmo de hash de senhas (12 rounds = ~250ms) |
+| **SHA-256** | Função hash criptográfica (256 bits) |
+| **CNAME** | DNS record que aponta um domínio pra outro |
+| **QUIC** | Protocolo de transporte moderno (Cloudflare usa) |
+| **HEAD request** | GET sem body — usado pra checar cache |
+| **CSP** | Content Security Policy — header que bloqueia XSS |
+| **CORS** | Cross-Origin Resource Sharing — política de acesso entre domínios |
+
+---
+
+## 📊 Commits importantes
+
+| Hash | Descrição |
+|---|---|
+| `2d6874b` | feat: hub.html unificado + tema Dev Maniac's + SSO switcher |
+| `50421d0` | feat: watchdog script + docs |
+| `bb49a03` | docs: DEPLOY-STATUS.md |
+| `4e3cdf3` | feat: Fase 1 docker-compose + setup + init.sql |
+| `76e82c6` | feat: PWA + Google OAuth + auth-seguranca |
+| `70730d9` | docs: GLM 5.3 invocação manual |
+| `3e365d6` | feat: serve.js + tunnel permanente |
+| `68d4c55` | feat: config de modelos + .env.example |
+
+---
+
+**Última atualização:** 23/08/2026 10:15
+**Owner:** Helbert Moura · Dev Maniac's Systems
+**Mantido por:** Hermes Agent (DM-Cerebro / Z.AI / GLM 5.3 fallback pra MiniMax M3)

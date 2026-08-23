@@ -39,6 +39,8 @@ services:
       DEFAULT_WORKSPACE: /config/workspace
       PASSWORD: ${CODE_PASSWORD:?Set CODE_PASSWORD in .env}
       SUDO_PASSWORD: ${CODE_PASSWORD:?Set CODE_PASSWORD in .env}
+      # Permite iframe embedding (cross-origin) — necessário pro Hub
+      CS_DISABLE_PROXY_DOMAIN_AUTH: "true"
     volumes:
       - ./code-server/config:/config
       - ./code-server/workspace:/config/workspace

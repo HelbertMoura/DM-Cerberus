@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#061637">
+  <title>Status · Hub DM</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .status-grid { display: grid; gap: 16px; padding: 24px 16px; max-width: 720px; margin: 0 auto; }
+    .status-card {
+      border: 3px solid var(--navy);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 6px 6px 0 var(--navy);
+      background: var(--paper);
+    }
+    .status-card h2 {
+      margin: 0 0 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple);
+    }
+    .status-card .check {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--navy);
+    }
+    .status-card .check .badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .status-card .check .badge.ok { background: #10b981; color: white; }
+    .status-card .check .badge.fail { background: #ef4444; color: white; }
+    .status-card .check .badge.pending { background: #fbbf24; color: var(--navy); }
+    .status-card .check code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: rgba(107,76,154,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .status-card .check a { color: var(--cyan); text-decoration: none; word-break: break-all; }
+    .status-card .check a:hover { text-decoration: underline; }
+    .tip {
+      background: var(--yellow);
+      border: 2px dashed var(--navy);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <header style="background: var(--navy); color: var(--paper); padding: 16px 20px; border-bottom: 4px solid var(--purple);">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--cyan);">DM//STATUS</div>
+    <h1 style="font-family: 'Inter', sans-serif; font-size: 22px; margin: 4px 0 0;">Diagnóstico do Hub Remoto</h1>
+  </header>
+
+  <main class="status-grid">
+
+    <div class="status-card">
+      <h2>1 · Login Mockup</h2>
+      <div class="check" id="check-mockup">
+        <span class="badge pending">⏳</span>
+        <span>Testando <code>/login.html</code>...</span>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <h2>2 · Hub Unificado (com iframe do code-server)</h2>
+      <div class="check" id="check-hub">
+        <span class="badge pending">⏳</span>
+        <span>Testando <code>/hub.html</code>...</span>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <h2>3 · Code-server (VSCode Web)</h2>
+      <div class="check" id="check-code">
+        <span class="badge pending">⏳</span>
+        <span>Testando <code>code.devmaniacs.com.br/login</code>...</span>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <h2>4 · PWA Service Worker</h2>
+      <div class="check" id="check-sw">
+        <span class="badge pending">⏳</span>
+        <span>Testando <code>/sw.js</code>...</span>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <h2>5 · Tema Dev Maniac's</h2>
+      <div class="check" id="check-theme">
+        <span class="badge pending">⏳</span>
+        <span>Verificando configuração no Rocky...</span>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>🛠 Se aparecer falha:</strong><br>
+      1. Limpa o cache do navegador (<code>Ctrl+Shift+R</code> ou <code>Cmd+Shift+R</code>)<br>
+      2. Tenta em aba anônima<br>
+      3. Tenta de outra rede (4G em vez de Wi-Fi)<br>
+      4. Se persistir, me chama no Telegram com print do erro
+    </div>
+
+    <div class="tip" style="background: var(--cyan);">
+      <strong>📱 Pra instalar como app no celular:</strong><br>
+      • <strong>iOS Safari:</strong> botão compartilhar (⬆️) → "Adicionar à Tela de Início"<br>
+      • <strong>Android Chrome:</strong> menu (⋮) → "Instalar app"
+    </div>
+
+  </main>
+
+  <script>
+    async function check(name, url, expectStatus = [200, 302]) {
+      const el = document.getElementById('check-' + name);
+      try {
+        const r = await fetch(url, { method: 'GET', cache: 'no-store' });
+        const ok = expectStatus.includes(r.status);
+        el.innerHTML = ok
+          ? `<span class="badge ok">✓</span><span><a href="${url}" target="_blank">${url}</a> → HTTP ${r.status}</span>`
+          : `<span class="badge fail">✗</span><span><a href="${url}" target="_blank">${url}</a> → HTTP ${r.status} (esperado ${expectStatus.join(' ou ')})</span>`;
+      } catch (e) {
+        el.innerHTML = `<span class="badge fail">✗</span><span>${url} → erro: ${e.message}</span>`;
+      }
+    }
+
+    async function proxyCheck(name, target) {
+      const el = document.getElementById('check-' + name);
+      try {
+        const r = await fetch('/health.php?target=' + target, { cache: 'no-store' });
+        const data = await r.json();
+        const ok = data.status === 200;
+        el.innerHTML = ok
+          ? `<span class="badge ok">✓</span><span>${data.url} → HTTP ${data.status} (${data.time_ms}ms via proxy Hub)</span>`
+          : `<span class="badge fail">✗</span><span>${data.url} → HTTP ${data.status || 'erro'} ${data.error ? '(' + data.error + ')' : ''}</span>`;
+      } catch (e) {
+        el.innerHTML = `<span class="badge fail">�</span><span>Erro no proxy: ${e.message}</span>`;
+      }
+    }
+
+    (async () => {
+      await check('mockup', '/login.html');
+      await check('hub', '/hub.html');
+      // Para code-server e theme, usa proxy local (evita CORS)
+      await proxyCheck('code', 'code');
+      await check('sw', '/sw.js');
+      await proxyCheck('theme', 'code-login');
+    })();
+  </script>
+
+</body>
+</html>
