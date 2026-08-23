@@ -1,5 +1,6 @@
-/* Footer — navegação PÚBLICA (fora do card de login).
-   Fixed no rodapé da página, nunca dentro do auth-shell. */
+/* Footer — APENAS copyright.
+   Fixed no rodapé da pagina, fora do card de login.
+   Zero links externos — login nao tem navegacao publica. */
 
 .auth-footer {
   position: fixed;
@@ -9,15 +10,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--s-2);
   padding: var(--s-3) var(--s-4);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: lowercase;
-  color: var(--dm-navy-1);
+  color: var(--dm-navy-3);
   z-index: 10;
-  /* Backdrop blur sutil pra legibilidade sobre qualquer bg */
+  /* Backdrop blur sutil pra legibilidade */
   background: linear-gradient(
     to top,
     rgba(6, 22, 55, 0.4) 0%,
@@ -27,27 +27,7 @@
   backdrop-filter: blur(2px);
 }
 
-.auth-footer-brand {
-  color: var(--dm-paper);
-  font-weight: 600;
-}
-
-.auth-footer-sep {
-  color: var(--dm-navy-3);
-}
-
-.auth-footer-link {
-  color: var(--dm-cyan-5);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--dm-cyan-5);
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.auth-footer-link:hover {
-  color: var(--dm-cyan-3);
-  border-color: var(--dm-cyan-3);
-}
-
 .auth-footer-copy {
   color: var(--dm-navy-1);
+  font-weight: 500;
 }
