@@ -104,6 +104,25 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 
 ---
 
+### [LEARN-009] Copy de superfície: pública vs interna (PII + arquitetura)
+> **Data:** 2026-08-23 · **Contexto:** hub-remote-ide/login v2.2 · **Agente:** Hermes/M3 (DM Agent) · **ADR:** [ADR-010](#adr-010-login-do-hub-sob-o-princípio-hub-apenas-rodada-2308-hermesm3-dm-agent--v21)
+
+- **Problema:** A tela de login (página **pública** — qualquer um com a URL vê) tinha no `<p class="login-sub">`: `"Gemini, MiniMax M3, Z.AI e VSCode Web — um login, do canteiro pro bolso."`. O Helbert percebeu: isso **vaza duas informações operacionais** que não interessam a um visitante: (a) **stack tecnológica específica** (concorrentes conseguem inferir estratégia), (b) **contexto pessoal** ("canteiro pro bolso" é específico da operação Dev Maniac's).
+- **Causa raiz:** copy não-separada por superfície. A mesma copy que serve pra documento interno de onboarding foi parar na landing pública. Falta de princípio explícito "página pública ≠ página interna".
+- **Solução:** copy dupla:
+  - **Login (público):** `"Hub Remoto de IDEs"` (título neutro) + `"Seu painel unificado — acesso único a partir de qualquer lugar."` (sub genérico). Identidade vem da marca + mascote, não de texto descritivo.
+  - **Dashboard/Hub/Status (internas, pós-auth via cookie SSO + allowlist):** `"Gemini · MiniMax M3 · Z.AI · VSCode Web"` continua aparecendo — é a tela de trabalho, você precisa saber qual IDE está abrindo. Ali sim, a copy técnica faz sentido.
+  - **`<meta description>` do login + `manifest.webmanifest` description:** mesma copy genérica.
+- **Princípio registrado:**
+  1. **PII nunca no front público**: email, telefone, contas pessoais (já removido email no LEARN-008 / a99a136).
+  2. **Stack tecnológica específica nunca no front público**: trocada por descrição genérica da função.
+  3. **Contexto pessoal/profissional nunca no front público**: "canteiro", "bolso" → só aparecem em docs internos (README, HANDOVER).
+  4. **Identidade vem de marca + mascote + logo**: o que distingue "Hub DM" de qualquer outro Hub é a marca visual, não a copy.
+- **Aplicar em:** qualquer página com acesso pré-auth (login, marketing, error, offline) + qualquer metadata pública (`<meta>`, `manifest.webmanifest`, og:image alt text). Páginas pós-auth podem manter stack + detalhes operacionais.
+- **Trade-off:** copy pública fica menos "vendável" pra um visitante — não lista os produtos. Aceitável: o Hub tem 1 usuário (você), não precisa converter leads. Se um dia virar produto, refaz a copy pública.
+
+---
+
 ## 🔄 Template Para Novas Entradas
 
 ```markdown

@@ -89,6 +89,55 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 **Não precisei purgar Cloudflare manualmente** — não tinha API token do CF na2222 (o `credentials-file.json` em `~/.cloudflared/` é só cred de tunnel, não API). O bump `v4→v5` + `skipWaiting()` resolve sozinho.
 
+### Rodada 23/08 11:55 — privacidade + ícone PWA do mascote
+
+**Helbert levantou 2 pontos sensatos:**
+1. Email `helbertcurcio@gmail.com` estava visível no front + mensagens técnicas de diagnóstico operacional ("login google pendente — cole o client id/secret no mockup/config.php", "credenciais ausentes"). Vazava arquitetura interna pra qualquer visitante.
+2. O ícone PWA atual (`dev-maniacs-mark-512.png`) era um **caminhão de carga genérico** — parecia ícone de qualquer projeto de logística, sem identidade da Dev Maniac's.
+
+**O que foi feito:**
+
+1. **Privacidade no front (LEARN-009 + ADR-010 atualizado):**
+   - Removido `helbertcurcio@gmail.com` do `<p class="login-restrict">">` (allowlist fica SÓ no back, em `config.php`)
+   - Removido parágrafo "acesso exclusivo · helbertcurcio@gmail.com"
+   - Removido aviso "login google pendente — cole o client id/secret no `mockup/config.php`" (HTML com `hidden=true`, JS nunca força visibilidade)
+   - Chip "credenciais ausentes" → "configuração pendente" (texto neutro)
+   - **Copy do front agora é genérica:** `"Seu painel unificado — acesso único a partir de qualquer lugar."` (era "Gemini, MiniMax M3, Z.AI e VSCode Web — um login, do canteiro pro bolso.")
+   - `<meta description>` + `manifest.webmanifest` description: mesma copy genérica
+   - **Páginas internas (dashboard/hub/status) MANTÊM a stack** — são pós-auth, faz sentido ver os IDEs específicos
+
+2. **Ícone PWA novo — rosto do mascote:**
+   - 4 tamanhos gerados via PIL: 32, 180, 192, 512px
+   - Crop: top 30% do asset 700×1400, fundo bege removido via alpha mask, fundo do canvas = NAVY #061637, borda cyan #08B9CA com 2.5% espessura
+   - **Pixel `(256,60)` do ícone 512 validado como `(6,22,55,255)` = NAVY (não transparente, não branco)**
+   - Visualmente validado: mascote limpo, sem sliver bege, profissional, distintivo
+
+3. **Substituições em todos HTMLs:**
+   - `login.html`, `hub.html`, `dashboard.html`, `offline.html`, `status.html` → `<link rel="icon">` + `<link rel="apple-touch-icon">` apontam pros ícones novos
+   - `manifest.webmanifest` → lista os 4 tamanhos novos (any/maskable)
+
+4. **SW v6 → v7:**
+   - `CACHE_VERSION = 'dm-hub-v7'`
+   - STATIC_ASSETS aponta pros ícones novos (mark.png antigo mantido — é o logo DM interno)
+   - Notification icon/badge aponta pros ícones novos
+
+**Commits na ordem:**
+- `984006d` — feat(login): v2.1 mobile-first
+- `8610262` — chore(sw): bump v4→v5
+- `c243d83` — docs(handover): status final
+- `a99a136` — fix(login): remove email + msgs técnicas (privacidade)
+- `3f3b957` — feat(brand): ícone PWA do mascote + copy segura (este)
+
+**Validação em produção (curl):**
+- `curl /login.html` → login-sub "Seu painel unificado — acesso único a partir de qualquer lugar." ✓
+- `curl /login.html | grep Gemini` → zero ocorrências ✓
+- `curl /sw.js | grep CACHE_VERSION` → `dm-hub-v7` ✓
+- `curl /manifest.webmanifest` → descrição atualizada ✓
+
+**Não commitei/pushei LEARN-009 nem atualizei HANDOVER automaticamente** — esses dois arquivos do cérebro ficam pra próxima rodada (LEARN-009 será commitado com o título de "docs(cérebro)" antes da Fase 2).
+
+**Próximo passo:** Hub interno (`hub.html` redesign) com CSS isolado (mesma estratégia do login v2.1). Aguardando OK visual do Helbert na tela de login AGORA.
+
 ## [2026-08-23 10:25] Z.AI GLM 5.3 (DM Agent · Hermes) → Helbert
 
 **Sessão:** Redesign da tela de login do zero (v1.4.0) a pedido do Helbert
