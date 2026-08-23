@@ -343,6 +343,20 @@ if (str_starts_with($uri, '/assets/')) {
     dm_page(404, 'DM//404', 'Asset não encontrado', '<p><code>' . htmlspecialchars($uri) . '</code></p>');
 }
 
+// sw.js NUNCA pode ser cacheado (nem pela Cloudflare): o service worker
+// precisa ver bytes novos pra se atualizar. Cache de CDN no sw.js = PWA
+// travado na versão velha pra sempre.
+if ($uri === '/sw.js') {
+    $f = __DIR__ . '/sw.js';
+    if (is_file($f)) {
+        header('Content-Type: application/javascript; charset=utf-8');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Content-Length: ' . (string) filesize($f));
+        readfile($f);
+        exit;
+    }
+}
+
 if ($uri !== '' && $uri !== '/') {
     $file = realpath(__DIR__ . $uri);
     $root = realpath(__DIR__);

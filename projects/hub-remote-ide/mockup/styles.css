@@ -143,330 +143,284 @@ svg { display: block; flex-shrink: 0; }
 }
 
 /* ============================================================
-   LOGIN
+   LOGIN — console Dev Maniac's (v1.3 · redesenhado do zero)
+   Conceito: tela navy imersiva, bandeira da marca no topo,
+   cartão brutalista estilo janela de terminal com o mascote
+   sobreposto, e UMA linha de status mono no rodapé.
    ============================================================ */
+
 .login-page {
-  background: var(--paper-warm);
-  min-height: 100vh;
-}
-
-.login-grid {
-  display: grid;
-  grid-template-columns: minmax(320px, 1fr) 1.1fr;
-  min-height: 100vh;
-}
-
-/* ASIDE ESQUERDO */
-.login-aside {
+  min-height: 100dvh;
   background: var(--navy);
   color: var(--paper);
-  padding: 32px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  padding: 0 20px calc(28px + env(safe-area-inset-bottom));
+  padding-top: env(safe-area-inset-top);
+  overflow-x: hidden;
   position: relative;
+}
+
+/* Bandeira Dev Maniac's (stripe) fixa no topo */
+.login-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg,
+    var(--coral) 0 25%,
+    var(--yellow) 25% 50%,
+    var(--cyan) 50% 75%,
+    var(--purple) 75% 100%);
+  z-index: 20;
+}
+
+/* Grade técnica + pixels decorativos no fundo navy */
+.login-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 22%, var(--coral) 0 3px, transparent 3px),
+    radial-gradient(circle at 88% 16%, var(--yellow) 0 3px, transparent 3px),
+    radial-gradient(circle at 14% 84%, var(--cyan) 0 3px, transparent 3px),
+    radial-gradient(circle at 91% 88%, var(--purple) 0 3px, transparent 3px),
+    linear-gradient(rgba(250, 246, 237, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250, 246, 237, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, 32px 32px, 32px 32px;
+  pointer-events: none;
+}
+
+.login-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0 8px;
+  animation: shell-in 0.5s ease both;
+}
+
+/* Marca */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-brand .brand-mark {
+  width: 60px;
+  height: 60px;
+}
+
+.login-brand .brand-word {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+/* Mascote sobrepõe o cartão */
+.login-mascot {
+  z-index: 3;
+  margin: 14px 0 -36px;
+}
+
+.login-mascot img {
+  width: 148px;
+  height: auto;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.55));
+  animation: mascot-bob 3.2s ease-in-out infinite;
+}
+
+/* Cartão brutalista (janela de terminal) */
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: var(--paper);
+  color: var(--navy);
+  border: 3px solid var(--navy);
+  border-radius: 12px;
+  box-shadow: 10px 10px 0 rgba(8, 185, 202, 0.85);
   overflow: hidden;
 }
 
-.login-aside::before {
-  /* Pixel decoration sutil (igual mascote) */
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 12% 28%, var(--coral) 0 4px, transparent 4px),
-    radial-gradient(circle at 85% 18%, var(--yellow) 0 4px, transparent 4px),
-    radial-gradient(circle at 18% 78%, var(--cyan) 0 4px, transparent 4px),
-    radial-gradient(circle at 92% 82%, var(--purple) 0 4px, transparent 4px);
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.aside-brand {
-  position: relative;
+.login-card-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.brand-copy {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.brand-copy strong {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.brand-copy small {
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--navy);
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--cyan);
-  letter-spacing: 0.1em;
-  margin-top: 2px;
-}
-
-.aside-mascot {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: 40px 0;
-}
-
-.aside-mascot img {
-  max-width: 360px;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.4));
-}
-
-.aside-meta {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-}
-
-.meta-tag { color: var(--cyan); }
-
-.meta-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--success);
-}
-
-/* MAIN DIREITO */
-.login-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 32px;
-  background: var(--paper);
-}
-
-.login-shell {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.login-title {
-  font-family: var(--font-mono);
-  font-size: clamp(28px, 4vw, 36px);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--navy);
-  margin-bottom: 8px;
+  letter-spacing: 0.18em;
+  color: var(--cyan);
+  text-transform: uppercase;
 }
 
-.login-subtitle {
-  font-size: 15px;
-  color: var(--muted);
-  margin-bottom: 12px;
+.login-card-bar i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-/* FORM */
-.login-form {
+.login-card-bar i:nth-child(1) { background: var(--coral); }
+.login-card-bar i:nth-child(2) { background: var(--yellow); }
+.login-card-bar i:nth-child(3) { background: var(--cyan); }
+.login-card-bar span { margin-left: 8px; }
+
+.login-card-body {
+  padding: 26px 22px 22px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.field-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.login-title {
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: clamp(22px, 5vw, 26px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--navy);
 }
 
-.field-hint {
+.login-sub {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-top: -10px;
+}
+
+.login-restrict {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--cyan);
   letter-spacing: 0.08em;
-  text-transform: none;
-  font-weight: 500;
-}
-
-.field-input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  background: var(--paper-warm);
-  border: 2px solid var(--navy);
-  border-radius: var(--radius-sm);
-  font-size: 16px; /* 16px evita o zoom automático do iOS Safari ao focar */
-  color: var(--navy);
-  transition: background 0.15s;
-}
-
-.field-input::placeholder { color: rgba(6, 22, 55, 0.4); }
-
-.field-input:focus {
-  background: var(--paper);
-  box-shadow: var(--shadow-sm);
-  transform: translate(-2px, -2px);
-}
-
-.field-input-mono {
-  font-family: var(--font-mono);
-  font-size: 22px;
-  letter-spacing: 0.4em;
+  color: var(--muted);
   text-align: center;
 }
 
-.field-password { position: relative; }
-
-.field-password .field-input { padding-right: 48px; }
-
-.field-toggle {
-  position: absolute;
-  right: 4px;
-  top: 4px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.auth-warn {
+  padding: 10px 12px;
+  border: 2px dashed var(--warning);
   border-radius: var(--radius-sm);
+  background: rgba(184, 92, 72, 0.07);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  color: var(--warning);
+  text-align: center;
+}
+
+.auth-warn a {
+  color: var(--warning);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Instalação PWA — discreta, dentro do cartão */
+.install-compact {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 18px;
+  background: transparent;
   color: var(--navy);
-}
-
-.field-toggle:hover { background: var(--navy); color: var(--paper); }
-
-.form-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--navy);
-  cursor: pointer;
-}
-
-.link {
+  border: 2px solid var(--navy);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  border-bottom: 2px solid var(--navy);
-  padding-bottom: 2px;
+  cursor: pointer;
 }
 
-.link:hover { color: var(--cyan); border-color: var(--cyan); }
-
-/* BOTÕES */
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 0 24px;
+.install-compact:active {
   background: var(--navy);
   color: var(--paper);
+}
+
+.install-compact-hint {
   font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border-radius: var(--radius-sm);
-  transition: all 0.15s;
-  box-shadow: var(--shadow);
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--muted);
+  text-align: center;
 }
 
-.btn-primary:hover {
-  background: var(--cyan);
-  color: var(--navy);
-  transform: translate(-2px, -2px);
-}
-
-.btn-primary:active { transform: translate(4px, 4px); box-shadow: none; }
-
-/* TOTP */
-.totp-step { margin-top: 8px; }
-.totp-step.hidden { display: none; }
-
-.totp-divider {
+/* Linha de status (rodapé do console) */
+.login-statusline {
+  margin-top: 26px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 16px 0 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: rgba(250, 246, 237, 0.55);
 }
 
-.totp-divider::before,
-.totp-divider::after {
-  content: '';
-  flex: 1;
-  height: 2px;
-  background: var(--line);
+.st-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: help;
 }
 
-/* FOOTER */
+.st-item .status-dot { background: rgba(250, 246, 237, 0.35); }
+
+.st-item.is-ok { color: var(--cyan); }
+.st-item.is-ok .status-dot { background: var(--cyan); }
+
+.st-item.is-warn { color: var(--yellow); }
+.st-item.is-warn .status-dot { background: var(--yellow); }
+
 .login-footer {
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 24px;
-  border-top: 2px solid var(--line);
+  gap: 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(250, 246, 237, 0.3);
+  text-transform: uppercase;
 }
 
-.footer-meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.08em;
+/* Animações */
+@keyframes shell-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.footer-version {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--cyan);
-  letter-spacing: 0.08em;
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-wrap,
+  .login-mascot img { animation: none; }
+}
+
+@media (max-width: 480px) {
+  .login-mascot img { width: 124px; }
+  .login-card-body { padding: 22px 18px 18px; }
 }
 
 /* ============================================================
@@ -1100,19 +1054,8 @@ svg { display: block; flex-shrink: 0; }
    RESPONSIVO
    ============================================================ */
 @media (max-width: 960px) {
-  .login-grid { grid-template-columns: 1fr; }
-  /* Aside vira hero compacto — mascote CONTINUA visível no celular */
-  .login-aside { padding: 20px 24px; min-height: 0; }
-  .aside-mascot { flex: 0 1 auto; padding: 12px 0; }
-  .aside-mascot img { max-width: 180px; }
-  .login-main { padding: 32px 20px; }
   .header-nav { display: none; }
   .dual-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 480px) {
-  .aside-mascot img { max-width: 140px; }
-  .login-title { font-size: 26px; }
 }
 
 @media (max-width: 768px) {
@@ -1133,25 +1076,21 @@ svg { display: block; flex-shrink: 0; }
   /* mantém o estilo claro oficial */
 }
 
-/* ---------- GOOGLE OAUTH BUTTON ---------- */
-.oauth-row {
-  margin-bottom: 20px;
-}
-
+/* ---------- BOTÃO GOOGLE (dentro do cartão console) ---------- */
 .btn-google {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   width: 100%;
-  min-height: 52px;
+  min-height: 56px;
   padding: 0 24px;
   background: #ffffff;
   color: #1f1f1f;
-  border: 2px solid #061637;
+  border: 3px solid var(--navy);
   border-radius: 8px;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 15px;
+  font-family: var(--font-sans);
+  font-size: 16px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -1173,182 +1112,7 @@ svg { display: block; flex-shrink: 0; }
   flex-shrink: 0;
 }
 
-/* ---------- DIVIDER (ou use e-mail) ---------- */
-.divider {
-  display: flex;
-  align-items: center;
-  margin: 20px 0 24px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  color: #5c5c5c;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #d4d4d4;
-}
-
-.divider span {
-  padding: 0 16px;
-}
-
-/* ---------- NOTA DE ACESSO RESTRITO (login Google-only) ---------- */
-.login-restrict {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-.login-restrict .eyebrow-bar {
-  width: 16px;
-  height: 2px;
-  background: var(--purple);
-}
-
-/* ---------- AVISO: CREDENCIAIS GOOGLE PENDENTES ---------- */
-.auth-warn {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border: 2px dashed var(--warning);
-  border-radius: var(--radius-sm);
-  background: rgba(184, 92, 72, 0.08);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  line-height: 1.6;
-  color: var(--warning);
-}
-
-.auth-warn a {
-  color: var(--warning);
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-/* ---------- STRIP DE STATUS DOS SISTEMAS ---------- */
-.system-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 22px;
-}
-
-.sys-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  background: var(--paper-warm);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  cursor: help;
-}
-
-.sys-chip .status-dot { background: var(--muted); opacity: 0.4; }
-
-.sys-chip.is-ok {
-  border-color: var(--success);
-  color: var(--success);
-}
-.sys-chip.is-ok .status-dot { background: var(--success); opacity: 1; }
-
-.sys-chip.is-warn {
-  border-color: var(--warning);
-  color: var(--warning);
-}
-.sys-chip.is-warn .status-dot { background: var(--warning); opacity: 1; }
-
-/* ---------- DICA DE INSTALAÇÃO PWA ---------- */
-.install-hint {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border: 2px solid var(--navy);
-  border-radius: var(--radius-sm);
-  background: var(--paper-warm);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.install-hint strong {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--purple);
-}
-
-.install-hint span {
-  font-size: 13px;
-  color: var(--ink);
-  line-height: 1.5;
-}
-
-.install-hint button {
-  align-self: flex-start;
-  min-height: 44px;
-  padding: 0 18px;
-  background: var(--navy);
-  color: var(--paper);
-  border: 0;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-}
-
-.install-hint button:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
-}
-
-/* ---------- LOGIN: animações e estados ---------- */
-.login-shell {
-  animation: shell-in 0.5s ease both;
-}
-
-@keyframes shell-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.aside-mascot img {
-  animation: mascot-bob 3.2s ease-in-out infinite;
-}
-
-@keyframes mascot-bob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-
 .btn-google.is-loading {
-  opacity: 0.75;
+  opacity: 0.7;
   pointer-events: none;
 }
-
-@media (max-width: 768px) {
-  .btn-google {
-    min-height: 52px;   /* mantém alvo de toque confortável no dedão */
-    font-size: 16px;    /* evita zoom do iOS no tap */
-  }
-}
-
