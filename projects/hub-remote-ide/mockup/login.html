@@ -97,10 +97,22 @@
 
         <!-- ============ STEP 3: SETUP 2FA (primeira vez) ============ -->
         <div id="stepSetup" class="login-form" hidden>
-          <p class="login-2fa-hint">Você ainda não configurou 2FA. Adicione este secret no seu app autenticador (Google Authenticator / Authy / 1Password):</p>
+          <p class="login-2fa-hint">Adicione este secret no seu app autenticador (Google Authenticator / Authy / 1Password / Bitwarden):</p>
           <div class="login-secret-box">
             <code id="totpSecret"></code>
+            <button type="button" class="login-copy-btn" id="copySecretBtn" aria-label="copiar secret">copiar</button>
           </div>
+          <details class="login-secret-details">
+            <summary>como adicionar?</summary>
+            <ol class="login-help-list">
+              <li>Abra seu app autenticador</li>
+              <li>Toque em <b>+</b> (adicionar conta)</li>
+              <li>Escolha <b>"Inserir chave de configuração"</b> (ou "manual")</li>
+              <li>Cole o secret acima</li>
+              <li>Conta: <code>helbert.moura@devmaniacs.com.br</code></li>
+              <li>Tipo: Baseado em tempo (TOTP)</li>
+            </ol>
+          </details>
           <p class="login-2fa-hint">Depois, digite o código de 6 dígitos pra confirmar:</p>
           <form id="formStep2Setup">
             <label class="login-field">
@@ -180,13 +192,21 @@
           }
           // Senha OK — vai pra 2FA (ou setup 2FA se primeira vez)
           if (data.next === '2fa_setup') {
-            // Busca secret novo
+            // Busca secret novo + otpauth URI
             var sr = await fetch('/auth/2fa/setup', { credentials: 'same-origin' });
             var sd = await sr.json();
             if (sr.ok && sd.ok) {
               document.getElementById('totpSecret').textContent = sd.secret;
               form1.hidden = true;
               stepSetup.hidden = false;
+              // Botão copiar secret
+              var copyBtn = document.getElementById('copySecretBtn');
+              copyBtn.addEventListener('click', function () {
+                navigator.clipboard.writeText(sd.secret).then(function () {
+                  copyBtn.textContent = 'copiado!';
+                  setTimeout(function () { copyBtn.textContent = 'copiar'; }, 1500);
+                });
+              });
             } else {
               showError('falha ao gerar secret 2FA');
               btn.disabled = false;
