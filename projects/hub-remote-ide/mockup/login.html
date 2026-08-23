@@ -22,6 +22,23 @@
 </head>
 <body class="login-page">
 
+  <script>
+    // Se já tem cookie SSO válido, pula direto pro Hub.
+    // PWA start_url = /login.html, então SEMPRE abre aqui primeiro.
+    // Esse redirect evita ter que ficar clicando "ENTRAR" toda vez.
+    (function () {
+      try {
+        var has = document.cookie.split('; ').some(function (c) {
+          return c.indexOf('dm_sso=') === 0;
+        });
+        if (has) {
+          // Cookie presente — assume válido (back valida em cada request)
+          window.location.replace('/hub.html');
+        }
+      } catch (_) {}
+    })();
+  </script>
+
   <main class="login-shell">
 
     <!-- Coluna esquerda: marca + avatar -->

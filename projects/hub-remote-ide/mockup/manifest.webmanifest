@@ -3,7 +3,7 @@
   "short_name": "DM Hub",
   "description": "Hub remoto de IDEs da Dev Maniac's — acesso unificado",
   "id": "/",
-  "start_url": "/hub.html",
+  "start_url": "/login.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#061637",
