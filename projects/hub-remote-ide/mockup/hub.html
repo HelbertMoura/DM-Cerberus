@@ -11,8 +11,10 @@
   <meta name="apple-mobile-web-app-title" content="DM Hub">
   <meta name="description" content="Hub unificado de IDEs Dev Maniac's — login único, SSO">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/assets/brand/dev-maniacs-mark.png" type="image/png">
-  <link rel="apple-touch-icon" href="/assets/brand/dev-maniacs-mark.png">
+  <link rel="icon" href="/assets/brand/dev-maniacs-mark-180.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/dev-maniacs-mark-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <title>Hub · Dev Maniac's</title>
   <script>
@@ -25,48 +27,48 @@
     }
   </script>
   <style>
-    /* Layout específico do hub-unificado */
-    .hub-frame-wrap {
-      position: relative;
-      width: 100%;
-      height: calc(100vh - 80px);
-      background: var(--paper);
-      border: 3px solid var(--navy);
-      border-radius: 12px;
-      box-shadow: 8px 8px 0 var(--navy);
+    /* Layout hub-unificado — mobile-first */
+    body.dashboard-page {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;               /* viewport dinâmica (barra do mobile some/aparece) */
       overflow: hidden;
-    }
-    .hub-frame-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
+      padding: 0;
     }
     .hub-toolbar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+      flex-wrap: wrap;              /* em telas pequenas o switch desce pra 2a linha */
+      gap: 8px 12px;
+      padding: 10px 14px;
+      padding-top: calc(10px + env(safe-area-inset-top)); /* notch iOS em standalone */
       background: var(--navy);
       color: var(--paper);
       border-bottom: 3px solid var(--purple);
     }
     .hub-toolbar .toolbar-brand {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--cyan);
+      white-space: nowrap;
     }
     .hub-toolbar .toolbar-title {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-sans);
       font-size: 14px;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
     .hub-toolbar .toolbar-actions {
       margin-left: auto;
       display: flex;
+      align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
     .hub-toolbar .toolbar-actions a,
     .hub-toolbar .toolbar-actions button {
@@ -74,9 +76,10 @@
       color: var(--paper);
       border: 1px solid var(--cyan);
       border-radius: 6px;
-      padding: 6px 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      min-height: 44px;             /* alvo de toque mínimo (ergonomia DM) */
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
       letter-spacing: 0.05em;
       cursor: pointer;
       text-decoration: none;
@@ -90,14 +93,64 @@
     .hub-toolbar .toolbar-actions .ide-switch {
       display: flex;
       gap: 4px;
+      max-width: 100%;
+      overflow-x: auto;             /* rola horizontal se precisar */
+      -webkit-overflow-scrolling: touch;
     }
     .hub-toolbar .toolbar-actions .ide-switch button {
       border-color: var(--purple);
-      color: var(--purple);
+      color: #c9a7f0;
+      white-space: nowrap;
     }
     .hub-toolbar .toolbar-actions .ide-switch button.active {
       background: var(--purple);
       color: var(--paper);
+    }
+    .toolbar-user {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cyan);
+      border: 1px solid var(--purple);
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: rgba(107, 76, 154, 0.15);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .toolbar-user img {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--cyan);
+      flex-shrink: 0;
+    }
+    .dashboard-main {
+      flex: 1;
+      min-height: 0;                /* deixa o iframe ocupar o resto da tela */
+      display: flex;
+      padding: 8px;
+      padding-bottom: calc(8px + env(safe-area-inset-bottom)); /* home indicator iOS */
+    }
+    .hub-frame-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      background: var(--paper);
+      border: 3px solid var(--navy);
+      border-radius: 12px;
+      box-shadow: 8px 8px 0 var(--navy);
+      overflow: hidden;
+    }
+    .hub-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
     }
     .hub-loading {
       position: absolute;
@@ -109,7 +162,9 @@
       gap: 16px;
       background: var(--paper);
       color: var(--navy);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
+      text-align: center;
+      padding: 20px;
     }
     .hub-loading .spinner {
       width: 48px;
@@ -120,35 +175,42 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    .toolbar-user {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--cyan);
-      border: 1px solid var(--purple);
-      border-radius: 6px;
-      padding: 4px 10px;
-      background: rgba(107, 76, 154, 0.15);
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .toolbar-user img {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 1px solid var(--cyan);
-      flex-shrink: 0;
-    }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast Dev Maniac's (substitui alert nativo) */
+    .dm-toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(16px);
+      background: var(--navy);
+      color: var(--paper);
+      border: 2px solid var(--cyan);
+      border-radius: 8px;
+      box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+      padding: 12px 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      max-width: min(92vw, 420px);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 1000;
+    }
+    .dm-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 768px) {
+      .hub-toolbar .toolbar-title { display: none; }  /* menos ruído no celular */
+      .hub-toolbar { padding: 8px 10px; padding-top: calc(8px + env(safe-area-inset-top)); }
+      .dashboard-main { padding: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+    }
   </style>
 </head>
 <body class="dashboard-page">
 
-  <!-- Toolbar do Hub (substitui header antigo) -->
+  <!-- Toolbar do Hub -->
   <header class="hub-toolbar">
     <span class="toolbar-brand">DM//HUB</span>
     <span class="toolbar-title">Code-server · VSCode Web</span>
@@ -180,15 +242,26 @@
     </div>
   </main>
 
+  <div class="dm-toast" id="toast" role="status" aria-live="polite"></div>
+
   <script>
-    // Esconde loading quando iframe carrega
     const iframe = document.getElementById('vscode-frame');
     const loading = document.getElementById('loading');
     iframe.addEventListener('load', () => {
       loading.style.display = 'none';
     });
 
-    // Usuário logado (via /auth/me do router.php) — chip Dev Maniac's
+    // Toast da marca (substitui alert nativo)
+    const toast = document.getElementById('toast');
+    let toastTimer = null;
+    function dmToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // Usuário logado (via /auth/me do router.php)
     (async () => {
       const chip = document.getElementById('userChip');
       const link = document.getElementById('authLink');
@@ -207,24 +280,26 @@
         chip.hidden = false;
         link.textContent = 'Sair';
         link.href = '/auth/logout';
+        if (data.sso_code) dmToast('SSO ativo — code-server sem senha');
       } catch (e) { /* offline/mock: mantém "Entrar" */ }
     })();
 
-    // Switcher de IDE (placeholder pra Fase 2/3)
+    // Switcher de IDE (Code ativo; demais chegam na Fase 2)
     document.querySelectorAll('.ide-switch button').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.ide-switch button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
         const ide = btn.dataset.ide;
         if (ide === 'code') {
-          iframe.src = 'https://code.devmaniacs.com.br';
-        } else if (ide === 'antigravity') {
-          alert('Antigravity 2.0 — Fase 3 (em breve). Por enquanto use Code.');
-        } else if (ide === 'm3') {
-          alert('MiniMax M3 — Fase 2 (em breve). Por enquanto use Code.');
-        } else if (ide === 'zai') {
-          alert('Z.AI Code — Fase 2 (em breve). Por enquanto use Code.');
+          document.querySelectorAll('.ide-switch button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          if (!iframe.src.includes('code.devmaniacs')) iframe.src = 'https://code.devmaniacs.com.br';
+          return;
         }
+        const nomes = {
+          antigravity: 'Antigravity 2.0',
+          m3: 'MiniMax M3',
+          zai: 'Z.AI Code'
+        };
+        dmToast(nomes[ide] + ' — chega na Fase 2. Por enquanto use o Code.');
       });
     });
 

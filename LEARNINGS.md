@@ -70,6 +70,17 @@ Toda vez que você (humano ou IA) aprender algo **reutilizável** em outros proj
 
 ---
 
+### [LEARN-006] `php -S` com router quebrado devolve 200 VAZIO (sem erro)
+> **Data:** 23/08/2026 · **Contexto:** hub-remote-ide · **Agente:** Z.AI ZCode · **ADR:** —
+
+- **Problema:** Site inteiro servindo páginas vazias com HTTP 200 — sem erro no log, sem 500, e o watchdog via "hub=200" e não reclamava.
+- **Causa raiz:** Parse error no `router.php` (typo: `__DIR__ '/../'` sem o ponto de concatenação). O PHP built-in server, com `display_errors=0`, responde 200 com body vazio quando o router não compila — falha **silenciosa**.
+- **Solução:** Diagnóstico definitivo foi rodar `php router.php` no CLI (mostra o parse error que o `-S` engole). Regra nova: **`php -l` obrigatório depois de QUALQUER edit em arquivo PHP servido ao vivo** — antes de qualquer curl de teste.
+- **Bônus:** descobri junto que o output de `echo` num router é DESCARTADO quando ele termina com `return false` (o built-in server assume a resposta inteira).
+- **Aplicar em:** Qualquer uso de `php -S <host:port> router.php` em DevManiacs.
+
+---
+
 ## 🔄 Template Para Novas Entradas
 
 ```markdown

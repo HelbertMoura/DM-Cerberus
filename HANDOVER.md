@@ -40,6 +40,34 @@ Toda vez que um agente terminar uma tarefa e passar pro próximo, ele **adiciona
 
 <!-- NOVA ENTRADA MAIS RECENTE PRIMEIRO -->
 
+## [2026-08-23 09:10] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
+
+**Sessão:** Auditoria UI/UX + mobile + PWA do hub-remote-ide (pré-Fase 2)
+**Tarefa executada:** auditoria completa + correções aplicadas no mesmo dia —
+relatório em `projects/hub-remote-ide/auditoria-ui-ux-2026-08-23.md`. Destaques:
+- **P0:** assets de marca 404 desde o deploy inicial (docroot ≠ pasta assets) → rota
+  `/assets/*` no router + ícones reais 512/180/maskable (Pillow nearest) ✅
+- **P0:** tipografia oficial nunca carregou (sem link de fonts) → Inter + JetBrains Mono
+  com preconnect ✅
+- Mobile: toolbar do hub responsiva (44px, safe-areas iOS, 100dvh, flex-wrap), inputs
+  16px (fim do zoom iOS), toast DM no lugar de alert() ✅
+- PWA: manifest v2 (start_url hub.html, orientation livre, ícones reais), SW v2
+  (cache hub/status/offline, exclusão de /auth/), offline.html com auto-retry ✅
+- status.html: check de SSO real (302 pro login = protegido), zero emojis em UI ✅
+- Incidente durante a auditoria: parse error no router (typo) = 200 vazio silencioso →
+  LEARN-006 (php -l obrigatório pós-edit); site recuperido em minutos ✅
+
+**Arquivos:** mockup/{router,sw,hub,login,status,dashboard,offline,health,manifest,styles,app},
+assets/brand/{512,180,maskable}, auditoria-ui-ux-2026-08-23.md, LEARNINGS.md, README.md
+
+**Status:** ✅ concluído · Validação no CELULAR (install PWA + safe-areas) fica pro Helbert
+
+**Próximo passo:**
+1. Helbert cola credenciais Google no `mockup/config.php` (última pendência!)
+2. Validar PWA no celular → depois Fase 2 (bridges Antigravity/M3/Z.AI)
+
+---
+
 ## [2026-08-23 08:45] Z.AI GLM 5.3 (ZCode CLI) → próxima sessão
 
 **Sessão:** SSO Hub → Code-server (continuidade das entregas 3a5acec/24d9605)

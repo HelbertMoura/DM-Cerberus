@@ -1,47 +1,50 @@
 // Service Worker — Dev Maniac's Hub
-// Versão: 1.0.0 · 22/08/2026
-// Estratégia: network-first pra HTML, cache-first pra assets estáticos
+// Versão: 2.0.0 · 23/08/2026 (auditoria mobile/PWA)
+// Estratégia: network-first pra HTML, cache-first pra assets estáticos,
+// rotas de auth/health SEMPRE na rede (nunca cache).
 
-const CACHE_VERSION = 'dm-hub-v1';
+const CACHE_VERSION = 'dm-hub-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
 const STATIC_ASSETS = [
   '/',
   '/login.html',
+  '/hub.html',
+  '/status.html',
   '/dashboard.html',
+  '/offline.html',
   '/styles.css',
   '/app.js',
   '/manifest.webmanifest',
   '/assets/brand/dev-maniacs-mark.png',
+  '/assets/brand/dev-maniacs-mark-512.png',
+  '/assets/brand/dev-maniacs-mark-maskable-512.png',
+  '/assets/brand/dev-maniacs-mark-180.png',
   '/assets/brand/dev-maniacs-mascot.webp',
-  '/assets/brand/dev-maniacs-social-card.png',
 ];
+
+// Nunca cachear (sessão/health/oauth mudam a cada request)
+const NEVER_CACHE = ['/auth/', '/api/', '/health.php'];
 
 // ========== INSTALL ==========
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing...');
+  console.log('[SW] Installing v2...');
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      console.log('[SW] Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
-    })
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
 
 // ========== ACTIVATE ==========
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating v2...');
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys
           .filter((key) => key !== STATIC_CACHE && key !== DYNAMIC_CACHE)
-          .map((key) => {
-            console.log('[SW] Removing old cache:', key);
-            return caches.delete(key);
-          })
+          .map((key) => caches.delete(key))
       );
     })
   );
@@ -53,11 +56,14 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignora requests pra outros domínios (APIs externas, etc)
+  // Só mesmo origin; ignora Google Fonts, code-server etc
   if (url.origin !== location.origin) return;
 
-  // ========== HTML: network-first ==========
-  if (request.mode === 'navigate' || request.headers.get('accept').includes('text/html')) {
+  // Rotas dinâmicas: sempre rede (sem cache, sem fallback offline)
+  if (NEVER_CACHE.some((p) => url.pathname.startsWith(p))) return;
+
+  // ========== HTML: network-first com fallback offline ==========
+  if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -65,7 +71,9 @@ self.addEventListener('fetch', (event) => {
           caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, clone));
           return response;
         })
-        .catch(() => caches.match(request).then((r) => r || caches.match('/login.html')))
+        .catch(() =>
+          caches.match(request).then((r) => r || caches.match('/offline.html'))
+        )
     );
     return;
   }
@@ -98,8 +106,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/assets/brand/dev-maniacs-mark.png',
-      badge: '/assets/brand/dev-maniacs-mark.png',
+      icon: '/assets/brand/dev-maniacs-mark-512.png',
+      badge: '/assets/brand/dev-maniacs-mark-180.png',
       tag: 'dm-hub-notification',
       requireInteraction: false,
     })

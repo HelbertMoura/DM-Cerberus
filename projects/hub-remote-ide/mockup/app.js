@@ -46,7 +46,7 @@
         submitLabel.textContent = 'Autenticando...';
         submitBtn.disabled = true;
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
+          window.location.href = '/hub.html';
         }, 900);
       }
     });

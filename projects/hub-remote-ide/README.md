@@ -175,9 +175,10 @@ C:\Users\Helbert\Desktop\DM-Cerebro\projects\hub-remote-ide\
     ├── status.html                    ← página de diagnóstico (5 checks)
     ├── styles.css                     ← identidade visual completa (22 KB)
     ├── app.js                         ← interações JS (toggle, login fake)
-    ├── manifest.webmanifest           ← PWA manifest (nome, ícones, atalhos)
-    ├── sw.js                          ← service worker (offline + cache)
-    ├── health.php                     ← proxy CORS pra health checks
+    ├── manifest.webmanifest           ← PWA manifest v2 (ícones reais, atalhos)
+    ├── sw.js                          ← service worker v2 (offline + cache)
+    ├── offline.html                   ← página offline da marca (auto-retry)
+    ├── health.php                     ← proxy CORS pra checks (+target sso)
     └── serve.js                       ← servidor Node backup (não usado)
 ```
 
@@ -546,36 +547,38 @@ ssh -p 2222 root@127.0.0.1 'docker logs hub-code-server --tail 20'
 
 ## 10. PWA — Instalação mobile
 
-### Manifest.webmanifest
+### Manifest.webmanifest (v2 — auditoria 23/08/2026)
 
 ```json
 {
   "name": "Dev Maniac's Hub",
   "short_name": "DM Hub",
-  "start_url": "/dashboard.html",
+  "start_url": "/hub.html",
   "display": "standalone",
   "background_color": "#061637",
   "theme_color": "#061637",
   "icons": [
-    { "src": "../assets/brand/dev-maniacs-mark.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "../assets/brand/dev-maniacs-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/assets/brand/dev-maniacs-mark-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/brand/dev-maniacs-mark-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/brand/dev-maniacs-mark-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
-    { "name": "Antigravity 2.0", "url": "/dashboard.html?ide=antigravity" },
-    { "name": "MiniMax Code", "url": "/dashboard.html?ide=m3" },
-    { "name": "Z.AI Code", "url": "/dashboard.html?ide=zai" }
+    { "name": "VSCode Web (Code-server)", "url": "/hub.html?ide=code" },
+    { "name": "Diagnóstico do Hub", "url": "/status.html" }
   ]
 }
 ```
 
-### Service Worker (sw.js)
+> Ícones reais gerados com Pillow (nearest-neighbor, pixel art preservado).
+> Sem `orientation` travada — landscape é essencial pra ler código no celular.
 
-- **Versão do cache:** `dm-hub-v1`
+### Service Worker (sw.js v2)
+
+- **Versão do cache:** `dm-hub-v2` (trocar a cada deploy de assets)
 - **Estratégia:** network-first pra HTML, cache-first pra assets estáticos
-- **Cache estático:** `/`, `/login.html`, `/dashboard.html`, `/styles.css`, `/app.js`, `/manifest.webmanifest`, `/assets/brand/*`
-- **Cache dinâmico:** respostas dinâmicas em runtime
-- **Background sync:** placeholder pra futuro (sync-audit-log)
-- **Push notifications:** placeholder pra futuro
+- **Cache estático:** `/`, `/login.html`, `/hub.html`, `/status.html`, `/offline.html`, `/styles.css`, `/app.js`, `/manifest.webmanifest`, ícones da marca
+- **Nunca cacheia:** `/auth/*`, `/api/*`, `/health.php` (dinâmicos/sessão)
+- **Offline:** sem rede, HTML cai no `/offline.html` (marca DM + botão retry + auto-recarga quando a rede volta)
 
 ### Como instalar no celular
 
@@ -943,6 +946,18 @@ ssh devmaniacs-vm "sed -i 's/^auth: password/auth: none/; /^password:/d' \
 
 ⚠️ Com `auth: none`, a única barreira do code-server é o SSO do Caddy — nunca exponha a porta do code-server direto (só via Caddy/tunnel).
 
+### ❌ 10. Assets de marca davam 404 (logo, mascote, ícones PWA)
+
+**Causa:** o docroot do PHP é `mockup/`, mas os arquivos de marca moram em `assets/` na raiz do projeto. Site no ar desde o deploy inicial sem logo/favicon/ícones corretos.
+
+**Solução (aplicada 23/08):** rota `/assets/*` no `router.php` mapeando pra `../assets` + ícones reais gerados (512/180/maskable). Detalhes na `auditoria-ui-ux-2026-08-23.md`.
+
+### ⚠️ 11. Páginas vazias com HTTP 200 (router com parse error)
+
+**Causa:** o PHP built-in server, com router que não compila e `display_errors=0`, responde **200 com body vazio** — sem erro no log, e o watchdog vê "200" e não reclama.
+
+**Solução:** `php -l` obrigatório após QUALQUER edit em PHP servido ao vivo. Diagnóstico definitivo: `php router.php` no CLI mostra o parse error que o `-S` engole (LEARN-006).
+
 ---
 
 ## 15. Backlog
@@ -1010,6 +1025,6 @@ ssh devmaniacs-vm "sed -i 's/^auth: password/auth: none/; /^password:/d' \
 
 ---
 
-**Última atualização:** 23/08/2026 08:45 (SSO Hub→Code-server no ar: cookie assinado + forward_auth)
+**Última atualização:** 23/08/2026 09:10 (auditoria UI/UX+mobile+PWA aplicada — assets 404 corrigidos, ícones reais, SW v2, toolbar mobile)
 **Owner:** Helbert Moura · Dev Maniac's Systems
 **Mantido por:** Hermes Agent (DM-Cerebro / Z.AI / GLM 5.3 fallback pra MiniMax M3)

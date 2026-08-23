@@ -319,7 +319,7 @@ svg { display: block; flex-shrink: 0; }
   background: var(--paper-warm);
   border: 2px solid var(--navy);
   border-radius: var(--radius-sm);
-  font-size: 15px;
+  font-size: 16px; /* 16px evita o zoom automático do iOS Safari ao focar */
   color: var(--navy);
   transition: background 0.15s;
 }
@@ -1192,8 +1192,8 @@ svg { display: block; flex-shrink: 0; }
 
 @media (max-width: 768px) {
   .btn-google {
-    min-height: 48px;
-    font-size: 14px;
+    min-height: 52px;   /* mantém alvo de toque confortável no dedão */
+    font-size: 16px;    /* evita zoom do iOS no tap */
   }
 }
 

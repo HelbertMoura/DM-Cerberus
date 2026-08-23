@@ -303,12 +303,31 @@ if ($uri === '/auth/me') {
 }
 
 // =============================================================
-// Estáticos (com guarda contra path traversal)
+// Estáticos
 // =============================================================
 
 if ($uri === '/') {
     header('Location: /login.html');
     exit;
+}
+
+// /assets/* mapeia pra pasta assets/ DO PROJETO (um nível acima do
+// docroot mockup/). Sem isso, logo/mascote/ícones PWA davam 404 —
+// bug encontrado na auditoria de 23/08/2026.
+if (str_starts_with($uri, '/assets/')) {
+    $root = realpath(__DIR__ . '/../assets');
+    $file = realpath(__DIR__ . '/../' . ltrim($uri, '/'));
+    $types = ['png' => 'image/png', 'webp' => 'image/webp', 'svg' => 'image/svg+xml', 'css' => 'text/css'];
+    $ext   = strtolower(pathinfo((string) $file, PATHINFO_EXTENSION));
+    if ($file !== false && $root !== false && str_starts_with($file, $root)
+        && is_file($file) && isset($types[$ext])) {
+        header('Content-Type: ' . $types[$ext]);
+        header('Cache-Control: public, max-age=86400');
+        header('Content-Length: ' . (string) filesize($file));
+        readfile($file);
+        exit;
+    }
+    dm_page(404, 'DM//404', 'Asset não encontrado', '<p><code>' . htmlspecialchars($uri) . '</code></p>');
 }
 
 if ($uri !== '' && $uri !== '/') {

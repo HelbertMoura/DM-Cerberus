@@ -1,12 +1,11 @@
 {
   "name": "Dev Maniac's Hub",
   "short_name": "DM Hub",
-  "description": "Hub remoto de IDEs da Dev Maniac's — Gemini, M3, Z.AI",
+  "description": "Hub remoto de IDEs da Dev Maniac's — Gemini, M3, Z.AI e VSCode Web",
   "id": "/",
-  "start_url": "/dashboard.html",
+  "start_url": "/hub.html",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#061637",
   "theme_color": "#061637",
   "categories": ["developer", "productivity", "utilities"],
@@ -15,19 +14,25 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "../assets/brand/dev-maniacs-mark.png",
-      "sizes": "192x192",
+      "src": "/assets/brand/dev-maniacs-mark-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "../assets/brand/dev-maniacs-mark.png",
+      "src": "/assets/brand/dev-maniacs-mark-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
-      "src": "../assets/brand/dev-maniacs-mark.png",
+      "src": "/assets/brand/dev-maniacs-mark.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/brand/dev-maniacs-mark-180.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
@@ -35,53 +40,31 @@
   ],
   "shortcuts": [
     {
-      "name": "Antigravity 2.0",
-      "short_name": "Gemini",
-      "description": "Abrir Antigravity IDE",
-      "url": "/dashboard.html?ide=antigravity",
-      "icons": [
-        {
-          "src": "../assets/brand/dev-maniacs-mark.png",
-          "sizes": "96x96"
-        }
-      ]
+      "name": "VSCode Web (Code-server)",
+      "short_name": "Code",
+      "description": "Abrir VSCode Web no Rocky",
+      "url": "/hub.html?ide=code",
+      "icons": [{ "src": "/assets/brand/dev-maniacs-mark.png", "sizes": "1024x1024", "type": "image/png" }]
     },
     {
-      "name": "MiniMax Code",
-      "short_name": "M3",
-      "description": "Abrir MiniMax Code",
-      "url": "/dashboard.html?ide=m3",
-      "icons": [
-        {
-          "src": "../assets/brand/dev-maniacs-mark.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Z.AI Code",
-      "short_name": "Z.AI",
-      "description": "Abrir Z.AI Code",
-      "url": "/dashboard.html?ide=zai",
-      "icons": [
-        {
-          "src": "../assets/brand/dev-maniacs-mark.png",
-          "sizes": "96x96"
-        }
-      ]
+      "name": "Diagnóstico do Hub",
+      "short_name": "Status",
+      "description": "Verificar saúde dos serviços",
+      "url": "/status.html",
+      "icons": [{ "src": "/assets/brand/dev-maniacs-mark.png", "sizes": "1024x1024", "type": "image/png" }]
     }
   ],
   "screenshots": [
     {
-      "src": "../assets/brand/dev-maniacs-social-card.png",
+      "src": "/assets/brand/dev-maniacs-social-card.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "DM Hub dashboard"
+      "label": "Hub Dev Maniac's"
     }
   ],
   "edge_side_panel": {
     "preferred_width": 480
   },
-  "display_override": ["window-controls-overlay", "minimal-ui", "standalone"]
+  "display_override": ["standalone", "minimal-ui"]
 }
