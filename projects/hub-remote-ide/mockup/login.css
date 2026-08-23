@@ -145,28 +145,6 @@ body {
   margin-bottom: var(--s-5);
 }
 
-.login-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  margin-bottom: var(--s-2);
-}
-.login-eyebrow-bar {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--dm-cyan);
-  border-radius: 1px;
-}
-.login-eyebrow-text {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--dm-cyan);
-  font-weight: 600;
-}
-
 .login-title {
   font-family: var(--font-sans);
   font-size: 28px;
@@ -464,6 +442,8 @@ body {
   letter-spacing: 0.12em;
   color: var(--paper-50);
   text-transform: uppercase;
+  opacity: 0.6;
+  font-weight: 500;
 }
 .login-field input {
   background: var(--paper);
