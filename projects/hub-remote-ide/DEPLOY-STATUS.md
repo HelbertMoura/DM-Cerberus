@@ -112,7 +112,7 @@ ssh -p 2222 root@127.0.0.1 'cd /opt/sistemas/hub-remote && docker compose ps'
 
 - ✅ Login mockup bonito? → OK, segue
 - 🔧 Algo ajustar? → me fala
-- 🔑 Google OAuth funcionar de verdade → criar projeto Google Cloud
+- 🟑 Google OAuth real → **código deployado 23/08** (PHP puro, `mockup/router.php`); colar Client ID/Secret no `mockup/config.php` pra ligar
 - 🎨 PWA instalável no celular → testar "Adicionar à tela inicial"
 - 📱 Login no code-server funciona? → testar VSCode real
 

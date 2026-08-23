@@ -112,8 +112,9 @@ Usuário acessa hub.devmaniacs.com.br/login.html
         ↓
 Vê: mascote Dev Maniac's + botão Google + form e-mail/senha
         ↓
-[Por enquanto] Submit fake → simula sucesso → redireciona pra /hub.html
-[Fase 2] Submit real → valida Google OAuth → cria JWT → cookie
+Botão Google → /auth/google → Google consent → /api/auth/callback/google
+(🟡 implementado; liga de vez ao preencher mockup/config.php)
+[Alternativa mock] Submit do form → TOTP fake → dashboard.html
         ↓
 hub.html abre iframe apontando pra code.devmaniacs.com.br
         ↓
@@ -601,13 +602,26 @@ ssh -p 2222 root@127.0.0.1 'docker logs hub-code-server --tail 20'
 
 Botão Google OAuth é **visual apenas** — link aponta pra `/auth/google` (rota que não existe).
 
-### Fase 2 (planejada)
+### Fase 2 — Google OAuth real (🟡 IMPLEMENTADO, aguardando credenciais — 23/08/2026)
 
-**Google OAuth real** via NextAuth.js:
-- Criar projeto no Google Cloud Console
-- Adicionar redirect URI: `https://hub.devmaniacs.com.br/api/auth/callback/google`
-- NextAuth valida token Google
-- Cria sessão JWT (cookie HttpOnly, Secure, SameSite=Lax)
+Implementado **em PHP puro** (sem NextAuth/Node — a stack do mockup é PHP, sem build step):
+o servidor agora sobe com roteador (`php -S 127.0.0.1:8766 router.php`).
+
+| Rota | Função |
+|---|---|
+| `/auth/google` | Inicia o fluxo: 302 pro Google com `state` anti-CSRF |
+| `/api/auth/callback/google` | Troca `code` → token (backchannel TLS), valida iss/aud/exp do `id_token`, checa allowlist, cria sessão |
+| `/auth/logout` | Encerra a sessão |
+| `/auth/me` | JSON com usuário logado (401 se não autenticado) |
+
+**Segurança:** allowlist de e-mails (`config.php` — só `helbertcurcio@gmail.com`), cookie
+`DMHUBSESSID` HttpOnly/Secure/SameSite=Lax, `session_regenerate_id` no login, audit log em
+`mockup/logs/auth-audit.jsonl` (login, negadas, erros de troca).
+
+**O que falta pra ligar:** colar Client ID/Secret no `mockup/config.php` (template em
+`config.example.php`; arquivo gitignored). Redirect URI já validado no Google Cloud:
+`https://hub.devmaniacs.com.br/api/auth/callback/google`. Testado com creds fake em 23/08:
+redirect, state, troca de token e tratamento de erro (`invalid_client`) todos OK.
 
 ### 2FA com TOTP (futuro)
 
@@ -687,7 +701,7 @@ audit_log (
 | CORS no Caddyfile | ✅ Configurado |
 | Docker Compose completo | ✅ Funcionando |
 | Schema PostgreSQL | ✅ Criado |
-| **Google OAuth real** | ❌ Não implementado (botão é fake) |
+| **Google OAuth real** | 🟡 Código deployado 23/08 (PHP puro, router.php) — falta colar Client ID/Secret no `mockup/config.php` |
 | **SSO Hub → Code-server** | ❌ Não implementado |
 | **Watchdog automático** | ✅ Agendado (Task Scheduler "DM Hub Watchdog" + systemd timer no Rocky, 23/08) |
 
@@ -734,9 +748,9 @@ cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-code.yml" r
 # Validar config antes de subir
 cloudflared tunnel --config "C:\Users\Helbert\.cloudflared\config.dm-hub.yml" ingress validate
 
-# Iniciar PHP mockup
+# Iniciar PHP mockup (com roteador de rotas de auth)
 cd "/c/Users/Helbert/Desktop/DM-Cerebro/projects/hub-remote-ide/mockup"
-php -S 127.0.0.1:8766 -t .
+php -S 127.0.0.1:8766 router.php
 
 # Testar local
 curl -sI http://127.0.0.1:8766/login.html
@@ -898,7 +912,7 @@ ssh -p 2222 root@127.0.0.1 'docker restart hub-code-server'
 
 ### 🔴 Alta prioridade (bloqueia uso real)
 
-- [ ] Implementar Google OAuth real no Hub (substituir botão fake)
+- [ ] Implementar Google OAuth real no Hub — 🟡 código deployado 23/08, falta colar credenciais no `mockup/config.php`
 - [ ] SSO Hub → Code-server (token compartilhado)
 - [x] Agendar watchdog automático (Task Scheduler Windows) — feito 23/08/2026
 - [x] Watchdog no Rocky (systemd timer) — feito 23/08/2026

@@ -113,6 +113,7 @@ ssh devmaniacs-vm "docker stop hub-caddy && systemctl start dm-hub-watchdog.serv
 | Sessão do usuário | A tarefa Windows roda na sessão do usuário (logon interactive). Tentamos S4U (rodar sem ninguém logado) mas o domínio `T2T3` nega — exige PowerShell elevado. Após reboot, tudo re-sobe no primeiro logon (trigger AtLogOn). |
 | Sem duplicatas | O check de túnel é por linha de comando do processo (`config.dm-*.yml`). Se a consulta WMI falhar, trata como "rodando" — duplicar túnel é o bug do 502, pior que adiar um restart. |
 | Quirk PowerShell 5.1 | `(Get-CimInstance ... | Where ...).Count` retorna **vazio** quando sobra 1 objeto escalar. Usar wrapper `@(...)`. |
+| Processos destacados | **Bug corrigido em 23/08:** processos filhos do console da tarefa (`cmd→bash→nohup`) morriam ~30-60s após a tarefa concluir (fechamento de console = CTRL_CLOSE; o `php.exe` morria, `cloudflared` sobrevive). Todos os starts agora usam `Start-Process -WindowStyle Hidden` (grupo próprio). |
 | Cloudflare outage global | Nada a fazer (raro). |
 | Windows desligado | Hub cai (PHP + dm-hub estão aqui). code-server continua via dm-code... não — dm-code também roda no Windows. Tudo depende deste Windows ligado. |
 

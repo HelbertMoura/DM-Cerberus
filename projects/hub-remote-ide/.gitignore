@@ -3,6 +3,10 @@
 .env.local
 .env.*.local
 
+# OAuth (Google) — credenciais locais
+mockup/config.php
+mockup/logs/
+
 # Secrets
 *.pem
 *.key
