@@ -424,6 +424,9 @@ body {
   .st-item { font-size: 12px; padding: 7px 12px; }
 }
 /* ============ FORMULÁRIO LOGIN v2.2 ============ === */
+/* IMPORTANTE: [hidden] precisa ganhar de .login-form que tem display:flex.
+   Sem este !important, os forms step2/stepSetup ficam visíveis mesmo com hidden. */
+[hidden] { display: none !important; }
 .login-form {
   display: flex;
   flex-direction: column;
