@@ -97,21 +97,16 @@
 
         <!-- ============ STEP 3: SETUP 2FA (primeira vez) ============ -->
         <div id="stepSetup" class="login-form" hidden>
-          <p class="login-2fa-hint">Adicione este secret no seu app autenticador (Google Authenticator / Authy / 1Password / Bitwarden):</p>
-          <div class="login-secret-box">
-            <code id="totpSecret"></code>
-            <button type="button" class="login-copy-btn" id="copySecretBtn" aria-label="copiar secret">copiar</button>
+          <p class="login-2fa-hint">Escaneie este QR code no seu app autenticador (Google Authenticator / Authy / 1Password / Bitwarden):</p>
+          <div class="login-qr-wrap">
+            <img id="qrcode" src="" alt="QR code 2FA" class="login-qr-img" />
           </div>
           <details class="login-secret-details">
-            <summary>como adicionar?</summary>
-            <ol class="login-help-list">
-              <li>Abra seu app autenticador</li>
-              <li>Toque em <b>+</b> (adicionar conta)</li>
-              <li>Escolha <b>"Inserir chave de configuração"</b> (ou "manual")</li>
-              <li>Cole o secret acima</li>
-              <li>Conta: <code>helbert.moura@devmaniacs.com.br</code></li>
-              <li>Tipo: Baseado em tempo (TOTP)</li>
-            </ol>
+            <summary>ou digite o secret manualmente</summary>
+            <div class="login-secret-box">
+              <code id="totpSecret"></code>
+              <button type="button" class="login-copy-btn" id="copySecretBtn" aria-label="copiar secret">copiar</button>
+            </div>
           </details>
           <p class="login-2fa-hint">Depois, digite o código de 6 dígitos pra confirmar:</p>
           <form id="formStep2Setup">
@@ -136,6 +131,25 @@
       </p>
 
     </div>
+
+    <!-- ============ FOOTER + MARCA D'ÁGUA ============ -->
+    <footer class="login-footer">
+      <span class="login-footer-brand">Dev Maniac&rsquo;s Systems</span>
+      <span class="login-footer-sep" aria-hidden="true">·</span>
+      <a href="/status.html" class="login-footer-link">status</a>
+      <span class="login-footer-sep" aria-hidden="true">·</span>
+      <span class="login-footer-copy">&copy; 2026</span>
+    </footer>
+
+    <!-- Marca d'água de fundo: padrão sutil de pontos tipo IDE -->
+    <svg class="login-watermark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+          <circle cx="16" cy="16" r="1.2" fill="#08B9CA" opacity="0.08"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#dots)"/>
+    </svg>
 
   </main>
 
@@ -197,6 +211,8 @@
             var sd = await sr.json();
             if (sr.ok && sd.ok) {
               document.getElementById('totpSecret').textContent = sd.secret;
+              // Render QR code (backend gera SVG da lib kazuhikoarase/qrcode-generator)
+              document.getElementById('qrcode').src = '/auth/2fa/qr?uri=' + encodeURIComponent(sd.otpauth_url);
               form1.hidden = true;
               stepSetup.hidden = false;
               // Botão copiar secret

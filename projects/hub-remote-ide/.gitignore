@@ -30,3 +30,37 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local SQLite (auth + sessions + audit)
+mockup/data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Local env files (DB credentials)
+mockup/.env.db
+mockup/.env.*
+
+# Go artifacts (auth service experimental)
+mockup/hubauth.exe
+mockup/go.mod
+mockup/go.sum
+
+# Init scripts (one-time)
+mockup/init-db.php
+
+# Astro login v2 (build artifacts)
+mockup/login-v2/node_modules/
+mockup/login-v2/dist/
+mockup/login-v2/.astro/
+mockup/login-v2/test-qr.svg
+
+# Astro build output (gerado em build, servido pelo PHP router)
+# IMPORTANTE: login-built/ é COMMITADO (é o que vai pra produção)
+# Apenas o test-qr.svg gerado durante dev é ignorado
+mockup/login-built/test-qr.svg
+mockup/login-v2/test-qr.svg
+
+# Astro public assets reuso (copiados dos assets do projeto)
+assets-public/

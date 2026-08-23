@@ -1,0 +1,43 @@
+---
+/**
+ * Button — botão reutilizável.
+ * Variants: primary, ghost, secondary
+ */
+interface Props {
+  variant?: 'primary' | 'ghost' | 'secondary';
+  type?: 'button' | 'submit';
+  fullWidth?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
+  id?: string;
+}
+
+const {
+  variant = 'primary',
+  type = 'button',
+  fullWidth = false,
+  loading = false,
+  disabled = false,
+  id,
+} = Astro.props;
+
+import '../styles/button.css';
+---
+
+<button
+  type={type}
+  id={id}
+  class:list={[
+    'btn',
+    `btn--${variant}`,
+    fullWidth && 'btn--full',
+    loading && 'btn--loading',
+  ]}
+  disabled={disabled || loading}
+>
+  <span class="btn__label"><slot /></span>
+  {loading && <span class="btn__spinner" aria-hidden="true"></span>}
+  <svg class="btn__arrow" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>

@@ -1,0 +1,36 @@
+/* Footer — discreto, opacity média */
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--dm-paper);
+  opacity: 0.55;
+  margin-top: auto;
+  padding-top: var(--s-5);
+  flex-wrap: wrap;
+}
+
+.auth-footer-brand {
+  font-weight: 600;
+}
+
+.auth-footer-sep {
+  opacity: 0.4;
+}
+
+.auth-footer-link {
+  color: var(--dm-cyan-5);
+  transition: opacity var(--t-base);
+}
+
+.auth-footer-link:hover {
+  opacity: 0.7;
+}
+
+.auth-footer-copy {
+  opacity: 0.7;
+}

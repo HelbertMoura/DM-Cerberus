@@ -1,17 +1,18 @@
 // Service Worker — Dev Maniac's Hub
-// Versão: 2.1.0 · 23/08/2026 (auditoria mobile/PWA + redesign login)
+// Versão: 3.0.0 · 23/08/2026 (migração login.html → /login Astro build)
 // Estratégia: network-first pra HTML, cache-first pra assets estáticos,
 // rotas de auth/health SEMPRE na rede (nunca cache).
 // REGRA: qualquer mudança em styles.css/app.js/ícones exige bump do CACHE_VERSION.
 
-const CACHE_VERSION = 'dm-hub-v9';
+const CACHE_VERSION = 'dm-hub-v10';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
 const STATIC_ASSETS = [
   '/',
-  '/login.html',
-  '/login.css',
+  '/login',                  // novo login Astro (v2)
+  '/login.html',             // legacy fallback
+  '/login.css',              // CSS legacy
   '/hub.html',
   '/status.html',
   '/dashboard.html',

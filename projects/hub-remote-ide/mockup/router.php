@@ -108,7 +108,7 @@ function dm_creds_ok(?array $cfg): bool
 // email + senha + 2FA TOTP — sem Google OAuth)
 // =============================================================
 
-if (in_array($uri, ['/auth/login', '/auth/2fa', '/auth/2fa/setup', '/auth/change-password', '/auth/regen-backup'], true)) {
+if (in_array($uri, ['/auth/login', '/auth/2fa', '/auth/2fa/setup', '/auth/2fa/qr', '/auth/change-password', '/auth/regen-backup'], true)) {
     require __DIR__ . '/auth.php';
     exit;
 }
@@ -194,8 +194,46 @@ if ($uri === '/auth/me') {
 // =============================================================
 
 if ($uri === '/') {
+    header('Location: /login');
+    exit;
+}
+
+// =============================================================
+// /login → Astro build (login v2.0)
+// Serve o HTML estático gerado por mockup/login-v2/ (npm run build).
+// Mais leve, mais rápido, melhor Lighthouse que o login.html legacy.
+// =============================================================
+if ($uri === '/login' || $uri === '/login/') {
+    $indexFile = __DIR__ . '/login-built/login/index.html';
+    if (is_file($indexFile)) {
+        header('Content-Type: text/html; charset=utf-8');
+        // Cache curto pra iterar — bump SW a cada release
+        header('Cache-Control: public, max-age=300');
+        readfile($indexFile);
+        exit;
+    }
+    // Fallback pro legacy se build não foi gerado ainda
     header('Location: /login.html');
     exit;
+}
+
+// /assets/* do build Astro (CSS, JS com hash) — servidos direto do _astro/
+// /assets/brand/* continua sendo servido pelo handler existente (assets/ do projeto)
+// O build Astro copia _astro/ pra /assets/, mas também tem CSS/JS em /_astro/.
+if (str_starts_with($uri, '/_astro/')) {
+    $root = realpath(__DIR__ . '/login-built/_astro');
+    $file = realpath(__DIR__ . '/login-built' . $uri);
+    if ($file !== false && $root !== false && str_starts_with($file, $root) && is_file($file)) {
+        $types = ['js' => 'application/javascript', 'css' => 'text/css', 'svg' => 'image/svg+xml'];
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
+        // Assets com hash do Astro podem ser cacheados 1 ano
+        header('Cache-Control: public, max-age=31536000, immutable');
+        header('Content-Length: ' . (string) filesize($file));
+        readfile($file);
+        exit;
+    }
+    dm_page(404, 'DM//404', 'Asset não encontrado', '<p><code>' . htmlspecialchars($uri) . '</code></p>');
 }
 
 // /assets/* mapeia pra pasta assets/ DO PROJETO (um nível acima do

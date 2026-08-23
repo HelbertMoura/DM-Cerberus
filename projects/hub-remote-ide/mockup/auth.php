@@ -255,6 +255,52 @@ if ($uri === '/auth/2fa' && $method === 'POST') {
     exit;
 }
 
+/** GET /auth/2fa/qr?uri=... — retorna SVG do QR code
+ *  Autenticado em pre_2fa (mesma sessão do /auth/2fa/setup).
+ *  Usa lib kazuhikoarase/qrcode-generator (MIT, ~50KB, zero deps). */
+if ($uri === '/auth/2fa/qr' && $method === 'GET') {
+    require_once __DIR__ . '/qrlib.php';
+
+    dm_session_start();
+    if (empty($_SESSION['pre_2fa'])) {
+        http_response_code(401);
+        header('Content-Type: image/svg+xml');
+        echo '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"/>';
+        exit;
+    }
+
+    $uri_param = (string) ($_GET['uri'] ?? '');
+    if ($uri_param === '' || !str_starts_with($uri_param, 'otpauth://')) {
+        http_response_code(400);
+        header('Content-Type: image/svg+xml');
+        echo '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"/>';
+        exit;
+    }
+
+    // Cache curto (30 dias) — o secret é por user e só muda em setup 2FA novo
+    header('Content-Type: image/svg+xml; charset=utf-8');
+    header('Cache-Control: private, max-age=2592000');
+
+    // Versão fixa 10 (57x57 módulos) — suporta otpauth URI até ~1430 chars.
+    // Versão 7 (992 max) overflow com URI encodado (1092 chars).
+    // Auto-detect (typeNumber=0) falha em alguns tamanhos com essa lib.
+    $qr = new QRCode();
+    $qr->setTypeNumber(10);
+    $qr->setErrorCorrectLevel(QR_ERROR_CORRECT_LEVEL_M);
+    $qr->addData($uri_param);
+    $qr->make();
+
+    // Captura o output do printSVG ao invés de imprimir direto
+    ob_start();
+    $qr->printSVG(8);  // size=8 = cada módulo = 8px
+    $svg = ob_get_clean();
+
+    // Injeta cor navy (brand) em vez de preto puro
+    $svg = str_replace('fill="#000000"', 'fill="#061637"', $svg);
+    echo $svg;
+    exit;
+}
+
 /** GET /auth/2fa/setup — gera otpauth URL (autenticado em pre_2fa) */
 if ($uri === '/auth/2fa/setup' && $method === 'GET') {
     header('Content-Type: application/json; charset=utf-8');

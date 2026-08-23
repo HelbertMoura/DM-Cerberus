@@ -620,3 +620,62 @@ body {
   margin: var(--s-3) 0;
   line-height: 1.5;
 }
+
+/* ============ FOOTER + MARCA D'ÁGUA ============ */
+.login-watermark {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-shell > *:not(.login-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--paper-50);
+  opacity: 0.5;
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  flex-wrap: wrap;
+}
+.login-footer-brand {
+  font-weight: 600;
+  color: var(--dm-paper);
+}
+.login-footer-sep { opacity: 0.4; }
+.login-footer-link {
+  color: var(--dm-cyan);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.login-footer-link:hover { opacity: 0.7; }
+.login-footer-copy { opacity: 0.6; }
+
+/* ============ QR CODE IMAGE ============ */
+.login-qr-wrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--s-3);
+  background: #fff;
+  border-radius: 12px;
+  border: 2px solid var(--dm-cyan);
+  margin-bottom: var(--s-3);
+}
+.login-qr-img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  image-rendering: pixelated;
+}
