@@ -1,36 +1,53 @@
-/* Footer — discreto, opacity média */
+/* Footer — navegação PÚBLICA (fora do card de login).
+   Fixed no rodapé da página, nunca dentro do auth-shell. */
+
 .auth-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
-  color: var(--dm-paper);
-  opacity: 0.55;
-  margin-top: auto;
-  padding-top: var(--s-5);
-  flex-wrap: wrap;
+  text-transform: lowercase;
+  color: var(--dm-navy-1);
+  z-index: 10;
+  /* Backdrop blur sutil pra legibilidade sobre qualquer bg */
+  background: linear-gradient(
+    to top,
+    rgba(6, 22, 55, 0.4) 0%,
+    rgba(6, 22, 55, 0) 100%
+  );
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .auth-footer-brand {
+  color: var(--dm-paper);
   font-weight: 600;
 }
 
 .auth-footer-sep {
-  opacity: 0.4;
+  color: var(--dm-navy-3);
 }
 
 .auth-footer-link {
   color: var(--dm-cyan-5);
-  transition: opacity var(--t-base);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--dm-cyan-5);
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .auth-footer-link:hover {
-  opacity: 0.7;
+  color: var(--dm-cyan-3);
+  border-color: var(--dm-cyan-3);
 }
 
 .auth-footer-copy {
-  opacity: 0.7;
+  color: var(--dm-navy-1);
 }

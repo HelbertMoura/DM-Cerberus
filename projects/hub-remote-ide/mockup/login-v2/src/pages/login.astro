@@ -2,6 +2,11 @@
 /**
  * Página /login — entrada principal do Hub.
  * Mobile-first com breakpoint desktop em 960px.
+ *
+ * Estrutura:
+ * - <auth-shell>    = card central com mascote + form (dentro do sistema)
+ * - <page-footer>  = fora do card, navegação pública (status) + copyright
+ * - <auth-watermark> = fora do card, marca d'água de fundo
  */
 import AuthLayout from '../layouts/AuthLayout.astro';
 import Mascot from '../components/Mascot.astro';
@@ -17,7 +22,7 @@ import '../styles/login-page.css';
       <Mascot />
     </div>
 
-    <!-- Coluna direita: título + form + footer -->
+    <!-- Coluna direita: APENAS o conteúdo do login (título + form) -->
     <div class="auth-right">
       <header class="auth-header">
         <h1 class="auth-title">Hub Remoto de IDEs</h1>
@@ -25,10 +30,11 @@ import '../styles/login-page.css';
       </header>
 
       <AuthForm client:load />
-
-      <Footer />
     </div>
   </main>
+
+  <!-- Footer FORA do card de login — navegação pública + copyright -->
+  <Footer />
 
   <script>
     // Se já tem cookie SSO válido, pula direto pro Hub.

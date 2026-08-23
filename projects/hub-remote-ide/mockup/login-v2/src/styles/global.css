@@ -19,8 +19,9 @@ body {
   flex-direction: column;
   align-items: stretch;
   width: 100%;
-  min-height: 100dvh;
-  padding: var(--s-6) var(--s-5);
+  /* 100dvh MENOS espaço pro footer (~48px) — evita que o form fique embaixo dele */
+  min-height: calc(100dvh - 56px);
+  padding: var(--s-6) var(--s-5) var(--s-8);
   gap: var(--s-6);
   isolation: isolate;
 }
