@@ -1,8 +1,26 @@
 ---
 titulo: Mapa Mestre do Segundo Cérebro Dev Maniac's
 tags: [brain, mapa, indice]
-atualizado: 2026-08-22
-status: ativo
+atualizado: 2026-08-26
+status: superseded
+---
+
+> ## ⚠️ SUPERSEDED / LEGACY ENTRY POINT
+>
+> **Este arquivo é o ponto de entrada LEGADO do DM-CEREBRO (versão 2.0, 22/08/2026).**
+>
+> **Canonical entry (vigente a partir de 26/08/2026):**
+> - [`AGENTS.md`](./AGENTS.md) — ponto de entrada universal para agentes.
+> - [`INDEX.md`](./INDEX.md) — mapa mestre do Second Brain multi-projeto v1.
+>
+> **Rules in `AGENTS.md`, `INDEX.md` and `global/` override legacy operational instructions in this file.**
+>
+> Em particular, as instruções operacionais abaixo sobre "Tríade Autorizada" (Gemini + M3 + Z.AI Hermes), prompt copy-paste obrigatório, commit/push direto, deploy direto, etc. **NÃO** devem ser seguidas operacionalmente. Use a governança vigente em `global/ai-governance.md` + referência canônica no repositório `dm-erp` (`TASK-GOV-AI-008` / ADR-014).
+>
+> **Do not delete historical content.** Este arquivo é preservado por compatibilidade. Trazido de `git log` (22/08/2026) sem reescrita.
+>
+> Veja também: [`ARCHITECTURE-EVOLUTION-2026-08-26.md`](./ARCHITECTURE-EVOLUTION-2026-08-26.md) e [`proposed-migration.md`](./proposed-migration.md).
+
 ---
 
 # 🧠 Dev Maniac's — Segundo Cérebro Central Global (DM-Cerebro)

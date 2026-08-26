@@ -1,9 +1,23 @@
 ---
 titulo: Contrato Obrigatório dos Agentes — Ler e Atualizar o Cérebro
 tags: [tríade, sistema, cerebro, contrato, gemini, m3, zai, obrigatorio, shared]
-atualizado: 2026-08-22
-status: ativo
+atualizado: 2026-08-26
+status: superseded
 prioridade: maxima
+---
+
+> ## ⚠️ SUPERSEDED / LEGACY OPERATIONAL CONTRACT
+>
+> **Current operational governance is defined by:**
+> - [`AGENTS.md`](../../AGENTS.md)
+> - [`INDEX.md`](../../INDEX.md)
+> - [`global/`](../../global/) (sete documentos de governança)
+> - E a referência canônica de governança AI: arquivo `protocolo-equipe-ai.md` dentro do repositório `dm-erp`, registrado como `TASK-GOV-AI-008` (26/08/2026) · **ADR-014 (dm-erp)**.
+>
+> **Legacy instructions such as mandatory commit/push, old triad-only routing, or direct deploy authority must NOT be followed operationally.** Em particular, este arquivo previa que a IA fizesse `commit + push` automaticamente; **essa regra está revogada** — a regra vigente está em `AGENTS.md` §4: nenhum agente faz commit/push/merge/tag/deploy sem autorização explícita do PO. Read-only é livre.
+>
+> **Historical content below is preserved for audit/history only.** Este arquivo é mantido por compatibilidade (referenciado por automação externa e versões antigas de prompts). Não deletar.
+
 ---
 
 # 🔒 Contrato Obrigatório dos 3 Agentes — Sempre Ler & Atualizar o Cérebro

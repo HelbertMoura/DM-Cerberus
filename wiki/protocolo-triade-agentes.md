@@ -1,12 +1,26 @@
 ---
 titulo: Protocolo de Operação da Tríade Dev Maniac's
 tags: [tríade, agentes, protocolo, gemini, m3, hermes]
-atualizado: 2026-08-22
-status: ativo
+atualizado: 2026-08-26
+status: superseded
+---
+
+> ## ⚠️ SUPERSEDED / LEGACY TRIAD-ONLY ROUTING
+>
+> **Current operational governance is defined by:**
+> - [`AGENTS.md`](../AGENTS.md)
+> - [`INDEX.md`](../INDEX.md)
+> - [`global/`](../global/) (sete documentos de governança)
+> - E a referência canônica de governança AI: arquivo `protocolo-equipe-ai.md` dentro do repositório `dm-erp`, registrado como `TASK-GOV-AI-008` (26/08/2026) · **ADR-014 (dm-erp)**.
+>
+> **Legacy instructions such as mandatory commit/push, old triad-only routing, or direct deploy authority must NOT be followed operationally.** Este arquivo é a versão `wiki/` (cross-produto) da tríade Gemini + M3 + Z.AI/Hermes e **NÃO** reflete a hierarquia vigente desde 26/08/2026, que inclui `GLM-5.3-Flash` (modos `MEDIUM`/`HIGH`/`MAX`), `Opus 4.6`/`Antigravity` (oportunístico) e o campo `MODE` + 4 campos de paralelismo no `MODEL ROUTING`.
+>
+> **Historical content below is preserved for audit/history only.** Não deletar.
+
 ---
 
 # 🤖 Protocolo de Operação da Tríade Dev Maniac's
-> **Regra de Ouro:** Apenas estas três IAs operam os sistemas da Dev Maniac's. Nunca misturar com contextos externos.
+> **Regra de Ouro (LEGACY — ver banner acima):** Apenas estas três IAs operam os sistemas da Dev Maniac's. Nunca misturar com contextos externos.
 
 ---
 

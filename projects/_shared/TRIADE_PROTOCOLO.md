@@ -1,8 +1,22 @@
 ---
 titulo: Protocolo da Tríade Multi-Agente — Panorâmica Oficial
 tags: [tríade, multi-agente, protocolo, gemini, m3, hermes, zai, glm, orquestracao, shared]
-atualizado: 2026-08-22
-status: ativo
+atualizado: 2026-08-26
+status: superseded
+---
+
+> ## ⚠️ SUPERSEDED / LEGACY TRIAD-ONLY ROUTING
+>
+> **Current operational governance is defined by:**
+> - [`AGENTS.md`](../../AGENTS.md)
+> - [`INDEX.md`](../../INDEX.md)
+> - [`global/`](../../global/) (sete documentos de governança)
+> - E a referência canônica de governança AI: arquivo `protocolo-equipe-ai.md` dentro do repositório `dm-erp`, registrado como `TASK-GOV-AI-008` (26/08/2026) · **ADR-014 (dm-erp)**.
+>
+> **Legacy instructions such as mandatory commit/push, old triad-only routing, or direct deploy authority must NOT be followed operationally.** Este arquivo descreve a tríade "Gemini + MiniMax M3 + Z.AI GLM 5.3/Hermes" como **única configuração autorizada**. A hierarquia **vigente** (26/08/2026) é mais ampla: inclui também `GLM-5.3-Flash` (Staff Engineer com modos `MEDIUM`/`HIGH`/`MAX`), `Opus 4.6` / `Antigravity` (oportunístico), `GLM-5.3 Max` como CTO formal, e regras de paralelismo, worktree, deploy state machine e failover. Ver `global/ai-governance.md` e `global/model-routing.md`.
+>
+> **Historical content below is preserved for audit/history only.** Não deletar.
+
 ---
 
 # 🤖 Protocolo da Tríade Multi-Agente Dev Maniac's

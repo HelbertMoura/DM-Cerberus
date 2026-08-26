@@ -1,10 +1,24 @@
 ---
 titulo: System Prompt Padrão — Cole Antes de Toda Tarefa no MiniMax M3
 tags: [prompt, m3, sistema, padrao, copiar-colar, trilho]
-atualizado: 2026-08-22
-status: ativo
+atualizado: 2026-08-26
+status: superseded
 tipo: system-prompt
 agente_destino: minimax-m3
+---
+
+> ## ⚠️ SUPERSEDED / LEGACY SYSTEM PROMPT
+>
+> **Current operational governance is defined by:**
+> - [`AGENTS.md`](../AGENTS.md)
+> - [`INDEX.md`](../INDEX.md)
+> - [`global/`](../global/) (sete documentos de governança)
+> - E a referência canônica de governança AI: arquivo `protocolo-equipe-ai.md` dentro do repositório `dm-erp`, registrado como `TASK-GOV-AI-008` (26/08/2026) · **ADR-014 (dm-erp)**.
+>
+> **Legacy instructions such as mandatory commit/push, old triad-only routing, or direct deploy authority must NOT be followed operationally.** Este prompt foi criado na era da tríade Gemini + M3 + Z.AI/Hermes; a hierarquia **vigente** (26/08/2026) traz `GLM-5.3-Flash` com modos `MEDIUM`/`HIGH`/`MAX`, `Opus 4.6`/`Antigravity` como oportuístico, e o bloco `MODEL ROUTING` com `MODE` + 4 campos de paralelismo. Ver `global/model-routing.md`.
+>
+> **Historical content below is preserved for audit/history only.** Não deletar.
+
 ---
 
 # 🚀 SYSTEM PROMPT PADRÃO — MiniMax M3
