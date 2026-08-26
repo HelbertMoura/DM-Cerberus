@@ -7,7 +7,7 @@ status: ativo
 
 # 🏗️ CanteiroHUB / DM-ERP (RadierHUB) — Project Index
 
-> **Slug:** `canteirohub` · **Nome oficial atual:** **RadierHUB** (rebranding ADR-011)
+> **Slug:** `canteirohub` · **Nome oficial atual:** **RadierHUB** (rebranding ADR-008 canônico pós-r161)
 > **Cliente fundador:** Construtora Teenus Ltda (instância `Teenus Gestão`)
 > **Servidor:** `/opt/sistemas/teenus-erp/` em `192.168.226.103`
 > **Domínio oficial:** `radierhub.com.br`
@@ -35,7 +35,7 @@ SaaS white-label multi-tenant para construtoras. ERP-âncora da Dev Maniac's. Cl
 - **Backend:** Django 5.0 + DRF, Python 3.11, PostgreSQL 16 (topologia híbrida), Celery + Redis.
 - **Frontend:** React 18 + Vite, Tailwind CSS, Lucide-React, Dexie.js (IndexedDB offline-first), PWA.
 - **Infra:** Docker Compose, Rocky Linux 10.2, Cloudflare Tunnel (`a0c5bea6-…`), SSL automático.
-- **Multi-tenancy:** Topologia híbrida (banco dedicado para Enterprise / pool compartilhado para Standard) — ver ADR-001.
+- **Multi-tenancy:** Topologia híbrida (banco dedicado para Enterprise / pool compartilhado para Standard) — ver ADR-003 (canônico pós-r161).
 
 ## 4. Canonical Document Map (apenas o que existe no DM-CEREBRO)
 
@@ -69,16 +69,21 @@ Estado operacional detalhado em `dm-erp/HANDOVER.md` (no repositório). Resumo:
 
 ## 7. Important Decisions
 
-ADRs ativos no `dm-erp/docs/DECISIONS.md`:
-- **ADR-001** Topologia híbrida de bancos PostgreSQL 16.
-- **ADR-002** Esteira atômica de formalização 1-clique.
-- **ADR-008** Módulos Clientes (CRM) e Tarefas (Kanban).
-- **ADR-009** Módulos Documentos (CNDs) e Notificações In-App.
-- **ADR-010** Code-Splitting Total com React.lazy() & Suspense.
-- **ADR-011** Rebranding Oficial do Produto SaaS para RadierHUB.
-- **ADR-012** Automação Periódica do Robô SEFAZ DF-e com Cofre A1.
+ADRs ativos no `dm-erp/docs/DECISIONS.md` (numeração canônica pós-consolidação r161+):
+- **ADR-001** Arquitetura Multi-Tenant com `TenantAwareModel` e Bancos Dedicados.
+- **ADR-002** RDO Digital Offline-First com IndexedDB (Dexie).
+- **ADR-003** Topologia Híbrida de Bancos PostgreSQL 16.
+- **ADR-004** Esteira Atômica de Formalização 1-Clique.
+- **ADR-005** Módulos Clientes (CRM) e Tarefas (Kanban) com Usabilidade Leiga & Isolamento por Papel.
+- **ADR-006** Módulos Documentos (CNDs) e Notificações In-App.
+- **ADR-007** Code-Splitting Total com React.lazy() & Suspense.
+- **ADR-008** Rebranding Oficial do Produto SaaS para RadierHUB (`radierhub.com.br`).
+- **ADR-009** Modal de Termos de Uso & Política de Privacidade LGPD Multi-Tenant.
+- **ADR-010** Novo Modelo de Governança e Pipeline Multi-Agente com Gates Estritos.
+- **ADR-011** Encerramento do Bootstrap de Governança — Decisões do Product Owner.
+- **ADR-012** Automação Periódica do Robô SEFAZ DF-e com Cofre A1 Criptografado e Integração Financeira Atômica.
 - **ADR-013** Blindagem Estrutural de Autenticação, Controle de Acesso e Isolamento Multi-Tenant.
-- **ADR-014** Revisão da Hierarquia de Roteamento de IA (26/08/2026) — fonte de governança AI canônica para todo o DM-CEREBRO.
+- **ADR-014** Revisão da Hierarquia de Roteamento de IA (AI-GOV-STACK-HIERARCHY-008) — fonte de governança AI canônica para todo o DM-CEREBRO.
 
 ## 8. Document Routing Guide
 
@@ -88,7 +93,7 @@ ADRs ativos no `dm-erp/docs/DECISIONS.md`:
 | Tarefa de segurança | `dm-erp/docs/DECISIONS.md` (ADR-013) + `global/security-baseline.md` (DM-CEREBRO) + `dm-erp/docs/brain/wiki/auditorias-tecnicas-cto.md` |
 | Tarefa SEFAZ | `wiki/fiscal-sefaz-a1.md` + `dm-erp/docs/DECISIONS.md` (ADR-012) + `dm-erp/apps/nfe/` (código) |
 | Tarefa de UI/UX | `dm-erp/AGENTS.md` §11 (Diretrizes Permanentes) + `dm-erp/docs/brain/wiki/acessibilidade-wcag.md` |
-| Tarefa de banco de dados | `dm-erp/docs/DATABASE.md` + ADR-001 (topologia híbrida) |
+| Tarefa de banco de dados | `dm-erp/docs/DATABASE.md` + ADR-003 (topologia híbrida, canônico pós-r161) |
 | Tarefa de IA | `dm-erp/docs/brain/wiki/protocolo-equipe-ai.md` (TASK-GOV-AI-008 / ADR-014) |
 | Tarefa de gate de auditoria CTO | `dm-erp/docs/brain/wiki/auditorias-tecnicas-cto.md` |
 

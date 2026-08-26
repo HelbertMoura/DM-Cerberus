@@ -68,7 +68,7 @@ ERP operacional e financeiro de **dedetização** para a Biolar Dedetizadora. Ca
 
 ## 7. Important Decisions
 
-- ADR-001 do `dm-erp` (topologia híbrida PostgreSQL) **NÃO** se aplica a Biolar — Biolar usa **um único banco dedicado** (`biolar-db`). Não importar a regra de multi-tenant do dm-erp.
+- ADR-003 do `dm-erp` (Topologia Híbrida de Bancos PostgreSQL 16 — canônico pós-r161) **NÃO** se aplica a Biolar — Biolar usa **um único banco dedicado** (`biolar-db`). Não importar a regra de multi-tenant do dm-erp.
 - Certificado A1 vence em **Outubro/2026** — renovação urgente. Coordenação com equipe SEFAZ do dm-erp (cross-pollination) é desejável.
 
 ## 8. Document Routing Guide
