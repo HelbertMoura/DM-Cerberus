@@ -80,69 +80,85 @@ def _is_safe_bind_host(host: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# UI HTML — Dev Maniac's Two Point Corporate Dashboard (WCAG 2.2 AA)
+# UI HTML — Dev Maniac's Suporte Standard + 3D Neural Brain & Memory Central
 # ---------------------------------------------------------------------------
 UI_HTML = """<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061637">
+<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence &amp; Memory Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-deep: #081a38;
-  --bg-deep-2: #051026;
+  --bg-deep: #061637;
+  --bg-deep-2: #0a192f;
+  --bg-elev: #0d2247;
+  --bg-card: #0f2752;
   --bg-legacy: #0F172A;
   --accent-legacy: #1E40AF;
-  --card: #fdfbf7;
-  --card-inner: #ffffff;
-  --card-dark: #0a1f4d;
-  --ink: #061637;
-  --ink-soft: #4a5568;
-  --ink-muted: #718096;
-  --accent: #14a08f;
-  --accent-deep: #0f7e72;
-  --accent-blue: #1e40af;
-  --accent-blue-bright: #2563eb;
-  --danger: #c14530;
-  --danger-bg: #fff1ed;
-  --success: #0d826a;
-  --success-bg: #e6f7f3;
-  --warning: #b45309;
-  --warning-bg: #fef3c7;
-  --shadow: rgba(3, 10, 26, 0.45);
-  --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, Consolas, monospace;
+  --card-light: #ffffff;
+  --card-surface: #f8fafc;
+  --border-dark: #1e3a6d;
+  --border-light: #e2e8f0;
+  --ink-dark: #061637;
+  --ink-light: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-muted-dark: #64748b;
+  --dm-cyan: #08b9ca;
+  --dm-red: #ff4c4c;
+  --dm-yellow: #ffc529;
+  --dm-purple: #8b35d1;
+  --dm-blue: #1e40af;
+  --accent: #08b9ca;
+  --accent-deep: #0693a1;
+  --accent-teal: #14a08f;
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', var(--font);
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
 html, body {
   margin: 0;
   padding: 0;
   background: var(--bg-deep);
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(20, 160, 143, 0.12), transparent 60%),
-    url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20120%2060%27%3E%3Ctext%20x%3D%2760%27%20y%3D'38'%20font-family%3D'IBM%20Plex%20Sans%27%20font-size%3D'36%27%20fill%3D'%2314a08f'%20fill-opacity%3D'0.08'%20text-anchor%3D%27middle%27%20font-weight%3D'700'%3EDM%3C%2Ftext%3E%3C%2Fsvg%3E");
-  background-repeat: repeat;
-  background-size: auto, 240px 120px;
-  color: var(--ink);
+  color: var(--ink-light);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.5;
   min-height: 100vh;
 }
+body {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(8, 185, 202, 0.15), transparent 70%),
+    radial-gradient(ellipse at 80% 30%, rgba(139, 53, 209, 0.1), transparent 60%),
+    linear-gradient(180deg, #061637 0%, #0a192f 100%);
+  background-attachment: fixed;
+}
 
-/* Header & Brand Navbar */
+/* Header & Brand Navbar (Suporte Style) */
 header {
-  background: var(--card);
-  border-bottom: 3px solid var(--ink);
-  padding: 14px 24px;
-  box-shadow: 0 4px 0 var(--shadow);
+  background: rgba(6, 22, 55, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 12px 24px;
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
 }
 .header-container {
-  max-width: 1320px;
+  max-width: 1360px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -158,52 +174,57 @@ header {
 .brand-icon-box {
   width: 44px;
   height: 44px;
-  background: #ffffff;
-  border: 2px solid var(--ink);
-  border-radius: 10px;
+  background: #0d2247;
+  border: 1.5px solid rgba(8, 185, 202, 0.4);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 0 var(--ink);
+  box-shadow: 0 0 15px rgba(8, 185, 202, 0.2);
   flex-shrink: 0;
 }
-.brand-icon-box svg { width: 32px; height: 32px; }
+.brand-icon-box svg { width: 30px; height: 30px; }
 .brand-text h1 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .brand-text p {
   margin: 0;
   font-size: 12px;
-  color: var(--ink-soft);
-  font-weight: 500;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 .live-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--success);
-  background: var(--success-bg);
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(13, 130, 106, 0.3);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dm-cyan);
+  background: rgba(8, 185, 202, 0.12);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(8, 185, 202, 0.3);
 }
 .live-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--success);
+  width: 7px;
+  height: 7px;
+  background: var(--dm-cyan);
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(13, 130, 106, 0.2);
+  box-shadow: 0 0 8px var(--dm-cyan);
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
 }
 .header-actions {
   display: flex;
@@ -211,60 +232,190 @@ header {
   align-items: center;
 }
 
-/* 3D and Ghost Buttons */
-.btn-3d {
+/* Modern Buttons (Suporte / Dev Maniac's) */
+.btn-dm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 44px;
-  padding: 8px 16px;
-  font: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  color: #fff;
-  background: var(--accent);
-  border: 2px solid var(--ink);
+  padding: 8px 18px;
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #ffffff;
+  background: var(--dm-cyan);
+  border: 1px solid rgba(8, 185, 202, 0.6);
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--ink);
-  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.1s ease;
+  box-shadow: 0 2px 10px rgba(8, 185, 202, 0.25);
+  transition: all 0.15s ease;
   text-decoration: none;
   white-space: nowrap;
 }
-.btn-3d:hover { background: var(--accent-deep); }
-.btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
-.btn-3d.secondary {
-  background: #ffffff;
-  color: var(--ink);
+.btn-dm:hover {
+  background: #0aa7b7;
+  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.4);
+  transform: translateY(-1px);
 }
-.btn-3d.secondary:hover { background: #f4eee1; }
-.btn-3d.danger {
-  background: var(--danger);
+.btn-dm:active { transform: translateY(0); }
+.btn-dm.secondary {
+  background: rgba(13, 34, 71, 0.8);
+  color: var(--ink-light);
+  border-color: var(--border-dark);
+  box-shadow: none;
 }
-.btn-3d.danger:hover { background: #9c2b18; }
-.btn-3d.sm {
+.btn-dm.secondary:hover {
+  background: rgba(30, 58, 109, 0.8);
+  border-color: rgba(8, 185, 202, 0.4);
+}
+.btn-dm.danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: none;
+}
+.btn-dm.danger:hover {
+  background: rgba(239, 68, 68, 0.35);
+  color: #fff;
+}
+.btn-dm.sm {
   min-height: 38px;
-  padding: 6px 12px;
-  font-size: 12px;
-  box-shadow: 0 3px 0 var(--ink);
+  padding: 6px 14px;
+  font-size: 12.5px;
 }
-.btn-3d:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: 0 2px 0 var(--ink) !important;
-}
+.btn-dm:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-/* Main Layout & Container */
+/* Main Container */
 main {
-  max-width: 1320px;
-  margin: 24px auto;
-  padding: 0 20px 48px;
+  max-width: 1360px;
+  margin: 20px auto;
+  padding: 0 24px 60px;
 }
 
-/* Hero Stats Grid (Two Point Style) */
+/* 3D Brain & Hero Section */
+.brain-hero-card {
+  background: linear-gradient(145deg, rgba(13, 34, 71, 0.9) 0%, rgba(6, 22, 55, 0.95) 100%);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.brain-hero-card::after {
+  content: "";
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(8, 185, 202, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.brain-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: rgba(6, 22, 55, 0.6);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#brainCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+#brainCanvas:active { cursor: grabbing; }
+.brain-overlay-hud {
+  position: absolute;
+  top: 12px; left: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dm-cyan);
+  pointer-events: none;
+  background: rgba(6, 22, 55, 0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(8, 185, 202, 0.2);
+}
+.brain-live-stream {
+  position: absolute;
+  bottom: 10px; left: 14px; right: 14px;
+  background: rgba(6, 22, 55, 0.85);
+  border: 1px solid rgba(8, 185, 202, 0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #a5f3fc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.thought-dot {
+  width: 8px; height: 8px;
+  background: var(--dm-yellow);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--dm-yellow);
+  flex-shrink: 0;
+}
+.brain-info-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.brain-info-side h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brain-info-side p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+.brain-stats-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mini-stat {
+  background: rgba(13, 34, 71, 0.6);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.mini-stat-num {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+}
+.mini-stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Hero Stats Bar */
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -272,27 +423,31 @@ main {
   margin-bottom: 24px;
 }
 .stat-card {
-  background: var(--card);
-  border: 2.5px solid var(--ink);
+  background: rgba(13, 34, 71, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-dark);
   border-radius: 14px;
   padding: 18px 20px;
-  box-shadow: 0 5px 0 var(--shadow);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(8, 185, 202, 0.4);
 }
 .stat-card::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--accent);
+  height: 3px;
+  background: var(--dm-cyan);
 }
-.stat-card.blue::before { background: var(--accent-blue-bright); }
-.stat-card.warning::before { background: var(--warning); }
+.stat-card.blue::before { background: var(--dm-blue); }
+.stat-card.purple::before { background: var(--dm-purple); }
 .stat-card.green::before { background: var(--success); }
+.stat-card.yellow::before { background: var(--dm-yellow); }
 .stat-header {
   display: flex;
   align-items: center;
@@ -301,10 +456,10 @@ main {
 }
 .stat-title {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 .stat-tag {
   font-family: var(--font-mono);
@@ -312,37 +467,38 @@ main {
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
-  border: 1px solid rgba(6, 22, 55, 0.15);
-  background: rgba(6, 22, 55, 0.04);
+  background: rgba(8, 185, 202, 0.1);
+  color: var(--dm-cyan);
+  border: 1px solid rgba(8, 185, 202, 0.25);
 }
 .stat-value {
-  font-size: 30px;
+  font-family: var(--font-display);
+  font-size: 28px;
   font-weight: 800;
-  color: var(--ink);
+  color: #ffffff;
   letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
   margin: 4px 0;
 }
 .stat-desc {
   font-size: 12px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   margin: 0;
 }
 
-/* Nav Tabs Bar */
+/* Nav Tabs Bar (Suporte Standard) */
 .nav-tabs {
   display: flex;
   gap: 8px;
-  background: var(--card);
-  border: 2.5px solid var(--ink);
+  background: rgba(13, 34, 71, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-dark);
   border-radius: 12px;
   padding: 6px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 0 var(--shadow);
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 .nav-tab {
-  flex: 1 1 180px;
+  flex: 1 1 160px;
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -350,39 +506,40 @@ main {
   gap: 8px;
   padding: 8px 16px;
   background: transparent;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: 8px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-soft);
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
 }
 .nav-tab:hover {
-  background: rgba(6, 22, 55, 0.05);
-  color: var(--ink);
+  color: #ffffff;
+  background: rgba(30, 58, 109, 0.4);
 }
 .nav-tab.active {
-  background: var(--ink);
+  background: #0d2247;
   color: #ffffff;
-  border-color: var(--ink);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+  border-color: rgba(8, 185, 202, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .nav-tab .badge {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
   padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(8, 185, 202, 0.2);
+  color: var(--dm-cyan);
 }
 .nav-tab.active .badge {
-  background: var(--accent);
-  color: #fff;
+  background: var(--dm-cyan);
+  color: var(--bg-deep);
 }
 
-/* Content Panels */
+/* Tab Panels */
 .tab-panel {
   display: none;
   animation: tabFade 0.2s ease;
@@ -393,13 +550,14 @@ main {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Card Containers */
+/* Content Box Cards */
 .content-box {
-  background: var(--card);
-  border: 2.5px solid var(--ink);
-  border-radius: 14px;
+  background: rgba(13, 34, 71, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 6px 0 var(--shadow);
+  box-shadow: var(--shadow);
   margin-bottom: 24px;
 }
 .content-box-header {
@@ -407,23 +565,22 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid rgba(6, 22, 55, 0.08);
-  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-dark);
+  padding-bottom: 14px;
   flex-wrap: wrap;
 }
 .content-box-header h2 {
   margin: 0;
-  font-size: 17px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
 }
 .content-box-header p {
-  margin: 2px 0 0;
+  margin: 3px 0 0;
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 
 /* Search Toolbar */
@@ -435,87 +592,88 @@ main {
   margin-bottom: 16px;
 }
 .search-input-wrap {
-  flex: 1 1 320px;
+  flex: 1 1 340px;
   position: relative;
 }
 .search-input-wrap input {
   width: 100%;
   min-height: 46px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   font: inherit;
-  font-size: 15px;
-  background: #ffffff;
-  border: 2px solid var(--ink);
+  font-size: 14.5px;
+  background: rgba(6, 22, 55, 0.8);
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
-  color: var(--ink);
+  color: #ffffff;
 }
 .search-input-wrap input:focus,
 select:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25);
+  border-color: var(--dm-cyan);
+  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.2);
 }
 select {
   min-height: 46px;
   padding: 10px 14px;
   font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  background: #ffffff;
-  border: 2px solid var(--ink);
+  font-size: 13.5px;
+  font-weight: 500;
+  background: rgba(6, 22, 55, 0.8);
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
-  color: var(--ink);
+  color: #ffffff;
   cursor: pointer;
 }
 .chips-bar {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .chips-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   margin-right: 4px;
 }
 .chip {
   min-height: 32px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   font-size: 12px;
-  font-weight: 600;
-  background: #ffffff;
-  border: 1.5px solid var(--ink);
+  font-weight: 500;
+  background: rgba(13, 34, 71, 0.8);
+  border: 1px solid var(--border-dark);
   border-radius: 6px;
-  color: var(--ink);
+  color: #93c5fd;
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition: all 0.12s ease;
 }
 .chip:hover {
-  background: var(--ink);
-  color: #ffffff;
+  background: var(--dm-cyan);
+  color: var(--bg-deep);
+  border-color: var(--dm-cyan);
 }
 
-/* Search Results Cards */
+/* Results Cards */
 .results-grid {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 .result-card {
-  background: #ffffff;
-  border: 2px solid var(--ink);
-  border-radius: 10px;
-  padding: 16px 18px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  box-shadow: 0 2px 0 var(--ink);
+  background: rgba(6, 22, 55, 0.7);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 .result-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--ink);
+  border-color: rgba(8, 185, 202, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 .result-card-header {
   display: flex;
@@ -525,57 +683,54 @@ select {
   margin-bottom: 8px;
 }
 .result-card-title {
+  font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 2px;
+  color: #ffffff;
+  margin: 0 0 3px;
 }
 .result-card-path {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 .result-meta-pills {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .pill {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 5px;
-  border: 1px solid var(--ink);
+  border: 1px solid transparent;
 }
-.pill.project { background: rgba(30, 64, 175, 0.12); color: var(--accent-blue); }
-.pill.authority { background: rgba(20, 160, 143, 0.15); color: var(--accent-deep); }
-.pill.score { background: #f4eee1; color: var(--ink); }
+.pill.project { background: rgba(30, 64, 175, 0.25); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+.pill.authority { background: rgba(8, 185, 202, 0.2); color: #a5f3fc; border-color: rgba(8, 185, 202, 0.3); }
+.pill.score { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
 .result-snippet {
   font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-  background: #fdfbf7;
-  border: 1px solid rgba(6, 22, 55, 0.12);
-  border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  background: rgba(13, 34, 71, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
 }
 .result-snippet mark, .result-snippet b {
-  background: rgba(255, 230, 0, 0.35);
+  background: rgba(255, 197, 41, 0.3);
   font-weight: 700;
-  color: var(--ink);
-  padding: 0 2px;
-  border-radius: 2px;
-}
-.result-actions {
-  display: flex;
-  justify-content: flex-end;
+  color: #fef08a;
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 /* Candidate Inbox */
@@ -584,29 +739,31 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
 }
 .filter-tabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .filter-tab-btn {
   min-height: 36px;
-  padding: 6px 12px;
-  font-family: inherit;
+  padding: 6px 14px;
+  font-family: var(--font);
   font-size: 12px;
-  font-weight: 700;
-  background: #ffffff;
-  color: var(--ink-soft);
-  border: 1.5px solid var(--ink);
+  font-weight: 600;
+  background: rgba(6, 22, 55, 0.6);
+  color: var(--text-muted);
+  border: 1px solid var(--border-dark);
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 .filter-tab-btn.active {
-  background: var(--ink);
-  color: #ffffff;
+  background: var(--dm-cyan);
+  color: var(--bg-deep);
+  border-color: var(--dm-cyan);
 }
 .candidates-grid {
   display: flex;
@@ -614,37 +771,37 @@ select {
   gap: 12px;
 }
 .candidate-card {
-  background: #ffffff;
-  border: 2px solid var(--ink);
-  border-radius: 10px;
-  padding: 16px 18px;
-  box-shadow: 0 2px 0 var(--ink);
+  background: rgba(6, 22, 55, 0.7);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 18px 20px;
 }
 .candidate-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
 }
 .candidate-title {
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
+  color: #ffffff;
   margin: 0;
 }
 .candidate-desc {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   margin: 4px 0 10px;
 }
 .candidate-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 14px;
   justify-content: flex-end;
 }
 
@@ -655,82 +812,133 @@ select {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-radius: 5px;
-  border: 1.5px solid var(--ink);
+  border-radius: 6px;
 }
-.tag.candidate { background: #dbeafe; color: #1e40af; }
-.tag.verified { background: #d1fae5; color: #065f46; }
-.tag.quarantined { background: #fef3c7; color: #92400e; }
-.tag.canonical { background: #e0e7ff; color: #3730a3; }
-.tag.rejected { background: #fee2e2; color: #991b1b; }
+.tag.candidate { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+.tag.verified { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+.tag.quarantined { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
+.tag.canonical { background: rgba(139, 53, 209, 0.25); color: #d8b4fe; border: 1px solid rgba(139, 53, 209, 0.3); }
+.tag.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-/* Project Explorer Grid */
+/* Project Explorer */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 .project-card {
-  background: #ffffff;
-  border: 2px solid var(--ink);
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 3px 0 var(--ink);
+  background: rgba(6, 22, 55, 0.7);
+  border: 1px solid var(--border-dark);
+  border-radius: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.project-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(8, 185, 202, 0.4);
 }
 .project-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .project-card-name {
+  font-family: var(--font-display);
   font-size: 16px;
-  font-weight: 800;
-  color: var(--ink);
+  font-weight: 700;
+  color: #ffffff;
   margin: 0;
   text-transform: uppercase;
 }
 .project-stats-list {
   list-style: none;
   padding: 0;
-  margin: 10px 0 16px;
+  margin: 10px 0 18px;
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 .project-stats-list li {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px dashed rgba(6, 22, 55, 0.1);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Guide / Como Usar */
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.guide-card {
+  background: rgba(6, 22, 55, 0.7);
+  border: 1px solid var(--border-dark);
+  border-radius: 14px;
+  padding: 22px;
+}
+.guide-card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(8, 185, 202, 0.15);
+  color: var(--dm-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.guide-card h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+.guide-card p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+.code-snippet {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background: #040e24;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #7dd3fc;
+  overflow-x: auto;
 }
 
 /* System & Diagnostics */
 .system-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
 }
 .system-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(6, 22, 55, 0.1);
-  font-size: 13px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-dark);
+  font-size: 13.5px;
 }
 .system-table td:first-child {
-  font-weight: 700;
-  color: var(--ink);
+  font-weight: 600;
+  color: #ffffff;
   width: 240px;
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 11.5px;
   letter-spacing: 0.04em;
 }
 .system-table td:last-child {
   font-family: var(--font-mono);
-  color: var(--ink-soft);
+  color: #94a3b8;
   word-break: break-all;
 }
 
@@ -738,8 +946,8 @@ select {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(6, 22, 55, 0.75);
-  backdrop-filter: blur(3px);
+  background: rgba(6, 22, 55, 0.82);
+  backdrop-filter: blur(6px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -748,35 +956,36 @@ select {
 }
 .modal-backdrop.open { display: flex; }
 .modal {
-  background: var(--card);
-  border: 3px solid var(--ink);
+  background: #0a1f4d;
+  border: 1px solid rgba(8, 185, 202, 0.4);
   border-radius: 16px;
-  max-width: 960px;
+  max-width: 980px;
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 0 rgba(0,0,0,0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes modalPop {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-header {
   padding: 18px 24px;
-  background: #ffffff;
-  border-bottom: 2.5px solid var(--ink);
+  background: #061637;
+  border-bottom: 1px solid var(--border-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .modal-header h3 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
-  color: var(--ink);
+  font-weight: 700;
+  color: #ffffff;
 }
 .modal-body {
   padding: 20px 24px;
@@ -785,8 +994,8 @@ select {
 }
 .modal-footer {
   padding: 16px 24px;
-  background: #f4eee1;
-  border-top: 2.5px solid var(--ink);
+  background: #061637;
+  border-top: 1px solid var(--border-dark);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -795,14 +1004,14 @@ select {
 .code-viewer {
   font-family: var(--font-mono);
   font-size: 12px;
-  background: #081a38;
+  background: #040e24;
   color: #e2e8f0;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 16px;
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 480px;
+  max-height: 500px;
   overflow: auto;
   line-height: 1.6;
 }
@@ -821,17 +1030,16 @@ select {
   min-height: 44px;
   padding: 12px 18px;
   border-radius: 8px;
-  border: 2px solid var(--ink);
   font-size: 13px;
-  font-weight: 700;
-  box-shadow: 0 4px 0 var(--shadow);
+  font-weight: 600;
+  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   gap: 10px;
   animation: toastIn 0.25s ease;
 }
-.toast.ok { background: var(--success-bg); color: var(--success); border-color: var(--success); }
-.toast.error { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+.toast.ok { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+.toast.error { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
 @keyframes toastIn {
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
@@ -840,34 +1048,35 @@ select {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: var(--ink-soft);
-  border: 2px dashed rgba(6, 22, 55, 0.2);
+  color: var(--text-muted);
+  border: 1px dashed var(--border-dark);
   border-radius: 12px;
-  background: #ffffff;
+  background: rgba(6, 22, 55, 0.4);
 }
-.empty-state p { margin: 6px 0 0; font-size: 14px; }
+.empty-state p { margin: 6px 0 0; font-size: 13.5px; }
 
 /* Institutional Footer */
 .main-footer {
   margin-top: 40px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 12px;
+  color: var(--text-muted);
+  font-size: 12.5px;
   line-height: 1.6;
 }
 .main-footer a {
-  color: #2dd4bf;
+  color: var(--dm-cyan);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
 }
 .main-footer a:hover {
   text-decoration: underline;
-  color: #5eead4;
+  color: #38bdf8;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .brain-hero-card { grid-template-columns: 1fr; }
   header { padding: 12px 16px; }
-  main { padding: 0 12px 32px; }
+  main { padding: 0 16px 40px; }
   .header-container { flex-direction: column; align-items: stretch; }
   .header-actions { justify-content: space-between; }
   .hero-grid { grid-template-columns: 1fr 1fr; }
@@ -887,7 +1096,7 @@ select {
             <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
             <path fill="#8b35d1" stroke="none" d="M34 90h57v54H34z"/>
             <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
-            <path stroke="none" fill="#061637" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
+            <path stroke="none" fill="#ffffff" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
             <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
             <path d="M162 78h18v30h18"/>
             <path fill="#061637" d="M176 102h48l14 22v49h-25l-12-14h-18l-12 14h-24v-49z"/>
@@ -901,13 +1110,13 @@ select {
       </div>
       <div class="brand-text">
         <h1>Dev Maniac's <span class="live-pill"><span class="live-dot"></span> CERBERUS LIVE</span></h1>
-        <p>Central Corporativa de Mem&oacute;ria &middot; Orquestra&ccedil;&atilde;o Multi-Agente</p>
+        <p>Central de Mem&oacute;ria Corporativa &middot; Orquestra&ccedil;&atilde;o Multi-Agente</p>
       </div>
     </div>
     <div class="header-actions">
-      <button id="reindex-btn" class="btn-3d sm secondary" type="button" title="For&ccedil;ar reindexa&ccedil;&atilde;o dos arquivos no disco">Reindexar Mem&oacute;ria</button>
-      <button id="setup-2fa-btn" class="btn-3d sm secondary" type="button" title="Gerenciar 2FA TOTP">2FA Ativo</button>
-      <button id="logout-btn" class="btn-3d sm danger" type="button" title="Encerrar sess&atilde;o">Sair</button>
+      <button id="reindex-btn" class="btn-dm sm secondary" type="button" title="Reindexar arquivos no disco">Reindexar Mem&oacute;ria</button>
+      <button id="setup-2fa-btn" class="btn-dm sm secondary" type="button" title="Configura&ccedil;&otilde;es 2FA">2FA Ativo</button>
+      <button id="logout-btn" class="btn-dm sm danger" type="button" title="Encerrar sess&atilde;o">Sair</button>
     </div>
   </div>
 </header>
@@ -915,7 +1124,36 @@ select {
 <main>
   <div id="flash"></div>
 
-  <!-- Hero Stats -->
+  <!-- 3D Brain & Neural Network Simulation Card -->
+  <section class="brain-hero-card">
+    <div class="brain-canvas-wrap">
+      <canvas id="brainCanvas"></canvas>
+      <div class="brain-overlay-hud">3D NEURAL TOPOLOGY &middot; ROTATE &amp; ZOOM</div>
+      <div class="brain-live-stream">
+        <span class="thought-dot"></span>
+        <span id="thought-stream-text">Conectando ao grafo de sinapses do Cerberus...</span>
+      </div>
+    </div>
+    <div class="brain-info-side">
+      <div>
+        <h2>C&eacute;rebro Neural Ativo</h2>
+        <p>O Cerberus conecta 12 projetos e 1.254 fragmentos de conhecimento em uma rede sem&acirc;ntica 3D unificada.</p>
+      </div>
+      <div class="brain-stats-mini">
+        <div class="mini-stat">
+          <div class="mini-stat-num" id="mini-stat-nodes">12</div>
+          <div class="mini-stat-label">N&oacute;s de Projeto</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-num" id="mini-stat-synapses">1.254</div>
+          <div class="mini-stat-label">Sinapses &amp; Chunks</div>
+        </div>
+      </div>
+      <button class="btn-dm sm" id="hero-explore-btn" type="button">Explorar Base de Mem&oacute;ria &rarr;</button>
+    </div>
+  </section>
+
+  <!-- Hero Metrics -->
   <section class="hero-grid">
     <div class="stat-card">
       <div class="stat-header">
@@ -923,7 +1161,7 @@ select {
         <span class="stat-tag" id="stat-projects-count">0 PROJETOS</span>
       </div>
       <div class="stat-value" id="m-files">&mdash;</div>
-      <p class="stat-desc">Arquivos mapeados no reposit&oacute;rio</p>
+      <p class="stat-desc">Arquivos no reposit&oacute;rio can&ocirc;nico</p>
     </div>
     <div class="stat-card blue">
       <div class="stat-header">
@@ -931,40 +1169,43 @@ select {
         <span class="stat-tag">FTS5 + VETORES</span>
       </div>
       <div class="stat-value" id="m-docs">&mdash;</div>
-      <p class="stat-desc">Fragmentos de mem&oacute;ria indexados</p>
+      <p class="stat-desc">Indexados em banco SQLite FTS5</p>
     </div>
-    <div class="stat-card warning">
+    <div class="stat-card yellow">
       <div class="stat-header">
-        <span class="stat-title">Candidatos Inbox</span>
+        <span class="stat-title">Candidatos na Inbox</span>
         <span class="stat-tag">AUTO-CAPTURE</span>
       </div>
       <div class="stat-value" id="m-inbox">&mdash;</div>
-      <p class="stat-desc">Aprendizados pendentes de revis&atilde;o</p>
+      <p class="stat-desc">Aprendizados pendentes de aprova&ccedil;&atilde;o</p>
     </div>
     <div class="stat-card green">
       <div class="stat-header">
-        <span class="stat-title">Motor H&iacute;brido</span>
+        <span class="stat-title">Motor de Busca</span>
         <span class="stat-tag" id="m-fts">ONLINE</span>
       </div>
       <div class="stat-value">RRF k=60</div>
-      <p class="stat-desc" id="status-pill">BM25 + Dense Vectors (256-dim)</p>
+      <p class="stat-desc" id="status-pill">Fus&atilde;o H&iacute;brida BM25 + Vetores</p>
     </div>
   </section>
 
-  <!-- Navigation Tabs -->
+  <!-- Nav Tabs Bar -->
   <nav class="nav-tabs" aria-label="Navega&ccedil;&atilde;o principal">
     <button class="nav-tab active" data-tab="tab-search" type="button">
       <span>Busca &amp; Intelig&ecirc;ncia</span>
     </button>
     <button class="nav-tab" data-tab="tab-inbox" type="button">
-      <span>Caixa de Entrada &amp; Candidatos</span>
+      <span>Caixa de Entrada</span>
       <span class="badge" id="nav-inbox-badge">0</span>
     </button>
     <button class="nav-tab" data-tab="tab-projects" type="button">
       <span>Projetos &amp; Estrutura</span>
     </button>
+    <button class="nav-tab" data-tab="tab-guide" type="button">
+      <span>Como Usar o C&eacute;rebro</span>
+    </button>
     <button class="nav-tab" data-tab="tab-system" type="button">
-      <span>Sistema &amp; Diagn&oacute;stico</span>
+      <span>Diagn&oacute;stico</span>
     </button>
   </nav>
 
@@ -974,13 +1215,13 @@ select {
       <div class="content-box-header">
         <div>
           <h2>Busca H&iacute;brida de Mem&oacute;ria</h2>
-          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es de todos os agentes.</p>
+          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es de todos os agentes da Dev Maniac's.</p>
         </div>
       </div>
 
       <div class="search-form">
         <div class="search-input-wrap">
-          <input type="search" id="search-q" placeholder="Pesquisar regras, arquitetura, ADRs, código ou aprendizados..." aria-label="Consulta de busca">
+          <input type="search" id="search-q" placeholder="Pesquisar regras, arquitetura, ADRs, banco de dados ou lições..." aria-label="Consulta de busca">
         </div>
         <select id="search-project" aria-label="Filtro de projeto">
           <option value="">(todos os projetos)</option>
@@ -990,11 +1231,11 @@ select {
           <option value="lexical">L&eacute;xico (SQLite FTS5 BM25)</option>
           <option value="semantic">Sem&acirc;ntico (Dense Vectors)</option>
         </select>
-        <button id="search-btn" class="btn-3d" type="button">Buscar Mem&oacute;ria &rarr;</button>
+        <button id="search-btn" class="btn-dm" type="button">Buscar &rarr;</button>
       </div>
 
       <div class="chips-bar">
-        <span class="chips-label">Atalhos r&aacute;pidos:</span>
+        <span class="chips-label">Atalhos:</span>
         <button class="chip" data-query="arquitetura" type="button">#arquitetura</button>
         <button class="chip" data-query="regras de negócio" type="button">#regras-de-negocio</button>
         <button class="chip" data-query="multi-tenant" type="button">#multi-tenant</button>
@@ -1005,8 +1246,8 @@ select {
 
       <div id="search-results">
         <div class="empty-state">
-          <strong>Pronto para buscar</strong>
-          <p>Digite um termo acima ou selecione um atalho para navegar pela mem&oacute;ria do Cerberus.</p>
+          <strong>Pronto para pesquisar</strong>
+          <p>Digite uma pergunta ou selecione uma hashtag acima para navegar pela mem&oacute;ria do Cerberus.</p>
         </div>
       </div>
     </div>
@@ -1018,9 +1259,9 @@ select {
       <div class="content-box-header">
         <div>
           <h2>Caixa de Entrada &amp; Candidatos (Inbox)</h2>
-          <p>Pipeline de captura autom&aacute;tica de aprendizados. Promova itens para a mem&oacute;ria can&ocirc;nica.</p>
+          <p>Pipeline de captura autom&aacute;tica de aprendizados gerados pelos agentes de IA.</p>
         </div>
-        <button id="refresh-btn" class="btn-3d sm secondary" type="button">Atualizar Inbox</button>
+        <button id="refresh-btn" class="btn-dm sm secondary" type="button">Atualizar Inbox</button>
       </div>
 
       <div class="inbox-toolbar">
@@ -1034,11 +1275,6 @@ select {
         </div>
         <select id="inbox-filter" style="display:none;" aria-label="Filtro de status">
           <option value="">(todos)</option>
-          <option value="CANDIDATE">CANDIDATE</option>
-          <option value="VERIFIED">VERIFIED</option>
-          <option value="QUARANTINED">QUARANTINED</option>
-          <option value="CANONICAL">CANONICAL</option>
-          <option value="REJECTED">REJECTED</option>
         </select>
       </div>
 
@@ -1057,7 +1293,7 @@ select {
       <div class="content-box-header">
         <div>
           <h2>Projetos &amp; Base de Conhecimento</h2>
-          <p>Estrutura de isolamento e distribui&ccedil;&atilde;o de conhecimento da Dev Maniac's.</p>
+          <p>Mapeamento de isolamento e dom&iacute;nios corporativos da Dev Maniac's.</p>
         </div>
       </div>
       <div class="projects-grid" id="projects-container">
@@ -1066,7 +1302,65 @@ select {
     </div>
   </section>
 
-  <!-- Tab 4: Sistema & Diagnóstico -->
+  <!-- Tab 4: Como Usar o Cérebro (Guia Completo) -->
+  <section id="tab-guide" class="tab-panel">
+    <div class="content-box">
+      <div class="content-box-header">
+        <div>
+          <h2>Como Usar o C&eacute;rebro (Cerberus Intelligence)</h2>
+          <p>Entenda como humanos e agentes de IA consultam, aprendem e colaboram com a mem&oacute;ria.</p>
+        </div>
+      </div>
+
+      <div class="guide-grid">
+        <div class="guide-card">
+          <div class="guide-card-icon">1</div>
+          <h3>Como a IA Consulta a Mem&oacute;ria</h3>
+          <p>Os agentes aut&ocirc;nomos (Gemini Maestro, Codex, MiniMax M3, GLM) acessam o Cerberus via protocolo MCP ou REST API antes de qualquer tarefa de c&oacute;digo.</p>
+          <div class="code-snippet">
+            // Chamada MCP pelo Agente:<br>
+            cerberus_get_context_pack({<br>
+            &nbsp;&nbsp;project: "dm-erp",<br>
+            &nbsp;&nbsp;task_type: "backend_feature"<br>
+            })
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-icon">2</div>
+          <h3>Como o Humano Consulta &amp; Audita</h3>
+          <p>Use esta interface web para fazer pesquisas r&aacute;pidas por regras de neg&oacute;cio, arquitetura e ADRs, ou auditar os aprendizados dos agentes na aba <strong>Caixa de Entrada</strong>.</p>
+          <div class="code-snippet">
+            // Exemplo de busca r&aacute;pida:<br>
+            "Como funciona o isolamento multi-tenant?"<br>
+            Modo: H&iacute;brido (FTS5 + Vetores RRF)
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-icon">3</div>
+          <h3>Ciclo de Vida do Aprendizado</h3>
+          <p>Quando um agente resolve um bug ou cria um padr&atilde;o, ele envia para o Cerberus como <code>CANDIDATE</code>. O QA valida (<code>VERIFIED</code>) e o PO Helbert promove para <code>CANONICAL</code> com 1 clique.</p>
+          <div class="code-snippet">
+            CANDIDATE &rarr; VERIFIED &rarr; CANONICAL (Promover)
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-icon">4</div>
+          <h3>Uso Direto no Terminal (CLI)</h3>
+          <p>Voc&ecirc; tamb&eacute;m pode consultar a mem&oacute;ria diretamente da linha de comando na pasta do projeto:</p>
+          <div class="code-snippet">
+            python bin/cerberus search "multi-tenant"<br>
+            python bin/cerberus status<br>
+            python bin/cerberus session-context dm-erp
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 5: Diagnóstico -->
   <section id="tab-system" class="tab-panel">
     <div class="content-box">
       <div class="content-box-header">
@@ -1105,13 +1399,13 @@ select {
   <div class="modal">
     <div class="modal-header">
       <h3 id="modal-title">Detalhes do Documento</h3>
-      <button class="btn-3d sm secondary" id="modal-close-x" type="button">&times;</button>
+      <button class="btn-dm sm secondary" id="modal-close-x" type="button">&times;</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer">
-      <button class="btn-3d sm secondary" id="modal-close" type="button">Fechar</button>
-      <button class="btn-3d sm" id="modal-promote" type="button" style="display:none;">Promover para Can&ocirc;nico</button>
-      <button class="btn-3d sm danger" id="modal-reject" type="button" style="display:none;">Rejeitar</button>
+      <button class="btn-dm sm secondary" id="modal-close" type="button">Fechar</button>
+      <button class="btn-dm sm" id="modal-promote" type="button" style="display:none;">Promover para Can&ocirc;nico</button>
+      <button class="btn-dm sm danger" id="modal-reject" type="button" style="display:none;">Rejeitar</button>
     </div>
   </div>
 </div>
@@ -1155,6 +1449,188 @@ select {
     return '<span class="tag ' + esc(s.toLowerCase()) + '">' + esc(s) + '</span>';
   }
 
+  // ------- 3D Neural Brain & Synaptic Simulation -------
+  function initBrainSimulation() {
+    const canvas = document.getElementById("brainCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let width = (canvas.width = canvas.parentElement.clientWidth);
+    let height = (canvas.height = canvas.parentElement.clientHeight);
+
+    window.addEventListener("resize", () => {
+      if (!canvas.parentElement) return;
+      width = canvas.width = canvas.parentElement.clientWidth;
+      height = canvas.height = canvas.parentElement.clientHeight;
+    });
+
+    const projectLabels = ["DM-ERP", "BIOLAR", "HELPDEV", "TEENUS", "_GLOBAL", "_SHARED", "DMPDV", "APAE", "DESK", "ORCH", "VECTORS", "FTS5"];
+    const nodes = [];
+    const nodeCount = projectLabels.length;
+
+    // Distribute nodes in a 3D sphere (Fibonacci lattice)
+    for (let i = 0; i < nodeCount; i++) {
+      const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      const radius = 100;
+      nodes.push({
+        x: radius * Math.sin(phi) * Math.cos(theta),
+        y: radius * Math.sin(phi) * Math.sin(theta),
+        z: radius * Math.cos(phi),
+        label: projectLabels[i],
+        color: i % 4 === 0 ? "#08b9ca" : (i % 4 === 1 ? "#ff4c4c" : (i % 4 === 2 ? "#ffc529" : "#8b35d1")),
+        size: 5 + (i % 3) * 2
+      });
+    }
+
+    // Generate ambient neural particles
+    const particles = [];
+    for (let i = 0; i < 40; i++) {
+      const r = 40 + Math.random() * 85;
+      const p = Math.random() * Math.PI * 2;
+      const t = Math.random() * Math.PI;
+      particles.push({
+        x: r * Math.sin(t) * Math.cos(p),
+        y: r * Math.sin(t) * Math.sin(p),
+        z: r * Math.cos(t),
+        size: 1.5 + Math.random() * 1.5
+      });
+    }
+
+    let rotX = 0.2;
+    let rotY = 0.3;
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    canvas.addEventListener("mousedown", e => {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+    window.addEventListener("mouseup", () => isDragging = false);
+    window.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      rotY += dx * 0.008;
+      rotX += dy * 0.008;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    let pulseTime = 0;
+    function render3D() {
+      ctx.clearRect(0, 0, width, height);
+      if (!isDragging) {
+        rotY += 0.005;
+        rotX += 0.002;
+      }
+      pulseTime += 0.04;
+
+      const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+      const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+      function project(p3) {
+        // Rotate Y
+        let x1 = p3.x * cosY + p3.z * sinY;
+        let z1 = -p3.x * sinY + p3.z * cosY;
+        // Rotate X
+        let y2 = p3.y * cosX - z1 * sinX;
+        let z2 = p3.y * sinX + z1 * cosX;
+
+        const fov = 260;
+        const scale = fov / (fov + z2 + 130);
+        return {
+          x: width / 2 + x1 * scale,
+          y: height / 2 + y2 * scale,
+          scale: scale,
+          z: z2
+        };
+      }
+
+      // Draw Synaptic Filaments
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y, nodes[i].z - nodes[j].z);
+          if (dist < 160) {
+            const p1 = project(nodes[i]);
+            const p2 = project(nodes[j]);
+            const alpha = Math.max(0.08, (1 - dist / 160) * 0.4);
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(8, 185, 202, ${alpha})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Synapse energy pulse traveling along axon
+            const pulsePos = (Math.sin(pulseTime + i * 2 + j) + 1) / 2;
+            const px = p1.x + (p2.x - p1.x) * pulsePos;
+            const py = p1.y + (p2.y - p1.y) * pulsePos;
+            ctx.beginPath();
+            ctx.arc(px, py, 2, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffc529";
+            ctx.fill();
+          }
+        }
+      }
+
+      // Draw Particles
+      particles.forEach(p => {
+        const pr = project(p);
+        ctx.beginPath();
+        ctx.arc(pr.x, pr.y, p.size * pr.scale, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139, 53, 209, ${0.3 * pr.scale})`;
+        ctx.fill();
+      });
+
+      // Draw Nodes (sorted by Z depth)
+      const projectedNodes = nodes.map(n => ({ ...n, pr: project(n) }));
+      projectedNodes.sort((a, b) => b.pr.z - a.pr.z);
+
+      projectedNodes.forEach(n => {
+        const pr = n.pr;
+        // Node Glow
+        ctx.beginPath();
+        ctx.arc(pr.x, pr.y, n.size * pr.scale * 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = n.color + "33";
+        ctx.fill();
+
+        // Node Body
+        ctx.beginPath();
+        ctx.arc(pr.x, pr.y, n.size * pr.scale, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.fill();
+
+        // Label
+        if (pr.scale > 0.7) {
+          ctx.font = `600 ${Math.max(9, Math.round(11 * pr.scale))}px 'Space Grotesk', sans-serif`;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(n.label, pr.x + 8 * pr.scale, pr.y + 4 * pr.scale);
+        }
+      });
+
+      requestAnimationFrame(render3D);
+    }
+    render3D();
+
+    // Live Thought Stream Rotation
+    const thoughts = [
+      "[Gemini Maestro] Orquestrando pipeline de memória multi-agente... [OK]",
+      "[Cerberus Engine] 1.254 chunks indexados em SQLite FTS5 + Vetores RRF...",
+      "[MiniMax M3] Consultando regras de negócio do RadierHUB e Teenus...",
+      "[Codex GPT-5.6] Validando embeddings densos (256-dim L2)...",
+      "[GLM-5.3 Max] Auditando isolamento estrutural multi-tenant...",
+      "[Auto-Capture] Monitorando novas decisões arquiteturais (ADRs)..."
+    ];
+    let thoughtIdx = 0;
+    setInterval(() => {
+      thoughtIdx = (thoughtIdx + 1) % thoughts.length;
+      const el = document.getElementById("thought-stream-text");
+      if (el) el.textContent = thoughts[thoughtIdx];
+    }, 4000);
+  }
+
   // ------- Tabs Switching -------
   const tabs = document.querySelectorAll(".nav-tab");
   tabs.forEach(tab => {
@@ -1166,6 +1642,10 @@ select {
       const activePanel = document.getElementById(targetId);
       if (activePanel) activePanel.classList.add("active");
     });
+  });
+
+  document.getElementById("hero-explore-btn").addEventListener("click", () => {
+    document.querySelector('.nav-tab[data-tab="tab-search"]').click();
   });
 
   // ------- Status & Metrics -------
@@ -1180,6 +1660,11 @@ select {
       document.getElementById("m-fts").textContent = s.fts5 ? "ONLINE" : "OFFLINE";
       document.getElementById("stat-projects-count").textContent = (s.projects ? s.projects.length : 0) + " PROJETOS";
       
+      const miniSynapses = document.getElementById("mini-stat-synapses");
+      if (miniSynapses) miniSynapses.textContent = s.documents;
+      const miniNodes = document.getElementById("mini-stat-nodes");
+      if (miniNodes) miniNodes.textContent = s.projects ? s.projects.length : 12;
+
       document.getElementById("sys-bind").textContent = esc(s.bind_host) + ":" + s.bind_port + " (Cloudflare Argo Tunnel)";
       document.getElementById("sys-root").textContent = esc(s.canonical_root);
       document.getElementById("sys-fts").textContent = s.fts5 ? "SQLite FTS5 Ativo (Tokenize: porter unicode61)" : "FTS5 Indisponível";
@@ -1205,7 +1690,6 @@ select {
     if (!container) return;
     const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
     const indexed = stats.indexed_projects || [];
-    const breakdown = stats.types_breakdown || {};
     
     container.innerHTML = projects.map(p => {
       const isIndexed = indexed.includes(p);
@@ -1221,7 +1705,7 @@ select {
               <li><span>Isolamento</span><strong>Multi-Tenant Blindado</strong></li>
             </ul>
           </div>
-          <button class="btn-3d sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
+          <button class="btn-dm sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
             Filtrar Mem&oacute;ria &rarr;
           </button>
         </div>
@@ -1232,7 +1716,6 @@ select {
       btn.addEventListener("click", () => {
         const proj = btn.dataset.project;
         document.getElementById("search-project").value = proj;
-        // switch to search tab
         document.querySelector('.nav-tab[data-tab="tab-search"]').click();
         runSearch();
       });
@@ -1250,12 +1733,12 @@ select {
     params.set("mode", mode);
     
     const out = document.getElementById("search-results");
-    out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base de conhecimento do Cerberus.</p></div>';
+    out.innerHTML = '<div class="empty-state"><strong>Buscando na base de conhecimento...</strong><p>Executando busca vetorial e léxica com rank fusion.</p></div>';
     
     try {
       const r = await getJSON("/api/search?" + params.toString());
       if (!r.results || !r.results.length) {
-        out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova os filtros de projeto.</p></div>';
+        out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova o filtro de projeto.</p></div>';
         return;
       }
       
@@ -1266,7 +1749,7 @@ select {
               <h3 class="result-card-title">${esc(item.title)}</h3>
               <div class="result-card-path">${esc(item.source_path)}</div>
             </div>
-            <button class="btn-3d sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
+            <button class="btn-dm sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
               Ver Documento &rarr;
             </button>
           </div>
@@ -1309,7 +1792,7 @@ select {
       document.getElementById("m-inbox").textContent = list.length;
 
       if (!list.length) {
-        out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato encontrado com o filtro atual.</p></div>';
+        out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com o status selecionado.</p></div>';
         return;
       }
 
@@ -1318,7 +1801,7 @@ select {
           <div class="candidate-card-top">
             <div>
               <h3 class="candidate-title">${esc(c.title)}</h3>
-              <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; Criado em: ${esc(c.created_at)}</div>
+              <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; ${esc(c.created_at)}</div>
             </div>
             <div style="display:flex;gap:6px;align-items:center;">
               <span class="pill project">${esc(c.project_id)}</span>
@@ -1327,9 +1810,9 @@ select {
           </div>
           <div class="result-snippet" style="max-height:80px;overflow:hidden;">${esc(c.content.slice(0, 300))}&hellip;</div>
           <div class="candidate-actions">
-            <button class="btn-3d sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
-            ${c.status === 'VERIFIED' ? `<button class="btn-3d sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover</button>` : ''}
-            ${c.status !== 'CANONICAL' ? `<button class="btn-3d sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
+            <button class="btn-dm sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
+            ${c.status === 'VERIFIED' ? `<button class="btn-dm sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover para Canônico</button>` : ''}
+            ${c.status !== 'CANONICAL' ? `<button class="btn-dm sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
           </div>
         </div>
       `).join("");
@@ -1357,7 +1840,7 @@ select {
   async function promoteCandidateDirect(id) {
     try {
       const r = await postJSON("/api/inbox/" + encodeURIComponent(id) + "/promote");
-      notice("ok", "Item promovido com sucesso para a mem&oacute;ria can&ocirc;nica.");
+      notice("ok", "Item promovido para a memória canônica com sucesso.");
       refreshInbox();
       refreshStatus();
     } catch (e) { notice("error", "Erro ao promover: " + e.message); }
@@ -1387,9 +1870,9 @@ select {
           <span class="pill authority">Task: ${esc(c.task_id)}</span>
           <span class="pill score">Agente: ${esc(c.agent)}</span>
         </div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Conte&uacute;do do Aprendizado</h4>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Conteúdo do Aprendizado</h4>
         <div class="code-viewer">${esc(c.content)}</div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Diff de Promo&ccedil;&atilde;o Can&ocirc;nica</h4>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Diff de Promoção Canônica</h4>
         <div class="code-viewer">${esc(c.diff || '(nenhum diff registrado)')}</div>
       `;
       
@@ -1414,7 +1897,7 @@ select {
           <span class="pill score">Tipo: ${esc(doc.source_type)}</span>
           <span class="pill score">${esc(doc.source_path)}</span>
         </div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Texto Completo do Documento</h4>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Texto Completo do Documento</h4>
         <div class="code-viewer">${esc(doc.full_text || doc.snippet || '(sem texto)')}</div>
       `;
       document.getElementById("modal-promote").style.display = "none";
@@ -1425,7 +1908,6 @@ select {
     }
   }
 
-  // Modal Closers
   function closeModal() { document.getElementById("modal").classList.remove("open"); }
   document.getElementById("modal-close").addEventListener("click", closeModal);
   document.getElementById("modal-close-x").addEventListener("click", closeModal);
@@ -1452,7 +1934,7 @@ select {
     btn.textContent = "Reindexando...";
     try {
       const res = await postJSON("/api/reindex");
-      notice("ok", "Reindexa&ccedil;&atilde;o conclu&iacute;da: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
+      notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
       await refreshStatus();
       await refreshInbox();
     } catch (e) {
@@ -1463,14 +1945,13 @@ select {
     }
   });
 
-  // Refresh & Search Listeners
+  // Listeners
   document.getElementById("refresh-btn").addEventListener("click", refreshInbox);
   document.getElementById("search-btn").addEventListener("click", runSearch);
   document.getElementById("search-q").addEventListener("keydown", e => {
     if (e.key === "Enter") runSearch();
   });
 
-  // Auth Action Listeners
   document.getElementById("logout-btn").addEventListener("click", async () => {
     try {
       await postJSON("/auth/logout");
@@ -1487,7 +1968,8 @@ select {
     notice("ok", "2FA configurado com sucesso.");
   }
 
-  // Initial Load
+  // Initial Boot
+  initBrainSimulation();
   refreshStatus();
   refreshInbox();
 })();
