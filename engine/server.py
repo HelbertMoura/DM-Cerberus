@@ -109,7 +109,6 @@ UI_HTML = """<!doctype html>
   --dm-cyan: #08b9ca;
   --dm-red: #ff4c4c;
   --dm-yellow: #ffc529;
-  --dm-purple: #8b35d1;
   --dm-blue: #1e40af;
   --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', var(--font);
@@ -247,8 +246,8 @@ header {
   color: #ffffff;
 }
 .btn-dm.sm {
-  min-height: 38px;
-  padding: 6px 14px;
+  min-height: 44px;
+  padding: 8px 14px;
   font-size: 12.5px;
 }
 .btn-dm:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -556,9 +555,9 @@ select {
   margin-right: 4px;
 }
 .chip {
-  min-height: 32px;
-  padding: 4px 12px;
-  font-size: 12px;
+  min-height: 44px;
+  padding: 6px 14px;
+  font-size: 12.5px;
   font-weight: 500;
   background: #0d2247;
   border: 1px solid var(--border-dark);
@@ -661,10 +660,10 @@ select {
   flex-wrap: wrap;
 }
 .filter-tab-btn {
-  min-height: 36px;
-  padding: 6px 14px;
+  min-height: 44px;
+  padding: 8px 14px;
   font-family: var(--font);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   background: #061637;
   color: var(--text-muted);
@@ -858,7 +857,7 @@ select {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(3, 10, 26, 0.85);
+  background: #061637;
   display: none;
   align-items: center;
   justify-content: center;
@@ -992,7 +991,7 @@ select {
             <path fill="#061637" d="M20 28h142v132H20z"/>
             <path fill="#ff4c4c" stroke="none" d="M34 42h57v48H34z"/>
             <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
-            <path fill="#8b35d1" stroke="none" d="M34 90h57v54H34z"/>
+            <path fill="#1e40af" stroke="none" d="M34 90h57v54H34z"/>
             <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
             <path stroke="none" fill="#ffffff" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
             <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
@@ -1002,7 +1001,7 @@ select {
           <g fill="#ffffff"><path d="M169 124h10v-10h10v10h10v10h-10v10h-10v-10h-10z"/></g>
           <rect x="209" y="119" width="9" height="9" fill="#ff4c4c"/>
           <rect x="220" y="130" width="9" height="9" fill="#ffc529"/>
-          <rect x="198" y="130" width="9" height="9" fill="#8b35d1"/>
+          <rect x="198" y="130" width="9" height="9" fill="#1e40af"/>
           <rect x="209" y="141" width="9" height="9" fill="#08b9ca"/>
         </svg>
       </div>
@@ -1308,12 +1307,14 @@ document.addEventListener("DOMContentLoaded", function () {
   "use strict";
   const flash = document.getElementById("flash");
   function notice(kind, msg) {
-    if (!msg || !flash) return;
-    const div = document.createElement("div");
-    div.className = "toast " + (kind === "ok" ? "ok" : "error");
-    div.textContent = (kind === "ok" ? "[OK] " : "[AVISO] ") + msg;
-    flash.appendChild(div);
-    setTimeout(() => { div.remove(); }, 4000);
+    try {
+      if (!msg || !flash) return;
+      const div = document.createElement("div");
+      div.className = "toast " + (kind === "ok" ? "ok" : "error");
+      div.textContent = (kind === "ok" ? "[OK] " : "[AVISO] ") + msg;
+      flash.appendChild(div);
+      setTimeout(() => { try { div.remove(); } catch(e){} }, 4000);
+    } catch (err) { console.error("Notice error:", err); }
   }
 
   async function getJSON(url) {
@@ -1338,7 +1339,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function esc(v) {
-    return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function statusTag(status) {
@@ -1347,27 +1348,35 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ------- 1. Tab Switching (Isolated & Fail-Safe) -------
+  function initTabs() {
   try {
     const tabs = document.querySelectorAll(".nav-tab");
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        const targetId = tab.dataset.tab;
-        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-        const activePanel = document.getElementById(targetId);
-        if (activePanel) activePanel.classList.add("active");
+        try {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          const targetId = tab.dataset.tab;
+          if (targetId) {
+            document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+            const activePanel = document.getElementById(targetId);
+            if (activePanel) activePanel.classList.add("active");
+          }
+        } catch (e) { console.error("Tab click error:", e); }
       });
     });
     const exploreBtn = document.getElementById("hero-explore-btn");
     if (exploreBtn) {
       exploreBtn.addEventListener("click", () => {
-        const searchTab = document.querySelector('.nav-tab[data-tab="tab-search"]');
-        if (searchTab) searchTab.click();
+        try {
+          const searchTab = document.querySelector('.nav-tab[data-tab="tab-search"]');
+          if (searchTab) searchTab.click();
+        } catch (e) { console.error(e); }
       });
     }
   } catch (err) {
     console.error("Tab setup error:", err);
+  }
   }
 
   // ------- 2. Knowledge Topology Canvas (Solid & Interactive) -------
@@ -1378,13 +1387,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      let width = (canvas.width = canvas.parentElement.clientWidth || 600);
-      let height = (canvas.height = canvas.parentElement.clientHeight || 280);
+      let width = (canvas.width = Math.max(canvas.parentElement.clientWidth || 600, 10));
+      let height = (canvas.height = Math.max(canvas.parentElement.clientHeight || 280, 10));
 
       window.addEventListener("resize", () => {
-        if (!canvas.parentElement) return;
-        width = canvas.width = canvas.parentElement.clientWidth || 600;
-        height = canvas.height = canvas.parentElement.clientHeight || 280;
+        try {
+          if (!canvas.parentElement) return;
+          width = canvas.width = Math.max(canvas.parentElement.clientWidth || 600, 10);
+          height = canvas.height = Math.max(canvas.parentElement.clientHeight || 280, 10);
+        } catch(e) {}
       });
 
       const projectLabels = ["DM-ERP", "BIOLAR", "HELPDEV", "TEENUS", "_GLOBAL", "_SHARED", "DMPDV", "APAE", "DESK", "ORCH", "VECTORS", "FTS5"];
@@ -1418,18 +1429,24 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       window.addEventListener("mouseup", () => isDragging = false);
       window.addEventListener("mousemove", e => {
-        if (!isDragging) return;
-        const dx = e.clientX - lastMouseX;
-        const dy = e.clientY - lastMouseY;
-        rotY += dx * 0.008;
-        rotX += dy * 0.008;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
+        try {
+          if (!isDragging) return;
+          const dx = e.clientX - lastMouseX;
+          const dy = e.clientY - lastMouseY;
+          rotY += dx * 0.008;
+          rotX += dy * 0.008;
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+        } catch(err) {}
       });
 
       let pulseTime = 0;
       function renderLoop() {
         try {
+          if (width === 0 || height === 0) {
+            requestAnimationFrame(renderLoop);
+            return;
+          }
           ctx.fillStyle = "#061637";
           ctx.fillRect(0, 0, width, height);
 
@@ -1468,7 +1485,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = "rgba(30, 58, 109, 0.7)";
+                ctx.strokeStyle = "#1e3a6d";
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
 
@@ -1504,6 +1521,7 @@ document.addEventListener("DOMContentLoaded", function () {
           requestAnimationFrame(renderLoop);
         } catch (e) {
           console.error("Render loop error:", e);
+          requestAnimationFrame(renderLoop); // Fallback to keep looping
         }
       }
       renderLoop();
@@ -1518,9 +1536,11 @@ document.addEventListener("DOMContentLoaded", function () {
       ];
       let msgIdx = 0;
       setInterval(() => {
-        msgIdx = (msgIdx + 1) % streamMessages.length;
-        const ticker = document.getElementById("thought-stream-text");
-        if (ticker) ticker.textContent = streamMessages[msgIdx];
+        try {
+          msgIdx = (msgIdx + 1) % streamMessages.length;
+          const ticker = document.getElementById("thought-stream-text");
+          if (ticker) ticker.textContent = streamMessages[msgIdx];
+        } catch(e){}
       }, 4000);
     } catch (err) {
       console.error("Topology init error:", err);
@@ -1575,175 +1595,243 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderProjectsGrid(stats) {
-    const container = document.getElementById("projects-container");
-    if (!container) return;
-    const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
-    const indexed = stats.indexed_projects || [];
+    try {
+      const container = document.getElementById("projects-container");
+      if (!container) return;
+      const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
+      const indexed = stats.indexed_projects || [];
 
-    container.innerHTML = projects.map(p => {
-      const isIndexed = indexed.includes(p);
-      return `
-        <div class="project-card">
-          <div>
-            <div class="project-card-header">
-              <h3 class="project-card-name">${esc(p)}</h3>
-              <span class="pill project">${isIndexed ? 'INDEXADO' : 'MONITORADO'}</span>
+      container.innerHTML = projects.map(p => {
+        const isIndexed = indexed.includes(p);
+        return `
+          <div class="project-card">
+            <div>
+              <div class="project-card-header">
+                <h3 class="project-card-name">${esc(p)}</h3>
+                <span class="pill project">${isIndexed ? 'INDEXADO' : 'MONITORADO'}</span>
+              </div>
+              <ul class="project-stats-list">
+                <li><span>Status</span><strong>${isIndexed ? 'Pronto para busca' : 'Ativo'}</strong></li>
+                <li><span>Isolamento</span><strong>Multi-Tenant Blindado</strong></li>
+              </ul>
             </div>
-            <ul class="project-stats-list">
-              <li><span>Status</span><strong>${isIndexed ? 'Pronto para busca' : 'Ativo'}</strong></li>
-              <li><span>Isolamento</span><strong>Multi-Tenant Blindado</strong></li>
-            </ul>
+            <button class="btn-dm sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
+              Filtrar Mem&oacute;ria &rarr;
+            </button>
           </div>
-          <button class="btn-dm sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
-            Filtrar Mem&oacute;ria &rarr;
-          </button>
-        </div>
-      `;
-    }).join("");
+        `;
+      }).join("");
 
-    container.querySelectorAll(".filter-project-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const proj = btn.dataset.project;
-        const selProj = document.getElementById("search-project");
-        if (selProj) selProj.value = proj;
-        const tabBtn = document.querySelector('.nav-tab[data-tab="tab-search"]');
-        if (tabBtn) tabBtn.click();
-        runSearch();
+      container.querySelectorAll(".filter-project-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          try {
+            const proj = btn.dataset.project;
+            const selProj = document.getElementById("search-project");
+            if (selProj) selProj.value = proj;
+            const tabBtn = document.querySelector('.nav-tab[data-tab="tab-search"]');
+            if (tabBtn) tabBtn.click();
+            runSearch();
+          } catch(e) {}
+        });
       });
-    });
+    } catch (err) {
+      console.error("Render projects grid error:", err);
+    }
+  }
+
+  function initMetrics() {
+    try { refreshStatus(); }
+    catch (err) { console.error("Metrics init error:", err); }
   }
 
   // ------- 4. Search Execution Engine -------
   async function runSearch() {
-    const inputQ = document.getElementById("search-q");
-    const selectProj = document.getElementById("search-project");
-    const selectMode = document.getElementById("search-mode");
-    const out = document.getElementById("search-results");
-    if (!out) return;
-
-    const q = inputQ ? inputQ.value.trim() : "";
-    const project = selectProj ? selectProj.value : "";
-    const mode = selectMode ? selectMode.value : "hybrid";
-
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (project) params.set("project", project);
-    params.set("mode", mode);
-
-    out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base vetorial e léxica.</p></div>';
-
     try {
-      const r = await getJSON("/api/search?" + params.toString());
-      if (!r.results || !r.results.length) {
-        out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova o filtro de projeto.</p></div>';
-        return;
-      }
+      const inputQ = document.getElementById("search-q");
+      const selectProj = document.getElementById("search-project");
+      const selectMode = document.getElementById("search-mode");
+      const out = document.getElementById("search-results");
+      if (!out) return;
 
-      const cards = r.results.map(item => `
-        <div class="result-card">
-          <div class="result-card-header">
-            <div>
-              <h3 class="result-card-title">${esc(item.title)}</h3>
-              <div class="result-card-path">${esc(item.source_path)}</div>
+      const q = inputQ ? inputQ.value.trim() : "";
+      const project = selectProj ? selectProj.value : "";
+      const mode = selectMode ? selectMode.value : "hybrid";
+
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (project) params.set("project", project);
+      params.set("mode", mode);
+
+      out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base vetorial e léxica.</p></div>';
+
+      try {
+        const r = await getJSON("/api/search?" + params.toString());
+        if (!r.results || !r.results.length) {
+          out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova o filtro de projeto.</p></div>';
+          return;
+        }
+
+        const cards = r.results.map(item => `
+          <div class="result-card result-card-open" data-id="${esc(item.memory_id || item.chunk_id)}" tabindex="0" role="button">
+            <div class="result-card-header">
+              <div>
+                <h3 class="result-card-title">${esc(item.title)}</h3>
+                <div class="result-card-path">${esc(item.source_path)}</div>
+              </div>
+              <button class="btn-dm sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
+                Ver Documento &rarr;
+              </button>
             </div>
-            <button class="btn-dm sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
-              Ver Documento &rarr;
-            </button>
+            <div class="result-meta-pills">
+              <span class="pill project">${esc(item.project_id || '_global')}</span>
+              <span class="pill authority">Auth: ${esc(item.authority_level || 50)}</span>
+              <span class="pill score">${esc(item.search_mode)} &middot; Score ${esc(Number(item.final_score).toFixed(2))}</span>
+            </div>
+            <div class="result-snippet">${item.snippet || '(sem snippet)'}</div>
           </div>
-          <div class="result-meta-pills">
-            <span class="pill project">${esc(item.project_id || '_global')}</span>
-            <span class="pill authority">Auth: ${esc(item.authority_level || 50)}</span>
-            <span class="pill score">${esc(item.search_mode)} &middot; Score ${esc(Number(item.final_score).toFixed(2))}</span>
-          </div>
-          <div class="result-snippet">${item.snippet || '(sem snippet)'}</div>
-        </div>
-      `).join("");
+        `).join("");
 
-      out.innerHTML = `<div class="results-grid">${cards}</div>`;
-      out.querySelectorAll(".view-doc-btn").forEach(btn => {
-        btn.addEventListener("click", () => openDocument(btn.dataset.id));
-      });
-    } catch (e) {
-      out.innerHTML = '<div class="toast error" style="position:static;">Erro na busca: ' + esc(e.message) + '</div>';
+        out.innerHTML = `<div class="results-grid">${cards}</div>`;
+        out.querySelectorAll(".result-card-open").forEach(card => {
+          const openCard = event => {
+            if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") return;
+            if (event.target && event.target.closest(".view-doc-btn")) return;
+            try { openDocument(card.dataset.id); } catch(e) { console.error("Document card error:", e); }
+          };
+          card.addEventListener("click", openCard);
+          card.addEventListener("keydown", openCard);
+        });
+        out.querySelectorAll(".view-doc-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            try { openDocument(btn.dataset.id); } catch(e){}
+          });
+        });
+      } catch (e) {
+        out.innerHTML = '<div class="toast error" style="position:static;">Erro na busca: ' + esc(e.message) + '</div>';
+      }
+    } catch (err) {
+      console.error("runSearch top level error:", err);
     }
   }
 
+  function initSearch() {
   // Quick Chips
-  document.querySelectorAll(".chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const inputQ = document.getElementById("search-q");
-      if (inputQ) inputQ.value = chip.dataset.query;
-      runSearch();
+  try {
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        try {
+          const inputQ = document.getElementById("search-q");
+          if (inputQ) inputQ.value = chip.dataset.query;
+          runSearch();
+        } catch(e) {}
+      });
     });
-  });
-
-  const searchBtn = document.getElementById("search-btn");
-  if (searchBtn) searchBtn.addEventListener("click", runSearch);
-  const searchInput = document.getElementById("search-q");
-  if (searchInput) {
-    searchInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") runSearch();
-    });
+  } catch(e) {}
   }
+
+  try {
+    const searchBtn = document.getElementById("search-btn");
+    if (searchBtn) {
+      searchBtn.addEventListener("click", () => { try { runSearch(); } catch(e){} });
+    }
+    const searchInput = document.getElementById("search-q");
+    if (searchInput) {
+      searchInput.addEventListener("keydown", e => {
+        try {
+          if (e.key === "Enter") runSearch();
+        } catch(err){}
+      });
+    }
+  } catch(e) {}
 
   // ------- 5. Candidate Inbox Engine -------
   let activeInboxFilter = "";
   async function refreshInbox() {
-    const out = document.getElementById("inbox-table");
-    if (!out) return;
-    const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
-
     try {
-      const r = await getJSON(url);
-      const list = r.candidates || [];
-      const badge = document.getElementById("nav-inbox-badge");
-      if (badge) badge.textContent = list.length;
-      const mInbox = document.getElementById("m-inbox");
-      if (mInbox) mInbox.textContent = list.length;
+      const out = document.getElementById("inbox-table");
+      if (!out) return;
+      const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
 
-      if (!list.length) {
-        out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com o status selecionado.</p></div>';
-        return;
+      try {
+        const r = await getJSON(url);
+        const list = r.candidates || [];
+        const badge = document.getElementById("nav-inbox-badge");
+        if (badge) badge.textContent = list.length;
+        const mInbox = document.getElementById("m-inbox");
+        if (mInbox) mInbox.textContent = list.length;
+
+        if (!list.length) {
+          out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com o status selecionado.</p></div>';
+          return;
+        }
+
+        const rows = list.map(c => `
+          <div class="candidate-card">
+            <div class="candidate-card-top">
+              <div>
+                <h3 class="candidate-title">${esc(c.title)}</h3>
+                <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; ${esc(c.created_at)}</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="pill project">${esc(c.project_id)}</span>
+                ${statusTag(c.status)}
+              </div>
+            </div>
+            <div class="result-snippet" style="max-height:80px;overflow:hidden;">${esc(c.content.slice(0, 300))}&hellip;</div>
+            <div class="candidate-actions">
+              <button class="btn-dm sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
+              ${c.status === 'CANDIDATE' ? `<button class="btn-dm sm verify-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Verificar</button>` : ''}
+              ${c.status === 'VERIFIED' ? `<button class="btn-dm sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover para Canônico</button>` : ''}
+              ${c.status !== 'CANONICAL' ? `<button class="btn-dm sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
+            </div>
+          </div>
+        `).join("");
+
+        out.innerHTML = `<div class="candidates-grid">${rows}</div>`;
+        out.querySelectorAll(".open-candidate-btn").forEach(b => b.addEventListener("click", () => {
+          try { openCandidate(b.dataset.id); } catch(e){}
+        }));
+        out.querySelectorAll(".promote-candidate-btn").forEach(b => b.addEventListener("click", () => {
+          try { promoteCandidateDirect(b.dataset.id); } catch(e){}
+        }));
+        out.querySelectorAll(".verify-candidate-btn").forEach(b => b.addEventListener("click", () => {
+          try { verifyCandidateDirect(b.dataset.id); } catch(e){}
+        }));
+        out.querySelectorAll(".reject-candidate-btn").forEach(b => b.addEventListener("click", () => {
+          try { rejectCandidateDirect(b.dataset.id); } catch(e){}
+        }));
+      } catch (e) {
+        out.innerHTML = '<div class="toast error" style="position:static;">Erro no inbox: ' + esc(e.message) + '</div>';
       }
-
-      const rows = list.map(c => `
-        <div class="candidate-card">
-          <div class="candidate-card-top">
-            <div>
-              <h3 class="candidate-title">${esc(c.title)}</h3>
-              <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; ${esc(c.created_at)}</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <span class="pill project">${esc(c.project_id)}</span>
-              ${statusTag(c.status)}
-            </div>
-          </div>
-          <div class="result-snippet" style="max-height:80px;overflow:hidden;">${esc(c.content.slice(0, 300))}&hellip;</div>
-          <div class="candidate-actions">
-            <button class="btn-dm sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
-            ${c.status === 'VERIFIED' ? `<button class="btn-dm sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover para Canônico</button>` : ''}
-            ${c.status !== 'CANONICAL' ? `<button class="btn-dm sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
-          </div>
-        </div>
-      `).join("");
-
-      out.innerHTML = `<div class="candidates-grid">${rows}</div>`;
-      out.querySelectorAll(".open-candidate-btn").forEach(b => b.addEventListener("click", () => openCandidate(b.dataset.id)));
-      out.querySelectorAll(".promote-candidate-btn").forEach(b => b.addEventListener("click", () => promoteCandidateDirect(b.dataset.id)));
-      out.querySelectorAll(".reject-candidate-btn").forEach(b => b.addEventListener("click", () => rejectCandidateDirect(b.dataset.id)));
-    } catch (e) {
-      out.innerHTML = '<div class="toast error" style="position:static;">Erro no inbox: ' + esc(e.message) + '</div>';
+    } catch(err) {
+      console.error("refreshInbox error:", err);
     }
   }
 
-  document.querySelectorAll(".filter-tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      activeInboxFilter = btn.dataset.status;
-      refreshInbox();
+  function initInbox() {
+  try {
+    document.querySelectorAll(".filter-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        try {
+          document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeInboxFilter = btn.dataset.status;
+          refreshInbox();
+        } catch(e){}
+      });
     });
-  });
+  } catch(e) {}
+    refreshInbox();
+  }
+
+  async function verifyCandidateDirect(id) {
+    try {
+      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/verify");
+      notice("ok", "Candidato verificado e pronto para promoção.");
+      refreshInbox();
+      refreshStatus();
+    } catch (e) { notice("error", "Erro ao verificar: " + e.message); }
+  }
 
   async function promoteCandidateDirect(id) {
     try {
@@ -1825,89 +1913,111 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function closeModal() {
-    const modal = document.getElementById("modal");
-    if (modal) modal.classList.remove("open");
+    try {
+      const modal = document.getElementById("modal");
+      if (modal) modal.classList.remove("open");
+    } catch(e){}
   }
-  const closeBtn = document.getElementById("modal-close");
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  const closeBtnX = document.getElementById("modal-close-x");
-  if (closeBtnX) closeBtnX.addEventListener("click", closeModal);
-  const modalElem = document.getElementById("modal");
-  if (modalElem) {
-    modalElem.addEventListener("click", e => {
-      if (e.target.id === "modal") closeModal();
-    });
-  }
-  window.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-  const modalPromote = document.getElementById("modal-promote");
-  if (modalPromote) {
-    modalPromote.addEventListener("click", async () => {
-      if (!currentCandidate) return;
-      await promoteCandidateDirect(currentCandidate.candidate_id);
-      closeModal();
-    });
-  }
-  const modalReject = document.getElementById("modal-reject");
-  if (modalReject) {
-    modalReject.addEventListener("click", async () => {
-      if (!currentCandidate) return;
-      await rejectCandidateDirect(currentCandidate.candidate_id);
-      closeModal();
-    });
+  function initModals() {
+  try {
+    const closeBtn = document.getElementById("modal-close");
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    const closeBtnX = document.getElementById("modal-close-x");
+    if (closeBtnX) closeBtnX.addEventListener("click", closeModal);
+    const modalElem = document.getElementById("modal");
+    if (modalElem) {
+      modalElem.addEventListener("click", e => {
+        try { if (e.target.id === "modal") closeModal(); } catch(err){}
+      });
+    }
+    window.addEventListener("keydown", e => { try { if (e.key === "Escape") closeModal(); } catch(err){} });
+
+    const modalPromote = document.getElementById("modal-promote");
+    if (modalPromote) {
+      modalPromote.addEventListener("click", async () => {
+        try {
+          if (!currentCandidate) return;
+          await promoteCandidateDirect(currentCandidate.candidate_id);
+          closeModal();
+        } catch(e){}
+      });
+    }
+    const modalReject = document.getElementById("modal-reject");
+    if (modalReject) {
+      modalReject.addEventListener("click", async () => {
+        try {
+          if (!currentCandidate) return;
+          await rejectCandidateDirect(currentCandidate.candidate_id);
+          closeModal();
+        } catch(e){}
+      });
+    }
+  } catch(e) {}
   }
 
   // ------- 7. Re-indexing & Auth Handlers -------
-  const reindexBtn = document.getElementById("reindex-btn");
-  if (reindexBtn) {
-    reindexBtn.addEventListener("click", async () => {
-      reindexBtn.disabled = true;
-      reindexBtn.textContent = "Reindexando...";
-      try {
-        const res = await postJSON("/api/reindex");
-        notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
-        await refreshStatus();
-        await refreshInbox();
-      } catch (e) {
-        notice("error", "Erro ao reindexar: " + e.message);
-      } finally {
-        reindexBtn.disabled = false;
-        reindexBtn.textContent = "Reindexar Memória";
-      }
-    });
-  }
+  function initReindex() {
+  try {
+    const reindexBtn = document.getElementById("reindex-btn");
+    if (reindexBtn) {
+      reindexBtn.addEventListener("click", async () => {
+        try {
+          reindexBtn.disabled = true;
+          reindexBtn.textContent = "Reindexando...";
+          try {
+            const res = await postJSON("/api/reindex");
+            notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
+            await refreshStatus();
+            await refreshInbox();
+          } catch (e) {
+            notice("error", "Erro ao reindexar: " + e.message);
+          } finally {
+            reindexBtn.disabled = false;
+            reindexBtn.textContent = "Reindexar Memória";
+          }
+        } catch(e){}
+      });
+    }
 
-  const refreshBtn = document.getElementById("refresh-btn");
-  if (refreshBtn) refreshBtn.addEventListener("click", refreshInbox);
+    const refreshBtn = document.getElementById("refresh-btn");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", () => { try { refreshInbox(); } catch(e){} });
+    }
 
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await postJSON("/auth/logout");
-        window.location.href = "/auth/login";
-      } catch (e) {
-        window.location.href = "/auth/login";
-      }
-    });
-  }
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          try {
+            await postJSON("/auth/logout");
+          } catch (e) { }
+          window.location.href = "/auth/login";
+        } catch(e){}
+      });
+    }
 
-  const setup2faBtn = document.getElementById("setup-2fa-btn");
-  if (setup2faBtn) {
-    setup2faBtn.addEventListener("click", () => {
-      window.location.href = "/auth/setup-2fa";
-    });
-  }
+    const setup2faBtn = document.getElementById("setup-2fa-btn");
+    if (setup2faBtn) {
+      setup2faBtn.addEventListener("click", () => {
+        try { window.location.href = "/auth/setup-2fa"; } catch(e){}
+      });
+    }
 
-  if (window.location.search.includes("setup=ok")) {
-    notice("ok", "2FA configurado com sucesso.");
+    if (window.location.search.includes("setup=ok")) {
+      notice("ok", "2FA configurado com sucesso.");
+    }
+  } catch(e) {}
   }
 
   // ------- 8. Boot Sequence -------
-  initTopologyCanvas();
-  refreshStatus();
-  refreshInbox();
-  runSearch();
+  try { initTabs(); } catch (err) { console.error("Tabs init error:", err); }
+  try { initTopologyCanvas(); } catch (err) { console.error("Canvas init error:", err); }
+  try { initMetrics(); } catch (err) { console.error("Metrics init error:", err); }
+  try { initSearch(); runSearch(); } catch (err) { console.error("Search init error:", err); }
+  try { initInbox(); } catch (err) { console.error("Inbox init error:", err); }
+  try { initModals(); } catch (err) { console.error("Modals init error:", err); }
+  try { initReindex(); } catch (err) { console.error("Reindex init error:", err); }
 });
 </script>
 </body>
@@ -1977,7 +2087,7 @@ DEV_MANIACS_LOGO_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2
     <path fill="#061637" d="M20 28h142v132H20z"/>
     <path fill="#ff4c4c" stroke="none" d="M34 42h57v48H34z"/>
     <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
-    <path fill="#8b35d1" stroke="none" d="M34 90h57v54H34z"/>
+    <path fill="#1e40af" stroke="none" d="M34 90h57v54H34z"/>
     <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
     <path stroke="none" fill="#061637" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
     <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
@@ -1989,7 +2099,7 @@ DEV_MANIACS_LOGO_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2
   </g>
   <rect x="209" y="119" width="9" height="9" fill="#ff4c4c"/>
   <rect x="220" y="130" width="9" height="9" fill="#ffc529"/>
-  <rect x="198" y="130" width="9" height="9" fill="#8b35d1"/>
+  <rect x="198" y="130" width="9" height="9" fill="#1e40af"/>
   <rect x="209" y="141" width="9" height="9" fill="#08b9ca"/>
 </svg>"""
 
@@ -2072,7 +2182,7 @@ def _render_login_html(step: str = "credentials",
   --dm-cyan: #08b9ca;
   --dm-red: #ff4c4c;
   --dm-yellow: #ffc529;
-  --dm-purple: #8b35d1;
+  --dm-blue: #1e40af;
   --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', var(--font);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -2088,11 +2198,7 @@ html, body {{
   font-size: 14.5px;
 }}
 body {{
-  background-image:
-    radial-gradient(ellipse at 50% 15%, rgba(8, 185, 202, 0.18), transparent 70%),
-    radial-gradient(ellipse at 80% 80%, rgba(139, 53, 209, 0.12), transparent 60%),
-    linear-gradient(180deg, #061637 0%, #0a192f 100%);
-  background-attachment: fixed;
+  background: #061637;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2107,13 +2213,12 @@ body {{
   align-items: center;
 }}
 .card {{
-  background: rgba(13, 34, 71, 0.85);
-  backdrop-filter: blur(14px);
+  background: #0d2247;
   border: 1px solid var(--border-dark);
   border-radius: 18px;
   padding: 34px 32px 30px;
   width: 100%;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(8, 185, 202, 0.1);
+  box-shadow: 0 15px 35px #030a1a;
   position: relative;
   overflow: hidden;
 }}
@@ -2122,7 +2227,7 @@ body {{
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--dm-cyan), var(--dm-purple));
+  background: var(--dm-cyan);
 }}
 .brand-header {{
   display: flex;
@@ -2138,10 +2243,9 @@ body {{
   width: 64px;
   height: 64px;
   background: #0d2247;
-  border: 1.5px solid rgba(8, 185, 202, 0.5);
+  border: 1px solid var(--dm-cyan);
   border-radius: 14px;
   margin-bottom: 14px;
-  box-shadow: 0 0 16px rgba(8, 185, 202, 0.25);
 }}
 .brand-title {{
   font-family: var(--font-display);
@@ -2161,10 +2265,10 @@ body {{
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--dm-cyan);
-  background: rgba(8, 185, 202, 0.12);
+  background: #0a192f;
   padding: 3px 10px;
   border-radius: 20px;
-  border: 1px solid rgba(8, 185, 202, 0.35);
+  border: 1px solid var(--dm-cyan);
   margin-bottom: 8px;
 }}
 .card-subtitle {{
@@ -2192,7 +2296,7 @@ body {{
   padding: 10px 14px;
   font: inherit;
   font-size: 14.5px;
-  background: rgba(6, 22, 55, 0.85);
+  background: #061637;
   color: #ffffff;
   border: 1px solid var(--border-dark);
   border-radius: 8px;
@@ -2201,7 +2305,7 @@ body {{
 .field input:focus {{
   outline: none;
   border-color: var(--dm-cyan);
-  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.25);
+  box-shadow: 0 0 0 3px #1e40af;
 }}
 .totp-input {{
   font-family: var(--font-mono);
@@ -2221,10 +2325,9 @@ body {{
   font-size: 14.5px;
   color: #fff;
   background: var(--dm-cyan);
-  border: 1px solid rgba(8, 185, 202, 0.6);
+  border: 1px solid var(--dm-cyan);
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.3);
   transition: all 0.15s ease;
   width: 100%;
   margin-top: 8px;
@@ -2232,7 +2335,7 @@ body {{
 }}
 .btn-dm:hover {{
   background: #0aa7b7;
-  box-shadow: 0 6px 18px rgba(8, 185, 202, 0.45);
+  box-shadow: 0 4px 0 #1e40af;
   transform: translateY(-1px);
 }}
 .btn-dm:active {{ transform: translateY(0); }}
@@ -2270,8 +2373,8 @@ body {{
   display: flex;
   gap: 10px;
   align-items: center;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: #0a192f;
+  border: 1px solid var(--dm-red);
   color: #fca5a5;
   padding: 10px 14px;
   border-radius: 8px;
@@ -2395,6 +2498,7 @@ def _render_setup_2fa_html(secret_b32: str, otp_uri: str,
   --dm-cyan: #08b9ca;
   --dm-red: #ff4c4c;
   --dm-yellow: #ffc529;
+  --dm-blue: #1e40af;
   --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', var(--font);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -2410,10 +2514,7 @@ html, body {{
   font-size: 14.5px;
 }}
 body {{
-  background-image:
-    radial-gradient(ellipse at 50% 15%, rgba(8, 185, 202, 0.18), transparent 70%),
-    linear-gradient(180deg, #061637 0%, #0a192f 100%);
-  background-attachment: fixed;
+  background: #061637;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2428,13 +2529,12 @@ body {{
   align-items: center;
 }}
 .card {{
-  background: rgba(13, 34, 71, 0.85);
-  backdrop-filter: blur(14px);
+  background: #0d2247;
   border: 1px solid var(--border-dark);
   border-radius: 18px;
   padding: 32px;
   width: 100%;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 15px 35px #030a1a;
   position: relative;
   overflow: hidden;
 }}
@@ -2443,7 +2543,7 @@ body {{
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--dm-cyan), var(--dm-yellow));
+  background: var(--dm-yellow);
 }}
 .brand-header {{
   display: flex;
@@ -2460,10 +2560,9 @@ body {{
   width: 52px;
   height: 52px;
   background: #0d2247;
-  border: 1.5px solid rgba(8, 185, 202, 0.5);
+  border: 1px solid var(--dm-cyan);
   border-radius: 12px;
   flex-shrink: 0;
-  box-shadow: 0 0 14px rgba(8, 185, 202, 0.25);
 }}
 .brand-logo-wrap svg {{
   width: 36px;
@@ -2510,7 +2609,7 @@ body {{
   padding: 10px 14px;
   font: inherit;
   font-size: 14.5px;
-  background: rgba(6, 22, 55, 0.85);
+  background: #061637;
   color: #ffffff;
   border: 1px solid var(--border-dark);
   border-radius: 8px;
@@ -2518,7 +2617,7 @@ body {{
 .field input:focus {{
   outline: none;
   border-color: var(--dm-cyan);
-  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.25);
+  box-shadow: 0 0 0 3px #1e40af;
 }}
 .totp-input {{
   font-family: var(--font-mono);
@@ -2549,25 +2648,24 @@ body {{
   font-size: 14.5px;
   color: #fff;
   background: var(--dm-cyan);
-  border: 1px solid rgba(8, 185, 202, 0.6);
+  border: 1px solid var(--dm-cyan);
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.3);
   width: 100%;
   transition: all 0.15s ease;
   text-decoration: none;
 }}
 .btn-dm:hover {{
   background: #0aa7b7;
-  box-shadow: 0 6px 18px rgba(8, 185, 202, 0.45);
+  box-shadow: 0 4px 0 #1e40af;
   transform: translateY(-1px);
 }}
 .btn-dm:active {{ transform: translateY(0); }}
 .login-error {{
   display: flex;
   gap: 8px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: #0a192f;
+  border: 1px solid var(--dm-red);
   color: #fca5a5;
   padding: 10px 12px;
   border-radius: 8px;
