@@ -103,6 +103,7 @@ UI_HTML = """<!doctype html>
   --card-light: #ffffff;
   --card-surface: #f8fafc;
   --border-dark: #1e3a6d;
+  --border-subtle: rgba(30, 58, 109, 0.6);
   --border-light: #e2e8f0;
   --ink-dark: #061637;
   --ink-light: #f8fafc;
@@ -122,7 +123,7 @@ UI_HTML = """<!doctype html>
   --success-bg: rgba(16, 185, 129, 0.15);
   --warning: #f59e0b;
   --warning-bg: rgba(245, 158, 11, 0.15);
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', var(--font);
@@ -141,16 +142,16 @@ html, body {
 }
 body {
   background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(8, 185, 202, 0.15), transparent 70%),
-    radial-gradient(ellipse at 80% 30%, rgba(139, 53, 209, 0.1), transparent 60%),
+    radial-gradient(ellipse at 50% 0%, rgba(8, 185, 202, 0.18), transparent 70%),
+    radial-gradient(ellipse at 80% 30%, rgba(139, 53, 209, 0.12), transparent 60%),
     linear-gradient(180deg, #061637 0%, #0a192f 100%);
   background-attachment: fixed;
 }
 
 /* Header & Brand Navbar (Suporte Style) */
 header {
-  background: rgba(6, 22, 55, 0.88);
-  backdrop-filter: blur(12px);
+  background: rgba(6, 22, 55, 0.92);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-dark);
   padding: 12px 24px;
   position: sticky;
@@ -175,12 +176,12 @@ header {
   width: 44px;
   height: 44px;
   background: #0d2247;
-  border: 1.5px solid rgba(8, 185, 202, 0.4);
+  border: 1.5px solid rgba(8, 185, 202, 0.5);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(8, 185, 202, 0.2);
+  box-shadow: 0 0 15px rgba(8, 185, 202, 0.25);
   flex-shrink: 0;
 }
 .brand-icon-box svg { width: 30px; height: 30px; }
@@ -212,7 +213,7 @@ header {
   background: rgba(8, 185, 202, 0.12);
   padding: 2px 8px;
   border-radius: 20px;
-  border: 1px solid rgba(8, 185, 202, 0.3);
+  border: 1px solid rgba(8, 185, 202, 0.35);
 }
 .live-dot {
   width: 7px;
@@ -295,7 +296,7 @@ main {
 
 /* 3D Brain & Hero Section */
 .brain-hero-card {
-  background: linear-gradient(145deg, rgba(13, 34, 71, 0.9) 0%, rgba(6, 22, 55, 0.95) 100%);
+  background: linear-gradient(145deg, rgba(13, 34, 71, 0.95) 0%, rgba(6, 22, 55, 0.98) 100%);
   border: 1px solid var(--border-dark);
   border-radius: 16px;
   padding: 24px;
@@ -319,8 +320,8 @@ main {
 .brain-canvas-wrap {
   position: relative;
   width: 100%;
-  height: 280px;
-  background: rgba(6, 22, 55, 0.6);
+  height: 290px;
+  background: rgba(6, 22, 55, 0.7);
   border: 1px solid var(--border-dark);
   border-radius: 12px;
   overflow: hidden;
@@ -342,16 +343,16 @@ main {
   font-size: 11px;
   color: var(--dm-cyan);
   pointer-events: none;
-  background: rgba(6, 22, 55, 0.7);
+  background: rgba(6, 22, 55, 0.75);
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(8, 185, 202, 0.2);
+  border: 1px solid rgba(8, 185, 202, 0.25);
 }
 .brain-live-stream {
   position: absolute;
   bottom: 10px; left: 14px; right: 14px;
-  background: rgba(6, 22, 55, 0.85);
-  border: 1px solid rgba(8, 185, 202, 0.3);
+  background: rgba(6, 22, 55, 0.88);
+  border: 1px solid rgba(8, 185, 202, 0.35);
   border-radius: 8px;
   padding: 6px 12px;
   font-family: var(--font-mono);
@@ -423,7 +424,7 @@ main {
   margin-bottom: 24px;
 }
 .stat-card {
-  background: rgba(13, 34, 71, 0.7);
+  background: rgba(13, 34, 71, 0.75);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-dark);
   border-radius: 14px;
@@ -552,7 +553,7 @@ main {
 
 /* Content Box Cards */
 .content-box {
-  background: rgba(13, 34, 71, 0.7);
+  background: rgba(13, 34, 71, 0.75);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-dark);
   border-radius: 16px;
@@ -601,7 +602,7 @@ main {
   padding: 10px 16px;
   font: inherit;
   font-size: 14.5px;
-  background: rgba(6, 22, 55, 0.8);
+  background: rgba(6, 22, 55, 0.85);
   border: 1px solid var(--border-dark);
   border-radius: 8px;
   color: #ffffff;
@@ -618,7 +619,7 @@ select {
   font: inherit;
   font-size: 13.5px;
   font-weight: 500;
-  background: rgba(6, 22, 55, 0.8);
+  background: rgba(6, 22, 55, 0.85);
   border: 1px solid var(--border-dark);
   border-radius: 8px;
   color: #ffffff;
@@ -664,7 +665,7 @@ select {
   gap: 12px;
 }
 .result-card {
-  background: rgba(6, 22, 55, 0.7);
+  background: rgba(6, 22, 55, 0.75);
   border: 1px solid var(--border-dark);
   border-radius: 12px;
   padding: 18px 20px;
@@ -771,7 +772,7 @@ select {
   gap: 12px;
 }
 .candidate-card {
-  background: rgba(6, 22, 55, 0.7);
+  background: rgba(6, 22, 55, 0.75);
   border: 1px solid var(--border-dark);
   border-radius: 12px;
   padding: 18px 20px;
@@ -829,7 +830,7 @@ select {
   gap: 16px;
 }
 .project-card {
-  background: rgba(6, 22, 55, 0.7);
+  background: rgba(6, 22, 55, 0.75);
   border: 1px solid var(--border-dark);
   border-radius: 14px;
   padding: 20px;
@@ -877,7 +878,7 @@ select {
   gap: 20px;
 }
 .guide-card {
-  background: rgba(6, 22, 55, 0.7);
+  background: rgba(6, 22, 55, 0.75);
   border: 1px solid var(--border-dark);
   border-radius: 14px;
   padding: 22px;
@@ -946,8 +947,8 @@ select {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(6, 22, 55, 0.82);
-  backdrop-filter: blur(6px);
+  background: rgba(6, 22, 55, 0.85);
+  backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -1972,6 +1973,7 @@ select {
   initBrainSimulation();
   refreshStatus();
   refreshInbox();
+  runSearch();
 })();
 </script>
 </body>
