@@ -105,6 +105,40 @@ def main():
     # Command: mcp
     p_mcp = subparsers.add_parser("mcp", help="Iniciar servidor MCP stdio")
 
+    # Command: session-context (Phase P2 - Orchestrator integration)
+    p_sess = subparsers.add_parser(
+        "session-context",
+        help="Gerar Context Pack para o início de sessão de um agente"
+    )
+    p_sess.add_argument("--project", type=str, required=True,
+                        help="Slug do projeto (ex: canteirohub, biolar, _global)")
+    p_sess.add_argument("--task", type=str, required=True,
+                        help="Descrição/resumo da tarefa atribuída")
+    p_sess.add_argument("--role", type=str, default="DEVELOPER",
+                        help="Papel do agente (DEVELOPER, QA, CTO, etc.)")
+
+    # Command: on-report-accepted (Phase P2 - Orchestrator integration)
+    p_rep = subparsers.add_parser(
+        "on-report-accepted",
+        help="Ingerir relatório aceito e gerar candidatos na inbox"
+    )
+    p_rep.add_argument("report", type=str,
+                       help="Caminho do arquivo de relatório ou conteúdo inline")
+    p_rep.add_argument("--task", type=str, required=True, help="ID da task")
+    p_rep.add_argument("--project", type=str, required=True, help="Slug do projeto")
+    p_rep.add_argument("--agent", type=str, default="REPORT_INGESTER",
+                       help="Papel/agente que originou o relatório")
+
+    # Command: on-qa-approved (Phase P2 - Orchestrator integration)
+    p_qa = subparsers.add_parser(
+        "on-qa-approved",
+        help="Marcar candidato(s) como VERIFIED após aprovação de QA"
+    )
+    p_qa.add_argument("--candidate", type=str, default=None,
+                      help="ID do candidato a ser verificado")
+    p_qa.add_argument("--task", type=str, default=None,
+                      help="ID da task (verifica todos os candidatos da task)")
+
     args = parser.parse_args()
 
     # Validate the MCP root before constructing SQLiteMemoryIndex; otherwise an
@@ -245,6 +279,36 @@ def main():
         print("• Tipos de documento:")
         for stype, count in stats['types_breakdown'].items():
             print(f"  - {stype}: {count}")
+
+    elif args.command == "session-context":
+        from engine.integrations.orchestrator import OrchestratorAdapter
+        adapter = OrchestratorAdapter(application_root=canonical_root, service=service)
+        result = adapter.session_start(
+            project_id=args.project, task_summary=args.task, role=args.role
+        )
+        print(result["markdown"])
+        print(f"\n📊 Estimativa de tokens: ~{result['token_estimate']} tokens")
+
+    elif args.command == "on-report-accepted":
+        from engine.integrations.orchestrator import OrchestratorAdapter
+        adapter = OrchestratorAdapter(application_root=canonical_root, service=service)
+        result = adapter.on_report_accepted(
+            report_path_or_content=args.report,
+            task_id=args.task,
+            project_id=args.project,
+            agent_role=args.agent,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+
+    elif args.command == "on-qa-approved":
+        if not args.candidate and not args.task:
+            raise SystemExit("ERROR: --candidate <id> or --task <id> is required")
+        from engine.integrations.orchestrator import OrchestratorAdapter
+        adapter = OrchestratorAdapter(application_root=canonical_root, service=service)
+        result = adapter.on_qa_approved(
+            candidate_id=args.candidate, task_id=args.task
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
 
     else:
         parser.print_help()
