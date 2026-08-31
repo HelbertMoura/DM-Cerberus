@@ -80,362 +80,1038 @@ def _is_safe_bind_host(host: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# UI HTML (single-page, industrial theme, WCAG-friendly)
+# UI HTML — Dev Maniac's Two Point Corporate Dashboard (WCAG 2.2 AA)
 # ---------------------------------------------------------------------------
 UI_HTML = """<!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cerberus Inspector — Dev Maniac's</title>
+<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence</title>
 <style>
 :root {
-  --bg: #0F172A;
-  --bg-elev: #1E293B;
-  --bg-card: #111827;
-  --border: #334155;
-  --text: #E2E8F0;
-  --text-muted: #94A3B8;
-  --accent: #1E40AF;
-  --accent-strong: #2563EB;
-  --accent-soft: rgba(37, 99, 235, 0.18);
-  --success: #047857;
-  --warning: #B45309;
-  --danger: #B91C1C;
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-          "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo,
-               Consolas, monospace;
+  --bg-deep: #081a38;
+  --bg-deep-2: #051026;
+  --bg-legacy: #0F172A;
+  --accent-legacy: #1E40AF;
+  --card: #fdfbf7;
+  --card-inner: #ffffff;
+  --card-dark: #0a1f4d;
+  --ink: #061637;
+  --ink-soft: #4a5568;
+  --ink-muted: #718096;
+  --accent: #14a08f;
+  --accent-deep: #0f7e72;
+  --accent-blue: #1e40af;
+  --accent-blue-bright: #2563eb;
+  --danger: #c14530;
+  --danger-bg: #fff1ed;
+  --success: #0d826a;
+  --success-bg: #e6f7f3;
+  --warning: #b45309;
+  --warning-bg: #fef3c7;
+  --shadow: rgba(3, 10, 26, 0.45);
+  --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, Consolas, monospace;
 }
 * { box-sizing: border-box; }
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(20, 160, 143, 0.12), transparent 60%),
+    url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20120%2060%27%3E%3Ctext%20x%3D%2760%27%20y%3D'38'%20font-family%3D'IBM%20Plex%20Sans%27%20font-size%3D'36%27%20fill%3D'%2314a08f'%20fill-opacity%3D'0.08'%20text-anchor%3D%27middle%27%20font-weight%3D'700'%3EDM%3C%2Ftext%3E%3C%2Fsvg%3E");
+  background-repeat: repeat;
+  background-size: auto, 240px 120px;
+  color: var(--ink);
   font-family: var(--font);
   font-size: 15px;
   line-height: 1.5;
   min-height: 100vh;
 }
+
+/* Header & Brand Navbar */
 header {
-  background: var(--bg-elev);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 24px;
+  background: var(--card);
+  border-bottom: 3px solid var(--ink);
+  padding: 14px 24px;
+  box-shadow: 0 4px 0 var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.header-container {
+  max-width: 1320px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
 }
-header h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-header .brand {
+.brand-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
-header .badge {
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 4px 10px;
-  border-radius: 4px;
+.brand-icon-box {
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 var(--ink);
+  flex-shrink: 0;
+}
+.brand-icon-box svg { width: 32px; height: 32px; }
+.brand-text h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-header .status-pill {
+.brand-text p {
+  margin: 0;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--ink-soft);
+  font-weight: 500;
 }
-header .header-actions {
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success);
+  background: var(--success-bg);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(13, 130, 106, 0.3);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(13, 130, 106, 0.2);
+}
+.header-actions {
   display: flex;
   gap: 10px;
   align-items: center;
 }
-.ghost-btn {
+
+/* 3D and Ghost Buttons */
+.btn-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-height: 44px;
-  padding: 8px 14px;
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 8px 16px;
+  font: inherit;
+  font-weight: 700;
   font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 4px 0 var(--ink);
+  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.1s ease;
+  text-decoration: none;
+  white-space: nowrap;
 }
-.ghost-btn:hover { background: var(--bg-elev); }
+.btn-3d:hover { background: var(--accent-deep); }
+.btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn-3d.secondary {
+  background: #ffffff;
+  color: var(--ink);
+}
+.btn-3d.secondary:hover { background: #f4eee1; }
+.btn-3d.danger {
+  background: var(--danger);
+}
+.btn-3d.danger:hover { background: #9c2b18; }
+.btn-3d.sm {
+  min-height: 38px;
+  padding: 6px 12px;
+  font-size: 12px;
+  box-shadow: 0 3px 0 var(--ink);
+}
+.btn-3d:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 2px 0 var(--ink) !important;
+}
+
+/* Main Layout & Container */
 main {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1320px;
+  margin: 24px auto;
+  padding: 0 20px 48px;
 }
-.grid {
+
+/* Hero Stats Grid (Two Point Style) */
+.hero-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px 18px;
-}
-.card h2 {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.card .value {
-  font-size: 24px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.card .sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-.toolbar {
+.stat-card {
+  background: var(--card);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 5px 0 var(--shadow);
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.toolbar input[type="search"] {
-  flex: 1 1 280px;
-  min-height: 44px;
-  padding: 10px 14px;
-  background: var(--bg-card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-}
-.toolbar input[type="search"]:focus,
-.toolbar select:focus {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 1px;
-  border-color: var(--accent-strong);
-}
-.toolbar select {
-  min-height: 44px;
-  padding: 8px 12px;
-  background: var(--bg-card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-}
-button {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 10px 16px;
-  background: var(--accent);
-  color: #fff;
-  border: 1px solid var(--accent-strong);
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-}
-button:hover { background: var(--accent-strong); }
-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-button.secondary { background: transparent; color: var(--text); border-color: var(--border); }
-button.secondary:hover { background: var(--bg-elev); }
-button.danger { background: var(--danger); border-color: var(--danger); }
-button.success { background: var(--success); border-color: var(--success); }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
   overflow: hidden;
 }
-th, td {
-  padding: 10px 14px;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--accent);
 }
-th {
-  background: var(--bg-elev);
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.stat-card.blue::before { background: var(--accent-blue-bright); }
+.stat-card.warning::before { background: var(--warning); }
+.stat-card.green::before { background: var(--success); }
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
-tr:last-child td { border-bottom: none; }
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-.tag.candidate { background: rgba(37, 99, 235, 0.2); color: #93C5FD; }
-.tag.verified { background: rgba(4, 120, 87, 0.2); color: #6EE7B7; }
-.tag.quarantined { background: rgba(180, 83, 9, 0.25); color: #FCD34D; }
-.tag.canonical { background: rgba(37, 99, 235, 0.4); color: #BFDBFE; }
-.tag.rejected { background: rgba(185, 28, 28, 0.2); color: #FCA5A5; }
-.muted { color: var(--text-muted); }
-.code {
-  font-family: var(--font-mono);
+.stat-title {
   font-size: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 8px 10px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 360px;
-  overflow: auto;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
-.section-title {
+.stat-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(6, 22, 55, 0.15);
+  background: rgba(6, 22, 55, 0.04);
+}
+.stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0;
+}
+.stat-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* Nav Tabs Bar */
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--card);
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 0 var(--shadow);
+  flex-wrap: wrap;
+}
+.nav-tab {
+  flex: 1 1 180px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.nav-tab:hover {
+  background: rgba(6, 22, 55, 0.05);
+  color: var(--ink);
+}
+.nav-tab.active {
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+}
+.nav-tab .badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.nav-tab.active .badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Content Panels */
+.tab-panel {
+  display: none;
+  animation: tabFade 0.2s ease;
+}
+.tab-panel.active { display: block; }
+@keyframes tabFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card Containers */
+.content-box {
+  background: var(--card);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 6px 0 var(--shadow);
+  margin-bottom: 24px;
+}
+.content-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid rgba(6, 22, 55, 0.08);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+.content-box-header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.content-box-header p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* Search Toolbar */
+.search-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.search-input-wrap {
+  flex: 1 1 320px;
+  position: relative;
+}
+.search-input-wrap input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 15px;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  color: var(--ink);
+}
+.search-input-wrap input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25);
+}
+select {
+  min-height: 46px;
+  padding: 10px 14px;
+  font: inherit;
   font-size: 14px;
   font-weight: 600;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.chips-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.chips-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-right: 4px;
+}
+.chip {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.chip:hover {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+/* Search Results Cards */
+.results-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.result-card {
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 2px 0 var(--ink);
+}
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--ink);
+}
+.result-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.result-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 2px;
+}
+.result-card-path {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.result-meta-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin: 24px 0 8px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--ink);
 }
-.row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.empty {
-  padding: 32px;
-  text-align: center;
-  color: var(--text-muted);
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-}
-.error {
-  padding: 12px 16px;
-  background: rgba(185, 28, 28, 0.15);
-  color: #FCA5A5;
-  border: 1px solid var(--danger);
+.pill.project { background: rgba(30, 64, 175, 0.12); color: var(--accent-blue); }
+.pill.authority { background: rgba(20, 160, 143, 0.15); color: var(--accent-deep); }
+.pill.score { background: #f4eee1; color: var(--ink); }
+.result-snippet {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  background: #fdfbf7;
+  border: 1px solid rgba(6, 22, 55, 0.12);
   border-radius: 6px;
-  margin-bottom: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.result-snippet mark, .result-snippet b {
+  background: rgba(255, 230, 0, 0.35);
+  font-weight: 700;
+  color: var(--ink);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.result-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Candidate Inbox */
+.inbox-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.filter-tab-btn {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  background: #ffffff;
+  color: var(--ink-soft);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.filter-tab-btn.active {
+  background: var(--ink);
+  color: #ffffff;
+}
+.candidates-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.candidate-card {
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 0 var(--ink);
+}
+.candidate-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.candidate-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.candidate-desc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin: 4px 0 10px;
+}
+.candidate-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+/* Status Badges */
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  border: 1.5px solid var(--ink);
+}
+.tag.candidate { background: #dbeafe; color: #1e40af; }
+.tag.verified { background: #d1fae5; color: #065f46; }
+.tag.quarantined { background: #fef3c7; color: #92400e; }
+.tag.canonical { background: #e0e7ff; color: #3730a3; }
+.tag.rejected { background: #fee2e2; color: #991b1b; }
+
+/* Project Explorer Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.project-card {
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 3px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.project-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.project-card-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  text-transform: uppercase;
+}
+.project-stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.project-stats-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(6, 22, 55, 0.1);
+}
+
+/* System & Diagnostics */
+.system-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.system-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(6, 22, 55, 0.1);
   font-size: 13px;
 }
-.ok {
-  padding: 12px 16px;
-  background: rgba(4, 120, 87, 0.15);
-  color: #6EE7B7;
-  border: 1px solid var(--success);
-  border-radius: 6px;
-  margin-bottom: 12px;
-  font-size: 13px;
+.system-table td:first-child {
+  font-weight: 700;
+  color: var(--ink);
+  width: 240px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
 }
+.system-table td:last-child {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  word-break: break-all;
+}
+
+/* Modal Window */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(6, 22, 55, 0.75);
+  backdrop-filter: blur(3px);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 100;
   padding: 24px;
 }
 .modal-backdrop.open { display: flex; }
 .modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  max-width: 900px;
+  background: var(--card);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  max-width: 960px;
   width: 100%;
   max-height: 90vh;
-  overflow: auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 0 rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.modal h3 { margin: 0 0 12px; font-size: 16px; }
-@media (max-width: 600px) {
-  main { padding: 16px; }
-  th, td { padding: 8px 10px; }
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  padding: 18px 24px;
+  background: #ffffff;
+  border-bottom: 2.5px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-footer {
+  padding: 16px 24px;
+  background: #f4eee1;
+  border-top: 2.5px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.code-viewer {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: #081a38;
+  color: #e2e8f0;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 480px;
+  overflow: auto;
+  line-height: 1.6;
+}
+
+/* Toast Notifications */
+#flash {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  min-height: 44px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: 2px solid var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toastIn 0.25s ease;
+}
+.toast.ok { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.toast.error { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-soft);
+  border: 2px dashed rgba(6, 22, 55, 0.2);
+  border-radius: 12px;
+  background: #ffffff;
+}
+.empty-state p { margin: 6px 0 0; font-size: 14px; }
+
+/* Institutional Footer */
+.main-footer {
+  margin-top: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.main-footer a {
+  color: #2dd4bf;
+  text-decoration: none;
+  font-weight: 600;
+}
+.main-footer a:hover {
+  text-decoration: underline;
+  color: #5eead4;
+}
+
+@media (max-width: 768px) {
+  header { padding: 12px 16px; }
+  main { padding: 0 12px 32px; }
+  .header-container { flex-direction: column; align-items: stretch; }
+  .header-actions { justify-content: space-between; }
+  .hero-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
 <body>
+
 <header>
-  <div class="brand">
-    <h1>Cerberus Inspector</h1>
-    <span class="badge">Localhost</span>
-  </div>
-  <div class="header-actions">
-    <span class="status-pill" id="status-pill">connecting&hellip;</span>
-    <button id="setup-2fa-btn" class="ghost-btn" type="button"
-            title="Habilitar ou re-cadastrar 2FA">2FA</button>
-    <button id="logout-btn" class="ghost-btn" type="button"
-            title="Encerrar sess&atilde;o">Sair</button>
+  <div class="header-container">
+    <div class="brand-group">
+      <div class="brand-icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dev Maniac's Mark" shape-rendering="crispEdges">
+          <g fill="none" stroke="#061637" stroke-width="12" stroke-linejoin="round">
+            <path fill="#061637" d="M20 28h142v132H20z"/>
+            <path fill="#ff4c4c" stroke="none" d="M34 42h57v48H34z"/>
+            <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
+            <path fill="#8b35d1" stroke="none" d="M34 90h57v54H34z"/>
+            <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
+            <path stroke="none" fill="#061637" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
+            <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
+            <path d="M162 78h18v30h18"/>
+            <path fill="#061637" d="M176 102h48l14 22v49h-25l-12-14h-18l-12 14h-24v-49z"/>
+          </g>
+          <g fill="#ffffff"><path d="M169 124h10v-10h10v10h10v10h-10v10h-10v-10h-10z"/></g>
+          <rect x="209" y="119" width="9" height="9" fill="#ff4c4c"/>
+          <rect x="220" y="130" width="9" height="9" fill="#ffc529"/>
+          <rect x="198" y="130" width="9" height="9" fill="#8b35d1"/>
+          <rect x="209" y="141" width="9" height="9" fill="#08b9ca"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Dev Maniac's <span class="live-pill"><span class="live-dot"></span> CERBERUS LIVE</span></h1>
+        <p>Central Corporativa de Mem&oacute;ria &middot; Orquestra&ccedil;&atilde;o Multi-Agente</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="reindex-btn" class="btn-3d sm secondary" type="button" title="For&ccedil;ar reindexa&ccedil;&atilde;o dos arquivos no disco">Reindexar Mem&oacute;ria</button>
+      <button id="setup-2fa-btn" class="btn-3d sm secondary" type="button" title="Gerenciar 2FA TOTP">2FA Ativo</button>
+      <button id="logout-btn" class="btn-3d sm danger" type="button" title="Encerrar sess&atilde;o">Sair</button>
+    </div>
   </div>
 </header>
+
 <main>
   <div id="flash"></div>
-  <section>
-    <div class="grid" id="metrics">
-      <div class="card"><h2>Files tracked</h2><div class="value" id="m-files">&mdash;</div></div>
-      <div class="card"><h2>Documents</h2><div class="value" id="m-docs">&mdash;</div></div>
-      <div class="card"><h2>Inbox candidates</h2><div class="value" id="m-inbox">&mdash;</div></div>
-      <div class="card"><h2>FTS5</h2><div class="value" id="m-fts">&mdash;</div></div>
+
+  <!-- Hero Stats -->
+  <section class="hero-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Arquivos Rastreados</span>
+        <span class="stat-tag" id="stat-projects-count">0 PROJETOS</span>
+      </div>
+      <div class="stat-value" id="m-files">&mdash;</div>
+      <p class="stat-desc">Arquivos mapeados no reposit&oacute;rio</p>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-header">
+        <span class="stat-title">Documentos &amp; Chunks</span>
+        <span class="stat-tag">FTS5 + VETORES</span>
+      </div>
+      <div class="stat-value" id="m-docs">&mdash;</div>
+      <p class="stat-desc">Fragmentos de mem&oacute;ria indexados</p>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-header">
+        <span class="stat-title">Candidatos Inbox</span>
+        <span class="stat-tag">AUTO-CAPTURE</span>
+      </div>
+      <div class="stat-value" id="m-inbox">&mdash;</div>
+      <p class="stat-desc">Aprendizados pendentes de revis&atilde;o</p>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-header">
+        <span class="stat-title">Motor H&iacute;brido</span>
+        <span class="stat-tag" id="m-fts">ONLINE</span>
+      </div>
+      <div class="stat-value">RRF k=60</div>
+      <p class="stat-desc" id="status-pill">BM25 + Dense Vectors (256-dim)</p>
     </div>
   </section>
 
-  <h3 class="section-title">Search</h3>
-  <div class="toolbar">
-    <input type="search" id="search-q" placeholder="Search the corpus&hellip;" aria-label="Search query">
-    <select id="search-project" aria-label="Project filter">
-      <option value="">(all projects)</option>
-    </select>
-    <select id="search-mode" aria-label="Search mode">
-      <option value="hybrid">Hybrid</option>
-      <option value="lexical">Lexical</option>
-      <option value="semantic">Semantic</option>
-    </select>
-    <button id="search-btn" type="button">Search</button>
-  </div>
-  <div id="search-results"></div>
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs" aria-label="Navega&ccedil;&atilde;o principal">
+    <button class="nav-tab active" data-tab="tab-search" type="button">
+      <span>Busca &amp; Intelig&ecirc;ncia</span>
+    </button>
+    <button class="nav-tab" data-tab="tab-inbox" type="button">
+      <span>Caixa de Entrada &amp; Candidatos</span>
+      <span class="badge" id="nav-inbox-badge">0</span>
+    </button>
+    <button class="nav-tab" data-tab="tab-projects" type="button">
+      <span>Projetos &amp; Estrutura</span>
+    </button>
+    <button class="nav-tab" data-tab="tab-system" type="button">
+      <span>Sistema &amp; Diagn&oacute;stico</span>
+    </button>
+  </nav>
 
-  <h3 class="section-title">Candidate inbox</h3>
-  <div class="toolbar">
-    <select id="inbox-filter" aria-label="Filter by status">
-      <option value="">(all statuses)</option>
-      <option value="CANDIDATE">CANDIDATE</option>
-      <option value="VERIFIED">VERIFIED</option>
-      <option value="QUARANTINED">QUARANTINED</option>
-      <option value="CANONICAL">CANONICAL</option>
-      <option value="REJECTED">REJECTED</option>
-    </select>
-    <button id="refresh-btn" class="secondary" type="button">Refresh inbox</button>
-  </div>
-  <div id="inbox-table"></div>
+  <!-- Tab 1: Busca & Memória -->
+  <section id="tab-search" class="tab-panel active">
+    <div class="content-box">
+      <div class="content-box-header">
+        <div>
+          <h2>Busca H&iacute;brida de Mem&oacute;ria</h2>
+          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es de todos os agentes.</p>
+        </div>
+      </div>
+
+      <div class="search-form">
+        <div class="search-input-wrap">
+          <input type="search" id="search-q" placeholder="Pesquisar regras, arquitetura, ADRs, código ou aprendizados..." aria-label="Consulta de busca">
+        </div>
+        <select id="search-project" aria-label="Filtro de projeto">
+          <option value="">(todos os projetos)</option>
+        </select>
+        <select id="search-mode" aria-label="Modo de busca">
+          <option value="hybrid">H&iacute;brido (BM25 + Vetores RRF)</option>
+          <option value="lexical">L&eacute;xico (SQLite FTS5 BM25)</option>
+          <option value="semantic">Sem&acirc;ntico (Dense Vectors)</option>
+        </select>
+        <button id="search-btn" class="btn-3d" type="button">Buscar Mem&oacute;ria &rarr;</button>
+      </div>
+
+      <div class="chips-bar">
+        <span class="chips-label">Atalhos r&aacute;pidos:</span>
+        <button class="chip" data-query="arquitetura" type="button">#arquitetura</button>
+        <button class="chip" data-query="regras de negócio" type="button">#regras-de-negocio</button>
+        <button class="chip" data-query="multi-tenant" type="button">#multi-tenant</button>
+        <button class="chip" data-query="banco de dados" type="button">#database</button>
+        <button class="chip" data-query="seguranca" type="button">#seguranca</button>
+        <button class="chip" data-query="protocolo ai" type="button">#protocolo-ai</button>
+      </div>
+
+      <div id="search-results">
+        <div class="empty-state">
+          <strong>Pronto para buscar</strong>
+          <p>Digite um termo acima ou selecione um atalho para navegar pela mem&oacute;ria do Cerberus.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 2: Caixa de Entrada & Candidatos -->
+  <section id="tab-inbox" class="tab-panel">
+    <div class="content-box">
+      <div class="content-box-header">
+        <div>
+          <h2>Caixa de Entrada &amp; Candidatos (Inbox)</h2>
+          <p>Pipeline de captura autom&aacute;tica de aprendizados. Promova itens para a mem&oacute;ria can&ocirc;nica.</p>
+        </div>
+        <button id="refresh-btn" class="btn-3d sm secondary" type="button">Atualizar Inbox</button>
+      </div>
+
+      <div class="inbox-toolbar">
+        <div class="filter-tabs">
+          <button class="filter-tab-btn active" data-status="" type="button">TODOS</button>
+          <button class="filter-tab-btn" data-status="CANDIDATE" type="button">CANDIDATE</button>
+          <button class="filter-tab-btn" data-status="VERIFIED" type="button">VERIFIED</button>
+          <button class="filter-tab-btn" data-status="QUARANTINED" type="button">QUARANTINED</button>
+          <button class="filter-tab-btn" data-status="CANONICAL" type="button">CANONICAL</button>
+          <button class="filter-tab-btn" data-status="REJECTED" type="button">REJECTED</button>
+        </div>
+        <select id="inbox-filter" style="display:none;" aria-label="Filtro de status">
+          <option value="">(todos)</option>
+          <option value="CANDIDATE">CANDIDATE</option>
+          <option value="VERIFIED">VERIFIED</option>
+          <option value="QUARANTINED">QUARANTINED</option>
+          <option value="CANONICAL">CANONICAL</option>
+          <option value="REJECTED">REJECTED</option>
+        </select>
+      </div>
+
+      <div id="inbox-table">
+        <div class="empty-state">
+          <strong>Inbox vazia</strong>
+          <p>Nenhum candidato pendente de revis&atilde;o no momento.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 3: Projetos -->
+  <section id="tab-projects" class="tab-panel">
+    <div class="content-box">
+      <div class="content-box-header">
+        <div>
+          <h2>Projetos &amp; Base de Conhecimento</h2>
+          <p>Estrutura de isolamento e distribui&ccedil;&atilde;o de conhecimento da Dev Maniac's.</p>
+        </div>
+      </div>
+      <div class="projects-grid" id="projects-container">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 4: Sistema & Diagnóstico -->
+  <section id="tab-system" class="tab-panel">
+    <div class="content-box">
+      <div class="content-box-header">
+        <div>
+          <h2>Diagn&oacute;stico do Sistema Cerberus</h2>
+          <p>Informa&ccedil;&otilde;es de infraestrutura, armazenamento e seguran&ccedil;a operacional.</p>
+        </div>
+      </div>
+      <table class="system-table">
+        <tbody>
+          <tr><td>Ambiente &middot; Rede</td><td id="sys-bind">&mdash;</td></tr>
+          <tr><td>Diret&oacute;rio Can&ocirc;nico</td><td id="sys-root">&mdash;</td></tr>
+          <tr><td>Motor SQLite FTS5</td><td id="sys-fts">&mdash;</td></tr>
+          <tr><td>Embeddings &amp; Vetores</td><td>HashingDenseEmbeddingProvider (256-dim feature hashing, L2 normalized)</td></tr>
+          <tr><td>Rank Fusion</td><td>Reciprocal Rank Fusion (RRF k=60, determin&iacute;stico)</td></tr>
+          <tr><td>Seguran&ccedil;a &amp; Autentica&ccedil;&atilde;o</td><td>Cookie de Sess&atilde;o Assinado HMAC-SHA256 &middot; 2FA TOTP RFC 6238 &middot; Rate Limiting Ativo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="main-footer">
+    <div>
+      <a href="https://devmaniacs.com.br" target="_blank" rel="noopener noreferrer">devmaniacs.com.br</a>
+      <span>&middot;</span>
+      <a href="https://suporte.devmaniacs.com.br" target="_blank" rel="noopener noreferrer">Suporte</a>
+      <span>&middot;</span>
+      <a href="https://radierhub.com.br" target="_blank" rel="noopener noreferrer">RadierHUB</a>
+    </div>
+    <div style="margin-top:4px;">&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development. Todos os direitos reservados. &middot; Tecnologia feita de perto.</div>
+  </footer>
 </main>
 
+<!-- Inspector Modal -->
 <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true">
   <div class="modal">
-    <h3 id="modal-title">Candidate</h3>
-    <div id="modal-body"></div>
-    <div class="row-actions" style="margin-top:16px;">
-      <button class="secondary" id="modal-close" type="button">Close</button>
-      <button id="modal-promote" type="button">Promote to canonical</button>
-      <button class="danger" id="modal-reject" type="button">Reject</button>
+    <div class="modal-header">
+      <h3 id="modal-title">Detalhes do Documento</h3>
+      <button class="btn-3d sm secondary" id="modal-close-x" type="button">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-3d sm secondary" id="modal-close" type="button">Fechar</button>
+      <button class="btn-3d sm" id="modal-promote" type="button" style="display:none;">Promover para Can&ocirc;nico</button>
+      <button class="btn-3d sm danger" id="modal-reject" type="button" style="display:none;">Rejeitar</button>
     </div>
   </div>
 </div>
@@ -445,13 +1121,12 @@ tr:last-child td { border-bottom: none; }
   "use strict";
   const flash = document.getElementById("flash");
   function notice(kind, msg) {
-    flash.innerHTML = "";
     if (!msg) return;
     const div = document.createElement("div");
-    div.className = kind;
-    div.textContent = msg;
+    div.className = "toast " + (kind === "ok" ? "ok" : "error");
+    div.innerHTML = (kind === "ok" ? "[OK] " : "[AVISO] ") + esc(msg);
     flash.appendChild(div);
-    setTimeout(() => { div.remove(); }, 4500);
+    setTimeout(() => { div.remove(); }, 4000);
   }
   async function getJSON(url) {
     const r = await fetch(url, { headers: { "Accept": "application/json" } });
@@ -459,8 +1134,15 @@ tr:last-child td { border-bottom: none; }
     if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
     return JSON.parse(text);
   }
-  async function postJSON(url) {
-    const r = await fetch(url, { method: "POST", headers: { "Accept": "application/json" } });
+  async function postJSON(url, body) {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body || {})
+    });
     const text = await r.text();
     if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
     return JSON.parse(text);
@@ -473,28 +1155,91 @@ tr:last-child td { border-bottom: none; }
     return '<span class="tag ' + esc(s.toLowerCase()) + '">' + esc(s) + '</span>';
   }
 
-  // ------- status -------
+  // ------- Tabs Switching -------
+  const tabs = document.querySelectorAll(".nav-tab");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const targetId = tab.dataset.tab;
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      const activePanel = document.getElementById(targetId);
+      if (activePanel) activePanel.classList.add("active");
+    });
+  });
+
+  // ------- Status & Metrics -------
+  let serverProjects = [];
   async function refreshStatus() {
     try {
       const s = await getJSON("/api/status");
       document.getElementById("m-files").textContent = s.files;
       document.getElementById("m-docs").textContent = s.documents;
       document.getElementById("m-inbox").textContent = s.inbox_count;
-      document.getElementById("m-fts").textContent = s.fts5 ? "online" : "offline";
-      document.getElementById("status-pill").textContent =
-        "loopback-only · bind " + esc(s.bind_host) + ":" + s.bind_port;
+      document.getElementById("nav-inbox-badge").textContent = s.inbox_count;
+      document.getElementById("m-fts").textContent = s.fts5 ? "ONLINE" : "OFFLINE";
+      document.getElementById("stat-projects-count").textContent = (s.projects ? s.projects.length : 0) + " PROJETOS";
+      
+      document.getElementById("sys-bind").textContent = esc(s.bind_host) + ":" + s.bind_port + " (Cloudflare Argo Tunnel)";
+      document.getElementById("sys-root").textContent = esc(s.canonical_root);
+      document.getElementById("sys-fts").textContent = s.fts5 ? "SQLite FTS5 Ativo (Tokenize: porter unicode61)" : "FTS5 Indisponível";
+
+      serverProjects = s.projects || [];
       const sel = document.getElementById("search-project");
-      sel.innerHTML = '<option value="">(all projects)</option>';
-      (s.projects || []).forEach(p => {
+      sel.innerHTML = '<option value="">(todos os projetos)</option>';
+      serverProjects.forEach(p => {
         const opt = document.createElement("option");
         opt.value = p;
         opt.textContent = p;
         sel.appendChild(opt);
       });
-    } catch (e) { notice("error", "status: " + e.message); }
+
+      renderProjectsGrid(s);
+    } catch (e) {
+      notice("error", "Erro ao carregar status: " + e.message);
+    }
   }
 
-  // ------- search -------
+  function renderProjectsGrid(stats) {
+    const container = document.getElementById("projects-container");
+    if (!container) return;
+    const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
+    const indexed = stats.indexed_projects || [];
+    const breakdown = stats.types_breakdown || {};
+    
+    container.innerHTML = projects.map(p => {
+      const isIndexed = indexed.includes(p);
+      return `
+        <div class="project-card">
+          <div>
+            <div class="project-card-header">
+              <h3 class="project-card-name">${esc(p)}</h3>
+              <span class="pill project">${isIndexed ? 'INDEXADO' : 'MONITORADO'}</span>
+            </div>
+            <ul class="project-stats-list">
+              <li><span>Status</span><strong>${isIndexed ? 'Pronto para busca' : 'Ativo'}</strong></li>
+              <li><span>Isolamento</span><strong>Multi-Tenant Blindado</strong></li>
+            </ul>
+          </div>
+          <button class="btn-3d sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
+            Filtrar Mem&oacute;ria &rarr;
+          </button>
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".filter-project-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const proj = btn.dataset.project;
+        document.getElementById("search-project").value = proj;
+        // switch to search tab
+        document.querySelector('.nav-tab[data-tab="tab-search"]').click();
+        runSearch();
+      });
+    });
+  }
+
+  // ------- Search Execution -------
   async function runSearch() {
     const q = document.getElementById("search-q").value.trim();
     const project = document.getElementById("search-project").value;
@@ -503,53 +1248,131 @@ tr:last-child td { border-bottom: none; }
     if (q) params.set("q", q);
     if (project) params.set("project", project);
     params.set("mode", mode);
+    
     const out = document.getElementById("search-results");
-    out.innerHTML = '<div class="muted">searching&hellip;</div>';
+    out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base de conhecimento do Cerberus.</p></div>';
+    
     try {
       const r = await getJSON("/api/search?" + params.toString());
-      if (!r.results.length) { out.innerHTML = '<div class="empty">No results.</div>'; return; }
-      const rows = r.results.map(item => (
-        '<tr>' +
-        '<td><span class="tag ' + esc(String(item.project_id || "").toLowerCase()) + '">' + esc(item.project_id) + '</span></td>' +
-        '<td>' + esc(item.title) + '<div class="muted">' + esc(item.source_path) + '</div></td>' +
-        '<td>' + esc(item.authority_level) + '<div class="muted">' +
-          esc(item.search_mode) + ' · ' + esc(item.final_score) + '</div></td>' +
-        '<td>' + esc(item.snippet) + '</td>' +
-        '</tr>'
-      )).join("");
-      out.innerHTML =
-        '<table><thead><tr><th>Project</th><th>Title</th><th>Auth</th><th>Snippet</th></tr></thead>' +
-        '<tbody>' + rows + '</tbody></table>';
-    } catch (e) { out.innerHTML = '<div class="error">' + esc(e.message) + '</div>'; }
+      if (!r.results || !r.results.length) {
+        out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova os filtros de projeto.</p></div>';
+        return;
+      }
+      
+      const cards = r.results.map(item => `
+        <div class="result-card">
+          <div class="result-card-header">
+            <div>
+              <h3 class="result-card-title">${esc(item.title)}</h3>
+              <div class="result-card-path">${esc(item.source_path)}</div>
+            </div>
+            <button class="btn-3d sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
+              Ver Documento &rarr;
+            </button>
+          </div>
+          <div class="result-meta-pills">
+            <span class="pill project">${esc(item.project_id || '_global')}</span>
+            <span class="pill authority">Auth: ${esc(item.authority_level || 50)}</span>
+            <span class="pill score">${esc(item.search_mode)} &middot; Score ${esc(Number(item.final_score).toFixed(2))}</span>
+          </div>
+          <div class="result-snippet">${item.snippet || '(sem snippet)'}</div>
+        </div>
+      `).join("");
+      
+      out.innerHTML = `<div class="results-grid">${cards}</div>`;
+      out.querySelectorAll(".view-doc-btn").forEach(btn => {
+        btn.addEventListener("click", () => openDocument(btn.dataset.id));
+      });
+    } catch (e) {
+      out.innerHTML = '<div class="toast error" style="position:static;">Erro na busca: ' + esc(e.message) + '</div>';
+    }
   }
 
-  // ------- inbox -------
+  // Quick Chips
+  document.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.getElementById("search-q").value = chip.dataset.query;
+      runSearch();
+    });
+  });
+
+  // ------- Candidate Inbox -------
+  let activeInboxFilter = "";
   async function refreshInbox() {
-    const filter = document.getElementById("inbox-filter").value;
-    const url = "/api/inbox" + (filter ? "?status=" + encodeURIComponent(filter) : "");
+    const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
     const out = document.getElementById("inbox-table");
+    
     try {
       const r = await getJSON(url);
-      if (!r.candidates.length) { out.innerHTML = '<div class="empty">Inbox is empty.</div>'; return; }
-      const rows = r.candidates.map(c => (
-        '<tr>' +
-        '<td>' + statusTag(c.status) + '</td>' +
-        '<td><strong>' + esc(c.title) + '</strong>' +
-          '<div class="muted">' + esc(c.candidate_id) + '</div></td>' +
-        '<td><span class="tag ' + esc(String(c.project_id || "").toLowerCase()) + '">' + esc(c.project_id) + '</span></td>' +
-        '<td class="muted">' + esc(c.task_id) + '</td>' +
-        '<td class="muted">' + esc(c.created_at) + '</td>' +
-        '<td><button data-id="' + esc(c.candidate_id) + '" class="open-btn secondary" type="button">Open</button></td>' +
-        '</tr>'
-      )).join("");
-      out.innerHTML =
-        '<table><thead><tr><th>Status</th><th>Title</th><th>Project</th><th>Task</th><th>Created</th><th></th></tr></thead>' +
-        '<tbody>' + rows + '</tbody></table>';
-      out.querySelectorAll(".open-btn").forEach(b => b.addEventListener("click", () => openCandidate(b.dataset.id)));
-    } catch (e) { out.innerHTML = '<div class="error">' + esc(e.message) + '</div>'; }
+      const list = r.candidates || [];
+      document.getElementById("nav-inbox-badge").textContent = list.length;
+      document.getElementById("m-inbox").textContent = list.length;
+
+      if (!list.length) {
+        out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato encontrado com o filtro atual.</p></div>';
+        return;
+      }
+
+      const rows = list.map(c => `
+        <div class="candidate-card">
+          <div class="candidate-card-top">
+            <div>
+              <h3 class="candidate-title">${esc(c.title)}</h3>
+              <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; Criado em: ${esc(c.created_at)}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span class="pill project">${esc(c.project_id)}</span>
+              ${statusTag(c.status)}
+            </div>
+          </div>
+          <div class="result-snippet" style="max-height:80px;overflow:hidden;">${esc(c.content.slice(0, 300))}&hellip;</div>
+          <div class="candidate-actions">
+            <button class="btn-3d sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
+            ${c.status === 'VERIFIED' ? `<button class="btn-3d sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover</button>` : ''}
+            ${c.status !== 'CANONICAL' ? `<button class="btn-3d sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
+          </div>
+        </div>
+      `).join("");
+
+      out.innerHTML = `<div class="candidates-grid">${rows}</div>`;
+      out.querySelectorAll(".open-candidate-btn").forEach(b => b.addEventListener("click", () => openCandidate(b.dataset.id)));
+      out.querySelectorAll(".promote-candidate-btn").forEach(b => b.addEventListener("click", () => promoteCandidateDirect(b.dataset.id)));
+      out.querySelectorAll(".reject-candidate-btn").forEach(b => b.addEventListener("click", () => rejectCandidateDirect(b.dataset.id)));
+    } catch (e) {
+      out.innerHTML = '<div class="toast error" style="position:static;">Erro no inbox: ' + esc(e.message) + '</div>';
+    }
   }
 
-  // ------- modal -------
+  // Filter tab buttons
+  document.querySelectorAll(".filter-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeInboxFilter = btn.dataset.status;
+      refreshInbox();
+    });
+  });
+
+  // Direct Candidate Actions
+  async function promoteCandidateDirect(id) {
+    try {
+      const r = await postJSON("/api/inbox/" + encodeURIComponent(id) + "/promote");
+      notice("ok", "Item promovido com sucesso para a mem&oacute;ria can&ocirc;nica.");
+      refreshInbox();
+      refreshStatus();
+    } catch (e) { notice("error", "Erro ao promover: " + e.message); }
+  }
+
+  async function rejectCandidateDirect(id) {
+    try {
+      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/reject");
+      notice("ok", "Candidato rejeitado.");
+      refreshInbox();
+      refreshStatus();
+    } catch (e) { notice("error", "Erro ao rejeitar: " + e.message); }
+  }
+
+  // ------- Modals (Document & Candidate) -------
   let currentCandidate = null;
   async function openCandidate(id) {
     try {
@@ -557,65 +1380,114 @@ tr:last-child td { border-bottom: none; }
       currentCandidate = c;
       document.getElementById("modal-title").textContent = c.title + " (" + c.candidate_id + ")";
       const body = document.getElementById("modal-body");
-      body.innerHTML =
-        '<p>' + statusTag(c.status) +
-        ' <span class="tag ' + esc(String(c.project_id || "").toLowerCase()) + '">' + esc(c.project_id) + '</span></p>' +
-        '<p class="muted">Task ' + esc(c.task_id) + ' · Agent ' + esc(c.agent) + ' · ' +
-        'Fingerprint ' + esc(c.fingerprint.slice(0, 16)) + '&hellip;</p>' +
-        '<div class="section-title">Content</div>' +
-        '<div class="code">' + esc(c.content) + '</div>' +
-        '<div class="section-title">Diff preview (promote)</div>' +
-        '<div class="code">' + esc(c.diff || "(no diff)") + '</div>';
-      const canPromote = c.status === "VERIFIED";
-      const canReject = c.status !== "CANONICAL";
-      document.getElementById("modal-promote").disabled = !canPromote;
-      document.getElementById("modal-reject").disabled = !canReject;
+      body.innerHTML = `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+          ${statusTag(c.status)}
+          <span class="pill project">${esc(c.project_id)}</span>
+          <span class="pill authority">Task: ${esc(c.task_id)}</span>
+          <span class="pill score">Agente: ${esc(c.agent)}</span>
+        </div>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Conte&uacute;do do Aprendizado</h4>
+        <div class="code-viewer">${esc(c.content)}</div>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Diff de Promo&ccedil;&atilde;o Can&ocirc;nica</h4>
+        <div class="code-viewer">${esc(c.diff || '(nenhum diff registrado)')}</div>
+      `;
+      
+      const promoteBtn = document.getElementById("modal-promote");
+      const rejectBtn = document.getElementById("modal-reject");
+      promoteBtn.style.display = (c.status === "VERIFIED") ? "inline-flex" : "none";
+      rejectBtn.style.display = (c.status !== "CANONICAL") ? "inline-flex" : "none";
+      
       document.getElementById("modal").classList.add("open");
-    } catch (e) { notice("error", "open: " + e.message); }
+    } catch (e) { notice("error", "Erro ao abrir candidato: " + e.message); }
   }
-  document.getElementById("modal-close").addEventListener("click", () => {
-    document.getElementById("modal").classList.remove("open");
+
+  async function openDocument(id) {
+    try {
+      const doc = await getJSON("/api/document?id=" + encodeURIComponent(id));
+      document.getElementById("modal-title").textContent = doc.title;
+      const body = document.getElementById("modal-body");
+      body.innerHTML = `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+          <span class="pill project">${esc(doc.project_id)}</span>
+          <span class="pill authority">Autoridade: ${esc(doc.authority_level)}</span>
+          <span class="pill score">Tipo: ${esc(doc.source_type)}</span>
+          <span class="pill score">${esc(doc.source_path)}</span>
+        </div>
+        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:var(--ink-soft);">Texto Completo do Documento</h4>
+        <div class="code-viewer">${esc(doc.full_text || doc.snippet || '(sem texto)')}</div>
+      `;
+      document.getElementById("modal-promote").style.display = "none";
+      document.getElementById("modal-reject").style.display = "none";
+      document.getElementById("modal").classList.add("open");
+    } catch (e) {
+      notice("error", "Erro ao carregar documento: " + e.message);
+    }
+  }
+
+  // Modal Closers
+  function closeModal() { document.getElementById("modal").classList.remove("open"); }
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("modal-close-x").addEventListener("click", closeModal);
+  document.getElementById("modal").addEventListener("click", e => {
+    if (e.target.id === "modal") closeModal();
   });
+  window.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
   document.getElementById("modal-promote").addEventListener("click", async () => {
     if (!currentCandidate) return;
-    try {
-      const r = await postJSON("/api/inbox/" + encodeURIComponent(currentCandidate.candidate_id) + "/promote");
-      notice("ok", "Promoted: " + r.status + " -> " + r.target_file);
-      document.getElementById("modal").classList.remove("open");
-      refreshInbox();
-      refreshStatus();
-    } catch (e) { notice("error", "promote: " + e.message); }
+    await promoteCandidateDirect(currentCandidate.candidate_id);
+    closeModal();
   });
   document.getElementById("modal-reject").addEventListener("click", async () => {
     if (!currentCandidate) return;
-    try {
-      await postJSON("/api/inbox/" + encodeURIComponent(currentCandidate.candidate_id) + "/reject");
-      notice("ok", "Rejected.");
-      document.getElementById("modal").classList.remove("open");
-      refreshInbox();
-      refreshStatus();
-    } catch (e) { notice("error", "reject: " + e.message); }
+    await rejectCandidateDirect(currentCandidate.candidate_id);
+    closeModal();
   });
 
+  // Re-indexing
+  document.getElementById("reindex-btn").addEventListener("click", async () => {
+    const btn = document.getElementById("reindex-btn");
+    btn.disabled = true;
+    btn.textContent = "Reindexando...";
+    try {
+      const res = await postJSON("/api/reindex");
+      notice("ok", "Reindexa&ccedil;&atilde;o conclu&iacute;da: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
+      await refreshStatus();
+      await refreshInbox();
+    } catch (e) {
+      notice("error", "Erro ao reindexar: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Reindexar Memória";
+    }
+  });
+
+  // Refresh & Search Listeners
   document.getElementById("refresh-btn").addEventListener("click", refreshInbox);
   document.getElementById("search-btn").addEventListener("click", runSearch);
   document.getElementById("search-q").addEventListener("keydown", e => {
     if (e.key === "Enter") runSearch();
   });
+
+  // Auth Action Listeners
   document.getElementById("logout-btn").addEventListener("click", async () => {
     try {
       await postJSON("/auth/logout");
       window.location.href = "/auth/login";
-    } catch (e) { notice("error", "logout: " + e.message); }
+    } catch (e) {
+      window.location.href = "/auth/login";
+    }
   });
   document.getElementById("setup-2fa-btn").addEventListener("click", () => {
     window.location.href = "/auth/setup-2fa";
   });
-  // Show setup success notice if redirected from /auth/setup-2fa
+
   if (window.location.search.includes("setup=ok")) {
-    notice("ok", "2FA habilitado com sucesso.");
+    notice("ok", "2FA configurado com sucesso.");
   }
 
+  // Initial Load
   refreshStatus();
   refreshInbox();
 })();
@@ -1508,6 +2380,8 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
             return self._serve_inbox_list(query)
         if path == "/api/search":
             return self._serve_search(query)
+        if path == "/api/document":
+            return self._serve_document_detail(query)
         if path.startswith("/api/inbox/"):
             tail = path[len("/api/inbox/"):]
             if not tail or "/" in tail:
@@ -1534,6 +2408,9 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
         # Everything else requires auth
         if not self._require_auth():
             return
+
+        if path == "/api/reindex":
+            return self._serve_reindex_post()
 
         if not path.startswith("/api/inbox/"):
             return self._error(HTTPStatus.NOT_FOUND, f"Unknown route: {path}")
@@ -1966,6 +2843,22 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
             "count": len(results),
             "results": [r.to_dict() for r in results],
         })
+
+    def _serve_document_detail(self, query: Dict[str, List[str]]) -> None:
+        doc_id = (query.get("id", [""])[0] or "").strip()
+        if not doc_id:
+            return self._error(HTTPStatus.BAD_REQUEST, "Query parameter 'id' is required")
+        items = self.state.service.index.get_items_by_ids([doc_id])
+        if not items:
+            return self._error(HTTPStatus.NOT_FOUND, f"Document not found: {doc_id}")
+        self._json(HTTPStatus.OK, items[0].to_dict())
+
+    def _serve_reindex_post(self) -> None:
+        try:
+            stats = self.state.ensure_indexed()
+            self._json(HTTPStatus.OK, {"status": "ok", "stats": stats})
+        except Exception as exc:  # noqa: BLE001
+            self._error(HTTPStatus.INTERNAL_SERVER_ERROR, str(exc))
 
 
 def make_server(host: str, port: int,

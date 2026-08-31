@@ -13,6 +13,7 @@ import time
 import unittest
 import urllib.parse
 import urllib.request
+from contextlib import contextmanager
 from http.client import HTTPConnection
 from pathlib import Path
 
@@ -458,6 +459,36 @@ class TestSearchEndpoint(unittest.TestCase):
         payload = json.loads(body)
         for r in payload["results"]:
             self.assertEqual("biolar", r["project_id"])
+
+
+class TestDocumentAndReindexEndpoints(unittest.TestCase):
+    @contextmanager
+    def _open(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            root, service, capture_engine = _build_state(tmp_path)
+            with _ServerHandle(application_root=root,
+                                service=service,
+                                capture_engine=capture_engine) as srv:
+                yield srv
+
+    def test_document_endpoint_returns_400_without_id(self) -> None:
+        with self._open() as srv:
+            status, body, _ = srv.request("GET", "/api/document")
+        self.assertEqual(400, status)
+
+    def test_document_endpoint_returns_404_for_unknown_id(self) -> None:
+        with self._open() as srv:
+            status, body, _ = srv.request("GET", "/api/document?id=non_existent_id")
+        self.assertEqual(404, status)
+
+    def test_reindex_post_triggers_indexing_and_returns_ok(self) -> None:
+        with self._open() as srv:
+            status, body, _ = srv.request("POST", "/api/reindex", body={})
+        self.assertEqual(200, status)
+        payload = json.loads(body)
+        self.assertEqual("ok", payload["status"])
+        self.assertIn("stats", payload)
 
 
 # ============================================================================

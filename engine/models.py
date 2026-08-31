@@ -116,6 +116,7 @@ class MemoryItem:
             "authority_level": self.authority_level,
             "tags": self.tags,
             "snippet": self.snippet,
+            "full_text": self.full_text,
             "updated_at": self.updated_at,
             "status": self.status.value if isinstance(self.status, MemoryStatus) else str(self.status),
             "metadata": self.metadata,
