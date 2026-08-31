@@ -129,6 +129,11 @@ class SearchResult:
     authority_boost: float
     final_score: float
     matched_snippets: List[str] = field(default_factory=list)
+    semantic_score: float = 0.0
+    rrf_score: float = 0.0
+    lexical_rank: Optional[int] = None
+    semantic_rank: Optional[int] = None
+    search_mode: str = "lexical"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -140,6 +145,11 @@ class SearchResult:
             "authority_level": self.item.authority_level,
             "final_score": round(self.final_score, 4),
             "lexical_score": round(self.lexical_score, 4),
+            "semantic_score": round(self.semantic_score, 4),
+            "rrf_score": round(self.rrf_score, 6),
+            "lexical_rank": self.lexical_rank,
+            "semantic_rank": self.semantic_rank,
+            "search_mode": self.search_mode,
             "authority_boost": round(self.authority_boost, 4),
             "tags": self.item.tags,
             "snippet": self.matched_snippets[0] if self.matched_snippets else self.item.snippet,

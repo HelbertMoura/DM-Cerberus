@@ -38,6 +38,12 @@ class CerberusMCPServer:
                     "properties": {
                         "query": {"type": "string", "description": "Termo de busca ou dúvida (ex: 'SEFAZ A1 cofre', 'BDI TCU 2622', 'WCAG login')"},
                         "project_id": {"type": "string", "description": "Slug do projeto (ex: 'canteirohub', 'biolar', 'helpdev', '_global')"},
+                        "mode": {
+                            "type": "string",
+                            "enum": ["hybrid", "lexical", "semantic"],
+                            "description": "Estratégia de recuperação (padrão hybrid)",
+                            "default": "hybrid"
+                        },
                         "limit": {"type": "integer", "description": "Número máximo de resultados (padrão 5)", "default": 5}
                     },
                     "required": ["query"]
@@ -132,7 +138,8 @@ class CerberusMCPServer:
             results = self.service.search(
                 query=args.get("query", ""),
                 project_id=args.get("project_id"),
-                limit=args.get("limit", 5)
+                limit=args.get("limit", 5),
+                mode=args.get("mode", "hybrid"),
             )
             return [r.to_dict() for r in results]
 
@@ -259,6 +266,8 @@ class CerberusMCPServer:
                 expected = python_types.get(schema.get("type"))
                 if expected is not None and (not isinstance(value, expected) or
                                               (expected is int and isinstance(value, bool))):
+                    invalid.append(key)
+                elif "enum" in schema and value not in schema["enum"]:
                     invalid.append(key)
             if invalid:
                 return {"jsonrpc": "2.0", "id": msg_id,

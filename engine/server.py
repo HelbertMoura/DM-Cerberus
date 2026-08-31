@@ -404,6 +404,11 @@ tr:last-child td { border-bottom: none; }
     <select id="search-project" aria-label="Project filter">
       <option value="">(all projects)</option>
     </select>
+    <select id="search-mode" aria-label="Search mode">
+      <option value="hybrid">Hybrid</option>
+      <option value="lexical">Lexical</option>
+      <option value="semantic">Semantic</option>
+    </select>
     <button id="search-btn" type="button">Search</button>
   </div>
   <div id="search-results"></div>
@@ -493,9 +498,11 @@ tr:last-child td { border-bottom: none; }
   async function runSearch() {
     const q = document.getElementById("search-q").value.trim();
     const project = document.getElementById("search-project").value;
+    const mode = document.getElementById("search-mode").value;
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (project) params.set("project", project);
+    params.set("mode", mode);
     const out = document.getElementById("search-results");
     out.innerHTML = '<div class="muted">searching&hellip;</div>';
     try {
@@ -505,7 +512,8 @@ tr:last-child td { border-bottom: none; }
         '<tr>' +
         '<td><span class="tag ' + esc(String(item.project_id || "").toLowerCase()) + '">' + esc(item.project_id) + '</span></td>' +
         '<td>' + esc(item.title) + '<div class="muted">' + esc(item.source_path) + '</div></td>' +
-        '<td>' + esc(item.authority_level) + '</td>' +
+        '<td>' + esc(item.authority_level) + '<div class="muted">' +
+          esc(item.search_mode) + ' · ' + esc(item.final_score) + '</div></td>' +
         '<td>' + esc(item.snippet) + '</td>' +
         '</tr>'
       )).join("");
@@ -1721,18 +1729,24 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
     def _serve_search(self, query: Dict[str, List[str]]) -> None:
         q = (query.get("q", [""])[0] or "").strip()
         project = (query.get("project", [""])[0] or "").strip() or None
+        mode = (query.get("mode", ["hybrid"])[0] or "hybrid").strip().casefold()
         if not q:
             return self._error(HTTPStatus.BAD_REQUEST,
                                 "Query parameter 'q' is required")
+        if mode not in {"hybrid", "lexical", "semantic"}:
+            return self._error(HTTPStatus.BAD_REQUEST,
+                               "Query parameter 'mode' must be hybrid, lexical, or semantic")
         try:
             results = self.state.service.search(
-                query=q, project_id=project, limit=10
+                query=q, project_id=project, mode=mode, limit=20,
+                include_global=project is None,
             )
         except Exception as exc:  # noqa: BLE001
             return self._error(HTTPStatus.INTERNAL_SERVER_ERROR, str(exc))
         self._json(HTTPStatus.OK, {
             "query": q,
             "project_id": project,
+            "mode": mode,
             "count": len(results),
             "results": [r.to_dict() for r in results],
         })

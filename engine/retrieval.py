@@ -12,20 +12,25 @@ from engine.index import SQLiteMemoryIndex
 class CerberusMemoryService:
     def __init__(self, index: Optional[SQLiteMemoryIndex] = None):
         self.index = index or SQLiteMemoryIndex()
+        from engine.search import HybridSearchEngine
+        self.hybrid_search = HybridSearchEngine(self.index)
 
     def search(
         self,
         query: str,
         project_id: Optional[str] = None,
         source_types: Optional[List[str]] = None,
-        limit: int = 10
+        limit: int = 20,
+        mode: str = "hybrid",
+        include_global: bool = True,
     ) -> List[SearchResult]:
-        return self.index.search(
+        return self.hybrid_search.search(
             query=query,
             project_id=project_id,
             source_types=source_types,
             limit=limit,
-            include_global=True
+            include_global=include_global,
+            mode=mode,
         )
 
     def get_decisions(self, project_id: Optional[str] = None, limit: int = 10) -> List[SearchResult]:

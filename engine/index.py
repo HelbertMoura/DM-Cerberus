@@ -401,3 +401,49 @@ class SQLiteMemoryIndex:
             "types_breakdown": types,
             "db_path": str(self.db_path)
         }
+
+    def get_items_by_ids(self, memory_ids: List[str]) -> List[MemoryItem]:
+        """Load canonical document records in caller-specified order."""
+        if not memory_ids:
+            return []
+        placeholders = ",".join("?" for _ in memory_ids)
+        with self._get_connection() as con:
+            rows = con.execute(f"""
+                SELECT memory_id, project_id, source_path, source_type, title,
+                       authority_level, tags, snippet, full_text, updated_at,
+                       status, metadata
+                FROM documents WHERE memory_id IN ({placeholders})
+            """, memory_ids).fetchall()
+        by_id = {row[0]: self._item_from_row(row) for row in rows}
+        return [by_id[memory_id] for memory_id in memory_ids if memory_id in by_id]
+
+    def all_items(self) -> List[MemoryItem]:
+        with self._get_connection() as con:
+            rows = con.execute("""
+                SELECT memory_id, project_id, source_path, source_type, title,
+                       authority_level, tags, snippet, full_text, updated_at,
+                       status, metadata
+                FROM documents ORDER BY memory_id
+            """).fetchall()
+        return [self._item_from_row(row) for row in rows]
+
+    @staticmethod
+    def _item_from_row(row: Tuple[Any, ...]) -> MemoryItem:
+        try:
+            tags = json.loads(row[6]) if row[6] else []
+        except Exception:
+            tags = []
+        try:
+            metadata = json.loads(row[11]) if row[11] else {}
+        except Exception:
+            metadata = {}
+        return MemoryItem(
+            memory_id=row[0], project_id=row[1], source_path=row[2],
+            source_type=(SourceType(row[3]) if row[3] in {s.value for s in SourceType}
+                         else SourceType.UNKNOWN),
+            title=row[4], authority_level=row[5], tags=tags,
+            snippet=row[7], full_text=row[8], updated_at=row[9],
+            status=(MemoryStatus(row[10]) if row[10] in {s.value for s in MemoryStatus}
+                    else MemoryStatus.ACTIVE),
+            metadata=metadata,
+        )
