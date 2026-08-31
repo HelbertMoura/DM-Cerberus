@@ -39,6 +39,7 @@ __pycache__/
 *.pyo
 .venv/
 venv/
+.cerberus/
 
 # Node (se houver)
 node_modules/

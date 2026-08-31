@@ -24,6 +24,7 @@ status: ativo
 | **Fast Operational Agent** | `MiniMax M2.7-Highspeed` | **Opcional / não-core** — usar só quando velocidade trouxer vantagem operacional real | Preferir M3 sempre que operacionalmente mais simples |
 | **QA Engineer / Reviewer** | `Gemini QA` (sessão logicamente separada) | Validação independente | Se Gemini indisponível → nova sessão `GLM-5.3-Flash` dedicada a QA |
 | **Opportunistic Capacity / Overflow** | `Opus 4.6 / Antigravity` | **NÃO-core** — aproveitar quando disponível | Gerar HANDOVER antes de sair por cota |
+| **Deep Reasoning & Architecture (Token Plan)** | `Qwen 3.8 Max / DeepSeek V4` (Alibaba / Bailian) | **Capacidade Ativa** — Raciocínio profundo, 980k context, refatoração pesada | Disponível no OpenCode / Qwen Code / Maestri |
 
 > Para o detalhamento completo (modos da Flash, gates por risco, paralelismo, worktree, deploy state machine, failover), ler o **canônico** em `protocolo-equipe-ai.md` dentro do repositório `dm-erp` (registrado como `TASK-GOV-AI-008` / **ADR-014 (dm-erp)**).
 

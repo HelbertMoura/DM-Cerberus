@@ -21,8 +21,8 @@ MODEL ROUTING
 TASK: <TASK-ID>
 PROJECT: <project-slug>
 RISK: 1 / 2 / 3 / 4
-USE MODEL: <Gemini PM | GLM-5.3 Max | GLM-5.3-Flash | MiniMax M3 | MiniMax M2.7-Highspeed | Gemini QA | Opus 4.6/Antigravity>
-USE TOOL: <ZCode | MiniMax | Gemini | Antigravity>
+USE MODEL: <Gemini PM | GLM-5.3 Max | GLM-5.3-Flash | Qwen 3.8 Max | DeepSeek V4 Pro | MiniMax M3 | MiniMax M2.7-Highspeed | Gemini QA | Opus 4.6/Antigravity>
+USE TOOL: <ZCode | OpenCode | Qwen Code | MiniMax | Gemini | Antigravity>
 MODE: <MEDIUM | HIGH | MAX | N/A>
 ROLE: <Role do Agente>
 USE SKILLS: <$skill-name ... ou NONE>
@@ -52,6 +52,7 @@ DEPLOY COLLISION RISK: <LOW | MEDIUM | HIGH | N/A>
 7. **Dúvida Flash vs Max**: iniciar com Flash. Escalar para Max se houver ambiguidade arquitetural, risco de segurança estrutural ou decisão irreversível.
 8. **Dúvida Flash vs M3**: raciocínio/design ➔ Flash; **implementação pesada** ➔ M3.
 9. **Dúvida M2.7 vs M3**: preferir M3. M2.7 é o atalho opcional, não o caminho padrão.
+10. **Raciocínio profundo, refatoração multi-módulo com contexto gigante (>500k tokens), algoritmos complexos**? ➔ `Qwen 3.8 Max` ou `DeepSeek V4 Pro` (Token Plan Alibaba no OpenCode/Qwen Code).
 
 ---
 

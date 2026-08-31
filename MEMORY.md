@@ -16,8 +16,9 @@ status: ativo
 ---
 
 ## 🖥️ Topologia de Infraestrutura Real
-- **Servidor Dedicado:** Rocky Linux 10.2 Red Quartz (`192.168.226.103`)
-- **Acesso SSH:** `ssh root@192.168.226.103` (chave direta)
+- **Servidor Dedicado (Rocky Linux 10.2 Red Quartz):**
+  - **Acesso Tailscale (Global/MagicDNS):** `100.127.233.62` / `devmaniacs-prod` (SSH direto: `ssh root@100.127.233.62` ou `ssh devmaniacs-prod`)
+  - **Acesso LAN (Local):** `192.168.226.103` (SSH direto: `ssh root@192.168.226.103`)
 - **Hardware:** 1 TB NVMe SSD (12% uso), 32 GB RAM (29% uso), 16 vCPUs Dedicated Intel Xeon Silver.
 - **Túnel Cloudflare:** `tunnel a0c5bea6-1a4b-4ffe-a041-da8cb18f419a` gerenciando domínios corporativos seguros HTTPS com SSL automático.
 
