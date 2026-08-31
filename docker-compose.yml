@@ -23,6 +23,8 @@ services:
     image: cerberus-inspector:local
     container_name: cerberus-inspector
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:7331:7331"
     environment:
       CERBERUS_ROOT: /data
       CERBERUS_ALLOWED_ROOTS: /data:/opt/sistemas/dm-cerebro
@@ -37,7 +39,7 @@ services:
       CERBERUS_TRUST_PROXY: ${CERBERUS_TRUST_PROXY:-1}
       CERBERUS_SECURE_COOKIES: ${CERBERUS_SECURE_COOKIES:-1}
     volumes:
-      - cerberus-data:/data
+      - /opt/sistemas/dm-cerebro:/data
     networks:
       - cerberus-net
     healthcheck:
@@ -48,19 +50,19 @@ services:
       retries: 3
       start_period: 10s
 
-  cloudflared:                # Named tunnel — recommended for production.
+  cloudflared:                # Named tunnel — opt-in if host cloudflared is not used.
     image: cloudflare/cloudflared:2024.12.2
     container_name: cerberus-cloudflared
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set the named-tunnel token from Cloudflare Zero Trust}
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
     networks:
       - cerberus-net
     depends_on:
       cerberus:
         condition: service_healthy
-    profiles: ["tunnel", "default"]      # default-on when token provided
+    profiles: ["standalone-tunnel"]
 
   cloudflared-quick:          # Quick Tunnel — opt-in for demos.
     image: cloudflare/cloudflared:2024.12.2
