@@ -40,6 +40,7 @@ RUN if [ -d /opt/sistemas/dm-cerebro/bin ]; then \
 RUN mkdir -p /data && chown -R cerberus:cerberus /data
 
 ENV CERBERUS_ROOT=/data \
+    CERBERUS_ALLOWED_ROOTS=/data:/opt/sistemas/dm-cerebro \
     CERBERUS_UI_HOST=0.0.0.0 \
     CERBERUS_UI_PORT=7331 \
     PYTHONUNBUFFERED=1 \

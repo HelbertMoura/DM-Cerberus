@@ -25,6 +25,7 @@ services:
     restart: unless-stopped
     environment:
       CERBERUS_ROOT: /data
+      CERBERUS_ALLOWED_ROOTS: /data:/opt/sistemas/dm-cerebro
       CERBERUS_UI_HOST: 0.0.0.0
       CERBERUS_UI_PORT: "7331"
       CERBERUS_UI_ALLOW_LAN: "1"
