@@ -680,12 +680,33 @@ def _sqlite_fts5_available() -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Two Point Design System — Login + Setup 2FA pages
+# Dev Maniac's Brand & Two Point Design System — Login + Setup 2FA
 # ---------------------------------------------------------------------------
+DEV_MANIACS_LOGO_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="56" height="56" role="img" aria-label="Dev Maniac's Logo" shape-rendering="crispEdges">
+  <g fill="none" stroke="#061637" stroke-width="10" stroke-linejoin="round">
+    <path fill="#061637" d="M20 28h142v132H20z"/>
+    <path fill="#ff4c4c" stroke="none" d="M34 42h57v48H34z"/>
+    <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
+    <path fill="#8b35d1" stroke="none" d="M34 90h57v54H34z"/>
+    <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
+    <path stroke="none" fill="#061637" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
+    <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
+    <path d="M162 78h18v30h18"/>
+    <path fill="#061637" d="M176 102h48l14 22v49h-25l-12-14h-18l-12 14h-24v-49z"/>
+  </g>
+  <g fill="#ffffff">
+    <path d="M169 124h10v-10h10v10h10v10h-10v10h-10v-10h-10z"/>
+  </g>
+  <rect x="209" y="119" width="9" height="9" fill="#ff4c4c"/>
+  <rect x="220" y="130" width="9" height="9" fill="#ffc529"/>
+  <rect x="198" y="130" width="9" height="9" fill="#8b35d1"/>
+  <rect x="209" y="141" width="9" height="9" fill="#08b9ca"/>
+</svg>"""
+
 WATERMARK_SVG = (
     "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20"
     "viewBox%3D%270%200%20120%2060%27%3E%3Ctext%20x%3D%2760%27%20y%3D'38'%20font-family%3D'IBM%20Plex"
-    "%20Sans%27%20font-size%3D'36%27%20fill%3D'%2314a08f'%20fill-opacity%3D'0.18'%20text-anchor%3D"
+    "%20Sans%27%20font-size%3D'36%27%20fill%3D'%2314a08f'%20fill-opacity%3D'0.14'%20text-anchor%3D"
     "%27middle%27%20font-weight%3D'700'%3EDM%3C%2Ftext%3E%3C%2Fsvg%3E"
 )
 
@@ -694,13 +715,13 @@ def _render_login_html(step: str = "credentials",
                        error_message: str = "",
                        pending_token: str = "",
                        target_email: str = "") -> str:
-    """Render the Two Point login page (Hub-style)."""
+    """Render the Dev Maniac's Cerberus Inspector login page."""
     error_block = ""
     if error_message:
         escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;"))
         error_block = (
-            f'<div class="login-error" role="alert">⚠ '
+            f'<div class="login-error" role="alert"><span class="err-icon">⚠️</span>'
             f'<span>{escaped}</span></div>'
         )
     # Step rendering
@@ -710,17 +731,16 @@ def _render_login_html(step: str = "credentials",
         creds_block = f'''
 <form id="loginForm" method="POST" action="/auth/login" class="step-form" autocomplete="on">
   <label class="field">
-    <span>E-mail</span>
+    <span>E-mail corporativo</span>
     <input type="email" name="email" required autofocus autocomplete="username"
            placeholder="helbert.moura@devmaniacs.com.br" value="{target_email}">
   </label>
   <label class="field">
-    <span>Senha</span>
+    <span>Senha de acesso</span>
     <input type="password" name="password" required autocomplete="current-password"
-           placeholder="••••••••" minlength="8">
+           placeholder="••••••••••••" minlength="8">
   </label>
-  <button type="submit" class="btn-3d primary">Entrar &rarr;</button>
-  <p class="muted">Primeiro acesso? Senha inicial exibida no log do servidor.</p>
+  <button type="submit" class="btn-3d primary">Acessar Painel &rarr;</button>
 </form>'''
         totp_block = ''
     else:
@@ -729,14 +749,16 @@ def _render_login_html(step: str = "credentials",
 <form id="totpForm" method="POST" action="/auth/login" class="step-form" autocomplete="off">
   <input type="hidden" name="pending_token" value="{pending_token}">
   <input type="hidden" name="email" value="{target_email}">
-  <p class="muted">Confirme com o código TOTP do seu aplicativo autenticador.</p>
+  <div class="totp-badge"><span>2FA &middot; SEGURAN&Ccedil;A EM DUAS ETAPAS</span></div>
+  <p class="totp-help">Digite o c&oacute;digo de 8 d&iacute;gitos gerado no seu aplicativo autenticador.</p>
   <label class="field">
-    <span>Código TOTP (8 dígitos)</span>
+    <span>C&oacute;digo de Autentica&ccedil;&atilde;o</span>
     <input type="text" name="totp" required autofocus inputmode="numeric"
            autocomplete="one-time-code" pattern="\\d{{8}}" maxlength="8"
-           placeholder="00000000">
+           placeholder="00000000" class="totp-input">
   </label>
-  <button type="submit" class="btn-3d primary">Validar &rarr;</button>
+  <button type="submit" class="btn-3d primary">Confirmar &amp; Entrar &rarr;</button>
+  <div class="back-link"><a href="/auth/login">&larr; Voltar para login</a></div>
 </form>'''
 
     return f'''<!doctype html>
@@ -744,56 +766,101 @@ def _render_login_html(step: str = "credentials",
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cerberus Inspector &mdash; Login</title>
+<title>Cerberus Inspector &mdash; Dev Maniac's</title>
 <style>
 :root {{
-  --bg-deep: #175047;
-  --bg-deep-2: #134339;
-  --card: #fdf7ea;
-  --ink: #22304A;
-  --ink-soft: #5B6770;
+  --bg-deep: #081a38;
+  --bg-deep-2: #051026;
+  --card: #fdfbf7;
+  --card-inner: #ffffff;
+  --ink: #061637;
+  --ink-soft: #4a5568;
+  --ink-muted: #718096;
   --accent: #14a08f;
   --accent-deep: #0f7e72;
-  --shadow: rgba(16,26,24,.45);
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-          "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo,
-               Consolas, monospace;
+  --accent-blue: #1e40af;
+  --shadow: rgba(3, 10, 26, 0.45);
+  --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, Consolas, monospace;
 }}
 * {{ box-sizing: border-box; }}
 html, body {{ margin: 0; padding: 0; min-height: 100vh; font-family: var(--font); }}
 body {{
   background: var(--bg-deep);
-  background-image: url("{WATERMARK_SVG}");
+  background-image:
+    radial-gradient(ellipse at 50% 10%, rgba(20, 160, 143, 0.15), transparent 70%),
+    url("{WATERMARK_SVG}");
   background-repeat: repeat;
-  background-size: 240px 120px;
+  background-size: auto, 240px 120px;
   color: var(--ink);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 32px 16px 24px;
   min-height: 100vh;
+}}
+.auth-wrapper {{
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }}
 .card {{
   background: var(--card);
   border: 3px solid var(--ink);
-  border-radius: 16px;
-  padding: 32px 32px 28px;
+  border-radius: 18px;
+  padding: 34px 32px 30px;
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 8px 0 var(--shadow);
+  box-shadow: 0 10px 0 var(--shadow);
 }}
-.card h1 {{
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.brand-header {{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}}
+.brand-logo-wrap {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  background: #ffffff;
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 0 var(--ink);
+}}
+.brand-title {{
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--ink);
+  margin: 0 0 4px;
 }}
-.card .subtitle {{
-  margin: 0 0 20px;
+.brand-tag {{
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  background: rgba(20, 160, 143, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(20, 160, 143, 0.3);
+  margin-bottom: 8px;
+}}
+.card-subtitle {{
   font-size: 13px;
   color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.4;
 }}
 .field {{
   display: block;
@@ -802,7 +869,7 @@ body {{
 .field > span {{
   display: block;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink);
@@ -810,36 +877,45 @@ body {{
 }}
 .field input {{
   width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
+  min-height: 46px;
+  padding: 10px 14px;
   font: inherit;
   font-size: 15px;
-  background: #fff;
+  background: var(--card-inner);
   color: var(--ink);
-  border: 1.5px solid var(--ink);
+  border: 2px solid var(--ink);
   border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }}
 .field input:focus {{
-  outline: 3px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25);
+}}
+.totp-input {{
+  font-family: var(--font-mono);
+  font-size: 22px !important;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-align: center;
 }}
 .btn-3d {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  padding: 12px 18px;
+  padding: 12px 20px;
   font: inherit;
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.02em;
   color: #fff;
   background: var(--accent);
-  border: none;
+  border: 2px solid var(--ink);
   border-radius: 10px;
   cursor: pointer;
   box-shadow: 0 5px 0 var(--ink);
-  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.1s ease;
   width: 100%;
   margin-top: 8px;
 }}
@@ -848,38 +924,122 @@ body {{
   transform: translateY(4px);
   box-shadow: 0 1px 0 var(--ink);
 }}
-.muted {{ color: var(--ink-soft); font-size: 12px; margin: 12px 0 0; }}
+.totp-badge {{
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 4px;
+}}
+.totp-help {{
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}}
+.back-link {{
+  text-align: center;
+  margin-top: 14px;
+}}
+.back-link a {{
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+}}
+.back-link a:hover {{
+  color: var(--accent-deep);
+  text-decoration: underline;
+}}
 .login-error {{
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
+  gap: 10px;
+  align-items: center;
   background: #fff1ed;
-  border: 1.5px solid #c14530;
+  border: 2px solid #c14530;
   color: #8a1c0a;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
   font-size: 13px;
-  margin-bottom: 16px;
+  font-weight: 500;
+  margin-bottom: 18px;
 }}
 .step-content {{ display: none; }}
 .step-content.active {{ display: block; }}
-.step-fade {{ animation: fade 0.32s ease; }}
+.step-fade {{ animation: fade 0.28s ease; }}
 @keyframes fade {{ from {{ opacity: 0; transform: translateY(-4px); }}
                    to   {{ opacity: 1; transform: translateY(0); }} }}
+
+/* Footer Institutional (Dev Maniac's standard) */
+.auth-footer {{
+  margin-top: 24px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  line-height: 1.6;
+}}
+.auth-footer-links {{
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}}
+.auth-footer-links a {{
+  color: #2dd4bf;
+  text-decoration: none;
+  font-weight: 600;
+}}
+.auth-footer-links a:hover {{
+  text-decoration: underline;
+  color: #5eead4;
+}}
+.auth-security-badge {{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 6px;
+}}
 </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Cerberus Inspector</h1>
-    <p class="subtitle">Dev Maniac&rsquo;s Memory Intelligence &mdash; Painel Localhost</p>
-    {error_block}
-    <section class="{creds_class}" id="credsStep">
-      {creds_block}
-    </section>
-    <section class="{totp_class} step-fade" id="totpStep">
-      {totp_block}
-    </section>
-  </main>
+  <div class="auth-wrapper">
+    <main class="card">
+      <div class="brand-header">
+        <div class="brand-logo-wrap">
+          {DEV_MANIACS_LOGO_SVG}
+        </div>
+        <h1 class="brand-title">Dev Maniac's</h1>
+        <span class="brand-tag">Cerberus Intelligence</span>
+        <p class="card-subtitle">Painel de Mem&oacute;ria Corporativa &middot; Acesso Seguro</p>
+      </div>
+      {error_block}
+      <section class="{creds_class}" id="credsStep">
+        {creds_block}
+      </section>
+      <section class="{totp_class} step-fade" id="totpStep">
+        {totp_block}
+      </section>
+    </main>
+    <footer class="auth-footer">
+      <nav class="auth-footer-links" aria-label="Links institucionais">
+        <a href="https://devmaniacs.com.br" target="_blank" rel="noopener noreferrer">devmaniacs.com.br</a>
+        <span>&middot;</span>
+        <a href="https://suporte.devmaniacs.com.br" target="_blank" rel="noopener noreferrer">Suporte</a>
+        <span>&middot;</span>
+        <a href="https://radierhub.com.br" target="_blank" rel="noopener noreferrer">RadierHUB</a>
+      </nav>
+      <div>&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development. Todos os direitos reservados.</div>
+      <div class="auth-security-badge">
+        <span>&#128737; Cloudflare Argo Tunnel Blindado &middot; 2FA TOTP RFC 6238</span>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>'''
 
@@ -891,7 +1051,7 @@ def _render_setup_2fa_html(secret_b32: str, otp_uri: str,
         escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;"))
         err_block = (
-            f'<div class="login-error" role="alert">⚠ '
+            f'<div class="login-error" role="alert">⚠️ '
             f'<span>{escaped}</span></div>'
         )
     return f'''<!doctype html>
@@ -899,93 +1059,149 @@ def _render_setup_2fa_html(secret_b32: str, otp_uri: str,
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cerberus Inspector &mdash; Setup 2FA</title>
+<title>Cerberus Inspector &mdash; Configurar 2FA</title>
 <style>
 :root {{
-  --bg-deep: #175047;
-  --card: #fdf7ea;
-  --ink: #22304A;
-  --ink-soft: #5B6770;
+  --bg-deep: #081a38;
+  --card: #fdfbf7;
+  --card-inner: #ffffff;
+  --ink: #061637;
+  --ink-soft: #4a5568;
   --accent: #14a08f;
   --accent-deep: #0f7e72;
-  --shadow: rgba(16,26,24,.45);
+  --shadow: rgba(3, 10, 26, 0.45);
   --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", sans-serif;
-  --font-mono: ui-monospace, "IBM Plex Mono", monospace;
+  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, monospace;
 }}
 * {{ box-sizing: border-box; }}
 html, body {{ margin: 0; padding: 0; font-family: var(--font); }}
 body {{
   background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 10%, rgba(20, 160, 143, 0.15), transparent 70%),
+    url("{WATERMARK_SVG}");
+  background-repeat: repeat;
+  background-size: auto, 240px 120px;
   color: var(--ink);
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 32px 16px 24px;
+}}
+.auth-wrapper {{
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }}
 .card {{
   background: var(--card);
   border: 3px solid var(--ink);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 32px;
   width: 100%;
-  max-width: 560px;
-  box-shadow: 0 8px 0 var(--shadow);
+  box-shadow: 0 10px 0 var(--shadow);
 }}
-.card h1 {{ margin: 0 0 4px; font-size: 22px; }}
-.card p.subtitle {{ margin: 0 0 20px; color: var(--ink-soft); font-size: 13px; }}
-.qr-wrap {{ display: flex; gap: 16px; align-items: center; }}
-.qr-wrap .svg {{ background: #fff; padding: 12px; border-radius: 8px;
-                 border: 1.5px solid var(--ink); flex-shrink: 0; }}
+.brand-header {{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid rgba(6, 22, 55, 0.1);
+  padding-bottom: 16px;
+}}
+.brand-logo-wrap {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 0 var(--ink);
+}}
+.brand-logo-wrap svg {{
+  width: 38px;
+  height: 38px;
+}}
+.brand-header h1 {{ margin: 0 0 2px; font-size: 20px; font-weight: 800; text-transform: uppercase; }}
+.brand-header p.subtitle {{ margin: 0; color: var(--ink-soft); font-size: 13px; }}
+.qr-wrap {{ display: flex; gap: 18px; align-items: flex-start; margin-bottom: 20px; }}
+.qr-wrap .svg {{ background: #fff; padding: 12px; border-radius: 10px;
+                 border: 2px solid var(--ink); flex-shrink: 0; }}
 .field {{ margin-bottom: 14px; }}
-.field > span {{ display: block; font-size: 12px; font-weight: 600;
+.field > span {{ display: block; font-size: 12px; font-weight: 700;
                   text-transform: uppercase; letter-spacing: 0.04em;
                   margin-bottom: 6px; }}
-.field input {{ width: 100%; min-height: 44px; padding: 10px 12px;
-                font: inherit; border: 1.5px solid var(--ink); border-radius: 8px; }}
-.uri-block {{ font-family: var(--font-mono); font-size: 11px; padding: 10px;
-               background: #fff; border: 1.5px solid var(--ink); border-radius: 8px;
-               word-break: break-all; }}
+.field input {{ width: 100%; min-height: 46px; padding: 10px 14px;
+                font: inherit; border: 2px solid var(--ink); border-radius: 8px; }}
+.field input:focus {{ outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25); }}
+.totp-input {{ font-family: var(--font-mono); font-size: 20px !important; font-weight: 700; letter-spacing: 0.2em; text-align: center; }}
+.uri-block {{ font-family: var(--font-mono); font-size: 11px; padding: 8px 10px;
+               background: #fff; border: 1.5px solid var(--ink); border-radius: 6px;
+               word-break: break-all; margin: 4px 0 10px; }}
 .btn-3d {{
   display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; padding: 12px 18px; font: inherit; font-weight: 700;
-  font-size: 15px; color: #fff; background: var(--accent); border: none;
+  min-height: 48px; padding: 12px 20px; font: inherit; font-weight: 700;
+  font-size: 15px; color: #fff; background: var(--accent); border: 2px solid var(--ink);
   border-radius: 10px; cursor: pointer;
   box-shadow: 0 5px 0 var(--ink); width: 100%;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
 }}
 .btn-3d:hover {{ background: var(--accent-deep); }}
 .btn-3d:active {{ transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }}
 .login-error {{ display: flex; gap: 8px; background: #fff1ed;
-                border: 1.5px solid #c14530; color: #8a1c0a; padding: 10px 12px;
+                border: 2px solid #c14530; color: #8a1c0a; padding: 10px 12px;
                 border-radius: 8px; font-size: 13px; margin-bottom: 16px; }}
-.muted {{ color: var(--ink-soft); font-size: 12px; margin: 8px 0 0; }}
+.muted {{ color: var(--ink-soft); font-size: 12px; margin: 6px 0 0; line-height: 1.4; }}
+.auth-footer {{
+  margin-top: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}}
 </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Habilitar 2FA</h1>
-    <p class="subtitle">Cadastre seu aplicativo autenticador (Google Authenticator, 1Password, Authy).</p>
-    {err_block}
-    <div class="qr-wrap">
-      <div class="svg">{svg}</div>
-      <div>
-        <p><strong>Passo 1.</strong> Escaneie o QR no app ou cole a URI abaixo.</p>
-        <p class="muted"><strong>Secret (base32):</strong></p>
-        <pre class="uri-block">{secret_b32}</pre>
-        <p class="muted">URI otpauth:</p>
-        <pre class="uri-block">{otp_uri}</pre>
+  <div class="auth-wrapper">
+    <main class="card">
+      <div class="brand-header">
+        <div class="brand-logo-wrap">
+          {DEV_MANIACS_LOGO_SVG}
+        </div>
+        <div>
+          <h1>Habilitar 2FA</h1>
+          <p class="subtitle">Cerberus &middot; Autentica&ccedil;&atilde;o em Duas Etapas</p>
+        </div>
       </div>
-    </div>
-    <form method="POST" action="/auth/setup-2fa" style="margin-top:18px">
-      <label class="field">
-        <span>Passo 2. Confirme com um código gerado pelo app</span>
-        <input type="text" name="totp" required autofocus inputmode="numeric"
-               pattern="\\d{{8}}" maxlength="8" placeholder="00000000">
-      </label>
-      <button type="submit" class="btn-3d">Ativar 2FA</button>
-    </form>
-    <p class="muted">Sem 2FA, o login fica limitado a emails e senhas (menos seguro).</p>
-  </main>
+      {err_block}
+      <div class="qr-wrap">
+        <div class="svg">{svg}</div>
+        <div>
+          <p style="margin:0 0 6px"><strong>1. Escaneie o QR Code</strong></p>
+          <p class="muted">Abra o Google Authenticator, 1Password ou Authy no seu celular e leia o c&oacute;digo ao lado.</p>
+          <p class="muted" style="margin-top:10px"><strong>C&oacute;digo Manual (Secret base32):</strong></p>
+          <pre class="uri-block">{secret_b32}</pre>
+        </div>
+      </div>
+      <form method="POST" action="/auth/setup-2fa" style="margin-top:14px">
+        <label class="field">
+          <span>2. Confirme com o c&oacute;digo gerado no app</span>
+          <input type="text" name="totp" required autofocus inputmode="numeric"
+                 pattern="\\d{{8}}" maxlength="8" placeholder="00000000" class="totp-input">
+        </label>
+        <button type="submit" class="btn-3d">Ativar 2FA &amp; Continuar &rarr;</button>
+      </form>
+    </main>
+    <footer class="auth-footer">
+      <div>&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development</div>
+    </footer>
+  </div>
 </body>
 </html>'''
 
