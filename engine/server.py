@@ -2071,14 +2071,14 @@ def _render_login_html(step: str = "credentials",
                        error_message: str = "",
                        pending_token: str = "",
                        target_email: str = "") -> str:
-    """Render the Dev Maniac's Cerberus Inspector login page."""
+    """Render the Dev Maniac's Cerberus Inspector login page in Suporte Dev Maniac's theme."""
     error_block = ""
     if error_message:
         escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;"))
         error_block = (
-            f'<div class="login-error" role="alert"><span class="err-icon">⚠️</span>'
-            f'<span>{escaped}</span></div>'
+            f'<div class="login-error" role="alert">'
+            f'<span class="err-dot"></span><span>{escaped}</span></div>'
         )
     # Step rendering
     creds_class = "step-content active" if step == "credentials" else "step-content"
@@ -2087,16 +2087,16 @@ def _render_login_html(step: str = "credentials",
         creds_block = f'''
 <form id="loginForm" method="POST" action="/auth/login" class="step-form" autocomplete="on">
   <label class="field">
-    <span>E-mail corporativo</span>
+    <span>E-mail Corporativo</span>
     <input type="email" name="email" required autofocus autocomplete="username"
            placeholder="helbert.moura@devmaniacs.com.br" value="{target_email}">
   </label>
   <label class="field">
-    <span>Senha de acesso</span>
+    <span>Senha de Acesso</span>
     <input type="password" name="password" required autocomplete="current-password"
            placeholder="••••••••••••" minlength="8">
   </label>
-  <button type="submit" class="btn-3d primary">Acessar Painel &rarr;</button>
+  <button type="submit" class="btn-dm primary">Acessar Central de Memória &rarr;</button>
 </form>'''
         totp_block = ''
     else:
@@ -2105,56 +2105,65 @@ def _render_login_html(step: str = "credentials",
 <form id="totpForm" method="POST" action="/auth/login" class="step-form" autocomplete="off">
   <input type="hidden" name="pending_token" value="{pending_token}">
   <input type="hidden" name="email" value="{target_email}">
-  <div class="totp-badge"><span>2FA &middot; SEGURAN&Ccedil;A EM DUAS ETAPAS</span></div>
-  <p class="totp-help">Digite o c&oacute;digo de 8 d&iacute;gitos gerado no seu aplicativo autenticador.</p>
+  <div class="totp-badge"><span>2FA &middot; AUTENTICAÇÃO EM DUAS ETAPAS</span></div>
+  <p class="totp-help">Digite o código de 8 dígitos gerado no seu aplicativo autenticador.</p>
   <label class="field">
-    <span>C&oacute;digo de Autentica&ccedil;&atilde;o</span>
+    <span>Código de Autenticação</span>
     <input type="text" name="totp" required autofocus inputmode="numeric"
            autocomplete="one-time-code" pattern="\\d{{8}}" maxlength="8"
            placeholder="00000000" class="totp-input">
   </label>
-  <button type="submit" class="btn-3d primary">Confirmar &amp; Entrar &rarr;</button>
-  <div class="back-link"><a href="/auth/login">&larr; Voltar para login</a></div>
+  <button type="submit" class="btn-dm primary">Confirmar &amp; Entrar &rarr;</button>
+  <div class="back-link"><a href="/auth/login">&larr; Voltar para o login</a></div>
 </form>'''
 
     return f'''<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cerberus Inspector &mdash; Dev Maniac's</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061637">
+<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --bg-deep: #081a38;
-  --bg-deep-2: #051026;
-  --card: #fdfbf7;
-  --card-inner: #ffffff;
-  --ink: #061637;
-  --ink-soft: #4a5568;
-  --ink-muted: #718096;
-  --accent: #14a08f;
-  --accent-deep: #0f7e72;
-  --accent-blue: #1e40af;
-  --shadow: rgba(3, 10, 26, 0.45);
-  --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, Consolas, monospace;
+  --bg-deep: #061637;
+  --bg-deep-2: #0a192f;
+  --bg-elev: #0d2247;
+  --border-dark: #1e3a6d;
+  --ink-light: #f8fafc;
+  --text-muted: #94a3b8;
+  --dm-cyan: #08b9ca;
+  --dm-red: #ff4c4c;
+  --dm-yellow: #ffc529;
+  --dm-purple: #8b35d1;
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', var(--font);
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }}
 * {{ box-sizing: border-box; }}
-html, body {{ margin: 0; padding: 0; min-height: 100vh; font-family: var(--font); }}
-body {{
+html, body {{
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: var(--font);
   background: var(--bg-deep);
+  color: var(--ink-light);
+  font-size: 14.5px;
+}}
+body {{
   background-image:
-    radial-gradient(ellipse at 50% 10%, rgba(20, 160, 143, 0.15), transparent 70%),
-    url("{WATERMARK_SVG}");
-  background-repeat: repeat;
-  background-size: auto, 240px 120px;
-  color: var(--ink);
+    radial-gradient(ellipse at 50% 15%, rgba(8, 185, 202, 0.18), transparent 70%),
+    radial-gradient(ellipse at 80% 80%, rgba(139, 53, 209, 0.12), transparent 60%),
+    linear-gradient(180deg, #061637 0%, #0a192f 100%);
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 32px 16px 24px;
-  min-height: 100vh;
 }}
 .auth-wrapper {{
   width: 100%;
@@ -2164,12 +2173,22 @@ body {{
   align-items: center;
 }}
 .card {{
-  background: var(--card);
-  border: 3px solid var(--ink);
+  background: rgba(13, 34, 71, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-dark);
   border-radius: 18px;
   padding: 34px 32px 30px;
   width: 100%;
-  box-shadow: 0 10px 0 var(--shadow);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(8, 185, 202, 0.1);
+  position: relative;
+  overflow: hidden;
+}}
+.card::before {{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--dm-cyan), var(--dm-purple));
 }}
 .brand-header {{
   display: flex;
@@ -2182,53 +2201,55 @@ body {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 68px;
-  height: 68px;
-  background: #ffffff;
-  border: 2.5px solid var(--ink);
+  width: 64px;
+  height: 64px;
+  background: #0d2247;
+  border: 1.5px solid rgba(8, 185, 202, 0.5);
   border-radius: 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 3px 0 var(--ink);
+  margin-bottom: 14px;
+  box-shadow: 0 0 16px rgba(8, 185, 202, 0.25);
 }}
 .brand-title {{
-  font-size: 19px;
+  font-family: var(--font-display);
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink);
+  letter-spacing: -0.01em;
+  color: #ffffff;
   margin: 0 0 4px;
 }}
 .brand-tag {{
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--accent-deep);
-  background: rgba(20, 160, 143, 0.12);
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(20, 160, 143, 0.3);
+  color: var(--dm-cyan);
+  background: rgba(8, 185, 202, 0.12);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(8, 185, 202, 0.35);
   margin-bottom: 8px;
 }}
 .card-subtitle {{
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.4;
 }}
 .field {{
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }}
 .field > span {{
   display: block;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--text-muted);
   margin-bottom: 6px;
 }}
 .field input {{
@@ -2236,17 +2257,17 @@ body {{
   min-height: 46px;
   padding: 10px 14px;
   font: inherit;
-  font-size: 15px;
-  background: var(--card-inner);
-  color: var(--ink);
-  border: 2px solid var(--ink);
+  font-size: 14.5px;
+  background: rgba(6, 22, 55, 0.85);
+  color: #ffffff;
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.15s ease;
 }}
 .field input:focus {{
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25);
+  border-color: var(--dm-cyan);
+  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.25);
 }}
 .totp-input {{
   font-family: var(--font-mono);
@@ -2255,42 +2276,44 @@ body {{
   letter-spacing: 0.25em;
   text-align: center;
 }}
-.btn-3d {{
+.btn-dm {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 48px;
   padding: 12px 20px;
-  font: inherit;
+  font-family: var(--font);
   font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.02em;
+  font-size: 14.5px;
   color: #fff;
-  background: var(--accent);
-  border: 2px solid var(--ink);
-  border-radius: 10px;
+  background: var(--dm-cyan);
+  border: 1px solid rgba(8, 185, 202, 0.6);
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--ink);
-  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.1s ease;
+  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.3);
+  transition: all 0.15s ease;
   width: 100%;
   margin-top: 8px;
+  text-decoration: none;
 }}
-.btn-3d:hover {{ background: var(--accent-deep); }}
-.btn-3d:active {{
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 var(--ink);
+.btn-dm:hover {{
+  background: #0aa7b7;
+  box-shadow: 0 6px 18px rgba(8, 185, 202, 0.45);
+  transform: translateY(-1px);
 }}
+.btn-dm:active {{ transform: translateY(0); }}
 .totp-badge {{
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--ink);
+  color: var(--dm-cyan);
   text-align: center;
   margin-bottom: 4px;
 }}
 .totp-help {{
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   text-align: center;
   margin: 0 0 16px;
   line-height: 1.4;
@@ -2302,25 +2325,32 @@ body {{
 .back-link a {{
   font-size: 13px;
   font-weight: 600;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   text-decoration: none;
 }}
 .back-link a:hover {{
-  color: var(--accent-deep);
+  color: var(--dm-cyan);
   text-decoration: underline;
 }}
 .login-error {{
   display: flex;
   gap: 10px;
   align-items: center;
-  background: #fff1ed;
-  border: 2px solid #c14530;
-  color: #8a1c0a;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 18px;
+}}
+.err-dot {{
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  flex-shrink: 0;
 }}
 .step-content {{ display: none; }}
 .step-content.active {{ display: block; }}
@@ -2332,7 +2362,7 @@ body {{
 .auth-footer {{
   margin-top: 24px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.6;
 }}
@@ -2344,13 +2374,13 @@ body {{
   flex-wrap: wrap;
 }}
 .auth-footer-links a {{
-  color: #2dd4bf;
+  color: var(--dm-cyan);
   text-decoration: none;
   font-weight: 600;
 }}
 .auth-footer-links a:hover {{
   text-decoration: underline;
-  color: #5eead4;
+  color: #38bdf8;
 }}
 .auth-security-badge {{
   display: inline-flex;
@@ -2358,7 +2388,7 @@ body {{
   gap: 6px;
   font-size: 11px;
   font-family: var(--font-mono);
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin-top: 6px;
 }}
 </style>
@@ -2371,8 +2401,8 @@ body {{
           {DEV_MANIACS_LOGO_SVG}
         </div>
         <h1 class="brand-title">Dev Maniac's</h1>
-        <span class="brand-tag">Cerberus Intelligence</span>
-        <p class="card-subtitle">Painel de Mem&oacute;ria Corporativa &middot; Acesso Seguro</p>
+        <span class="brand-tag"><span class="err-dot" style="background:var(--dm-cyan);"></span> CERBERUS INTELLIGENCE</span>
+        <p class="card-subtitle">Central de Mem&oacute;ria Corporativa &middot; Acesso Seguro</p>
       </div>
       {error_block}
       <section class="{creds_class}" id="credsStep">
@@ -2392,7 +2422,7 @@ body {{
       </nav>
       <div>&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development. Todos os direitos reservados.</div>
       <div class="auth-security-badge">
-        <span>&#128737; Cloudflare Argo Tunnel Blindado &middot; 2FA TOTP RFC 6238</span>
+        <span>Cloudflare Argo Tunnel Blindado &middot; 2FA TOTP RFC 6238</span>
       </div>
     </footer>
   </div>
@@ -2407,39 +2437,49 @@ def _render_setup_2fa_html(secret_b32: str, otp_uri: str,
         escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;"))
         err_block = (
-            f'<div class="login-error" role="alert">⚠️ '
+            f'<div class="login-error" role="alert"><span class="err-dot"></span> '
             f'<span>{escaped}</span></div>'
         )
     return f'''<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061637">
 <title>Cerberus Inspector &mdash; Configurar 2FA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --bg-deep: #081a38;
-  --card: #fdfbf7;
-  --card-inner: #ffffff;
-  --ink: #061637;
-  --ink-soft: #4a5568;
-  --accent: #14a08f;
-  --accent-deep: #0f7e72;
-  --shadow: rgba(3, 10, 26, 0.45);
-  --font: ui-sans-serif, system-ui, -apple-system, "IBM Plex Sans", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, monospace;
+  --bg-deep: #061637;
+  --bg-deep-2: #0a192f;
+  --bg-elev: #0d2247;
+  --border-dark: #1e3a6d;
+  --ink-light: #f8fafc;
+  --text-muted: #94a3b8;
+  --dm-cyan: #08b9ca;
+  --dm-red: #ff4c4c;
+  --dm-yellow: #ffc529;
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', var(--font);
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }}
 * {{ box-sizing: border-box; }}
-html, body {{ margin: 0; padding: 0; font-family: var(--font); }}
-body {{
-  background: var(--bg-deep);
-  background-image:
-    radial-gradient(ellipse at 50% 10%, rgba(20, 160, 143, 0.15), transparent 70%),
-    url("{WATERMARK_SVG}");
-  background-repeat: repeat;
-  background-size: auto, 240px 120px;
-  color: var(--ink);
+html, body {{
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--ink-light);
+  font-size: 14.5px;
+}}
+body {{
+  background-image:
+    radial-gradient(ellipse at 50% 15%, rgba(8, 185, 202, 0.18), transparent 70%),
+    linear-gradient(180deg, #061637 0%, #0a192f 100%);
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2454,19 +2494,29 @@ body {{
   align-items: center;
 }}
 .card {{
-  background: var(--card);
-  border: 3px solid var(--ink);
+  background: rgba(13, 34, 71, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-dark);
   border-radius: 18px;
   padding: 32px;
   width: 100%;
-  box-shadow: 0 10px 0 var(--shadow);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}}
+.card::before {{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--dm-cyan), var(--dm-yellow));
 }}
 .brand-header {{
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 20px;
-  border-bottom: 2px solid rgba(6, 22, 55, 0.1);
+  border-bottom: 1px solid var(--border-dark);
   padding-bottom: 16px;
 }}
 .brand-logo-wrap {{
@@ -2475,50 +2525,138 @@ body {{
   justify-content: center;
   width: 52px;
   height: 52px;
-  background: #ffffff;
-  border: 2px solid var(--ink);
+  background: #0d2247;
+  border: 1.5px solid rgba(8, 185, 202, 0.5);
   border-radius: 12px;
   flex-shrink: 0;
-  box-shadow: 0 2px 0 var(--ink);
+  box-shadow: 0 0 14px rgba(8, 185, 202, 0.25);
 }}
 .brand-logo-wrap svg {{
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
 }}
-.brand-header h1 {{ margin: 0 0 2px; font-size: 20px; font-weight: 800; text-transform: uppercase; }}
-.brand-header p.subtitle {{ margin: 0; color: var(--ink-soft); font-size: 13px; }}
-.qr-wrap {{ display: flex; gap: 18px; align-items: flex-start; margin-bottom: 20px; }}
-.qr-wrap .svg {{ background: #fff; padding: 12px; border-radius: 10px;
-                 border: 2px solid var(--ink); flex-shrink: 0; }}
+.brand-header h1 {{
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}}
+.brand-header p.subtitle {{
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}}
+.qr-wrap {{
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}}
+.qr-wrap .svg {{
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-dark);
+  flex-shrink: 0;
+}}
 .field {{ margin-bottom: 14px; }}
-.field > span {{ display: block; font-size: 12px; font-weight: 700;
-                  text-transform: uppercase; letter-spacing: 0.04em;
-                  margin-bottom: 6px; }}
-.field input {{ width: 100%; min-height: 46px; padding: 10px 14px;
-                font: inherit; border: 2px solid var(--ink); border-radius: 8px; }}
-.field input:focus {{ outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(20, 160, 143, 0.25); }}
-.totp-input {{ font-family: var(--font-mono); font-size: 20px !important; font-weight: 700; letter-spacing: 0.2em; text-align: center; }}
-.uri-block {{ font-family: var(--font-mono); font-size: 11px; padding: 8px 10px;
-               background: #fff; border: 1.5px solid var(--ink); border-radius: 6px;
-               word-break: break-all; margin: 4px 0 10px; }}
-.btn-3d {{
-  display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; padding: 12px 20px; font: inherit; font-weight: 700;
-  font-size: 15px; color: #fff; background: var(--accent); border: 2px solid var(--ink);
-  border-radius: 10px; cursor: pointer;
-  box-shadow: 0 5px 0 var(--ink); width: 100%;
-  transition: transform 0.06s ease, box-shadow 0.06s ease;
+.field > span {{
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }}
-.btn-3d:hover {{ background: var(--accent-deep); }}
-.btn-3d:active {{ transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }}
-.login-error {{ display: flex; gap: 8px; background: #fff1ed;
-                border: 2px solid #c14530; color: #8a1c0a; padding: 10px 12px;
-                border-radius: 8px; font-size: 13px; margin-bottom: 16px; }}
-.muted {{ color: var(--ink-soft); font-size: 12px; margin: 6px 0 0; line-height: 1.4; }}
+.field input {{
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14.5px;
+  background: rgba(6, 22, 55, 0.85);
+  color: #ffffff;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+}}
+.field input:focus {{
+  outline: none;
+  border-color: var(--dm-cyan);
+  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.25);
+}}
+.totp-input {{
+  font-family: var(--font-mono);
+  font-size: 20px !important;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-align: center;
+}}
+.uri-block {{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 8px 10px;
+  background: #040e24;
+  color: #7dd3fc;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
+  word-break: break-all;
+  margin: 4px 0 10px;
+}}
+.btn-dm {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #fff;
+  background: var(--dm-cyan);
+  border: 1px solid rgba(8, 185, 202, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.3);
+  width: 100%;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}}
+.btn-dm:hover {{
+  background: #0aa7b7;
+  box-shadow: 0 6px 18px rgba(8, 185, 202, 0.45);
+  transform: translateY(-1px);
+}}
+.btn-dm:active {{ transform: translateY(0); }}
+.login-error {{
+  display: flex;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}}
+.err-dot {{
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  flex-shrink: 0;
+}}
+.muted {{
+  color: var(--text-muted);
+  font-size: 12.5px;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}}
 .auth-footer {{
   margin-top: 20px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   font-size: 12px;
 }}
 </style>
@@ -2551,7 +2689,7 @@ body {{
           <input type="text" name="totp" required autofocus inputmode="numeric"
                  pattern="\\d{{8}}" maxlength="8" placeholder="00000000" class="totp-input">
         </label>
-        <button type="submit" class="btn-3d">Ativar 2FA &amp; Continuar &rarr;</button>
+        <button type="submit" class="btn-dm">Ativar 2FA &amp; Continuar &rarr;</button>
       </form>
     </main>
     <footer class="auth-footer">
