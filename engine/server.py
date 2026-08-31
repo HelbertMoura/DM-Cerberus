@@ -80,7 +80,7 @@ def _is_safe_bind_host(host: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# UI HTML — Dev Maniac's Suporte Standard + 3D Neural Brain & Memory Central
+# UI HTML — Dev Maniac's Solid Industrial Standard (HelpDesk & Suporte Standard)
 # ---------------------------------------------------------------------------
 UI_HTML = """<!doctype html>
 <html lang="pt-BR">
@@ -95,36 +95,22 @@ UI_HTML = """<!doctype html>
 <style>
 :root {
   --bg-deep: #061637;
-  --bg-deep-2: #0a192f;
-  --bg-elev: #0d2247;
-  --bg-card: #0f2752;
+  --bg-surface: #0a192f;
+  --bg-card: #0d2247;
+  --bg-card-inner: #061637;
   --bg-legacy: #0F172A;
   --accent-legacy: #1E40AF;
-  --card-light: #ffffff;
-  --card-surface: #f8fafc;
   --border-dark: #1e3a6d;
-  --border-subtle: rgba(30, 58, 109, 0.6);
-  --border-light: #e2e8f0;
-  --ink-dark: #061637;
+  --border-subtle: #152e5a;
+  --border-focus: #08b9ca;
   --ink-light: #f8fafc;
   --text-muted: #94a3b8;
-  --text-muted-dark: #64748b;
+  --text-dim: #64748b;
   --dm-cyan: #08b9ca;
   --dm-red: #ff4c4c;
   --dm-yellow: #ffc529;
   --dm-purple: #8b35d1;
   --dm-blue: #1e40af;
-  --accent: #08b9ca;
-  --accent-deep: #0693a1;
-  --accent-teal: #14a08f;
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.15);
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.15);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.15);
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', var(--font);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -136,30 +122,22 @@ html, body {
   background: var(--bg-deep);
   color: var(--ink-light);
   font-family: var(--font);
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.5;
   min-height: 100vh;
 }
-body {
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(8, 185, 202, 0.18), transparent 70%),
-    radial-gradient(ellipse at 80% 30%, rgba(139, 53, 209, 0.12), transparent 60%),
-    linear-gradient(180deg, #061637 0%, #0a192f 100%);
-  background-attachment: fixed;
-}
 
-/* Header & Brand Navbar (Suporte Style) */
+/* Header Navbar - Solid Industrial Style */
 header {
-  background: rgba(6, 22, 55, 0.92);
-  backdrop-filter: blur(14px);
+  background: #061637;
   border-bottom: 1px solid var(--border-dark);
   padding: 12px 24px;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
 }
 .header-container {
-  max-width: 1360px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -175,13 +153,12 @@ header {
 .brand-icon-box {
   width: 44px;
   height: 44px;
-  background: #0d2247;
-  border: 1.5px solid rgba(8, 185, 202, 0.5);
-  border-radius: 12px;
+  background: #0a192f;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(8, 185, 202, 0.25);
   flex-shrink: 0;
 }
 .brand-icon-box svg { width: 30px; height: 30px; }
@@ -207,25 +184,19 @@ header {
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--dm-cyan);
-  background: rgba(8, 185, 202, 0.12);
+  background: #0a192f;
   padding: 2px 8px;
-  border-radius: 20px;
-  border: 1px solid rgba(8, 185, 202, 0.35);
+  border-radius: 4px;
+  border: 1px solid var(--border-dark);
 }
 .live-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: var(--dm-cyan);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--dm-cyan);
-  animation: pulseGlow 2s infinite ease-in-out;
-}
-@keyframes pulseGlow {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.7; }
 }
 .header-actions {
   display: flex;
@@ -233,7 +204,7 @@ header {
   align-items: center;
 }
 
-/* Modern Buttons (Suporte / Dev Maniac's) */
+/* Solid Buttons (ISO 44px) */
 .btn-dm {
   display: inline-flex;
   align-items: center;
@@ -246,88 +217,69 @@ header {
   font-size: 13.5px;
   color: #ffffff;
   background: var(--dm-cyan);
-  border: 1px solid rgba(8, 185, 202, 0.6);
-  border-radius: 8px;
+  border: 1px solid var(--dm-cyan);
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(8, 185, 202, 0.25);
-  transition: all 0.15s ease;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
   text-decoration: none;
   white-space: nowrap;
 }
 .btn-dm:hover {
   background: #0aa7b7;
-  box-shadow: 0 4px 14px rgba(8, 185, 202, 0.4);
-  transform: translateY(-1px);
+  border-color: #0aa7b7;
 }
-.btn-dm:active { transform: translateY(0); }
 .btn-dm.secondary {
-  background: rgba(13, 34, 71, 0.8);
+  background: #0d2247;
   color: var(--ink-light);
   border-color: var(--border-dark);
-  box-shadow: none;
 }
 .btn-dm.secondary:hover {
-  background: rgba(30, 58, 109, 0.8);
-  border-color: rgba(8, 185, 202, 0.4);
+  background: #122e5e;
+  border-color: var(--dm-cyan);
 }
 .btn-dm.danger {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.4);
-  box-shadow: none;
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
 }
 .btn-dm.danger:hover {
-  background: rgba(239, 68, 68, 0.35);
-  color: #fff;
+  background: #991b1b;
+  color: #ffffff;
 }
 .btn-dm.sm {
   min-height: 38px;
   padding: 6px 14px;
   font-size: 12.5px;
 }
-.btn-dm:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.btn-dm:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Main Container */
 main {
-  max-width: 1360px;
+  max-width: 1400px;
   margin: 20px auto;
   padding: 0 24px 60px;
 }
 
-/* 3D Brain & Hero Section */
-.brain-hero-card {
-  background: linear-gradient(145deg, rgba(13, 34, 71, 0.95) 0%, rgba(6, 22, 55, 0.98) 100%);
-  border: 1px solid var(--border-dark);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow);
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-.brain-hero-card::after {
-  content: "";
-  position: absolute;
-  top: -50px; right: -50px;
-  width: 250px; height: 250px;
-  background: radial-gradient(circle, rgba(8, 185, 202, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-.brain-canvas-wrap {
-  position: relative;
-  width: 100%;
-  height: 290px;
-  background: rgba(6, 22, 55, 0.7);
+/* Knowledge Network Topology Card */
+.topology-card {
+  background: #0a192f;
   border: 1px solid var(--border-dark);
   border-radius: 12px;
-  overflow: hidden;
-  display: flex;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
   align-items: center;
-  justify-content: center;
+}
+.topology-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: #061637;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  overflow: hidden;
 }
 #brainCanvas {
   width: 100%;
@@ -336,87 +288,84 @@ main {
   cursor: grab;
 }
 #brainCanvas:active { cursor: grabbing; }
-.brain-overlay-hud {
+.topology-hud {
   position: absolute;
-  top: 12px; left: 14px;
+  top: 10px; left: 10px;
   font-family: var(--font-mono);
   font-size: 11px;
+  font-weight: 600;
   color: var(--dm-cyan);
-  pointer-events: none;
-  background: rgba(6, 22, 55, 0.75);
+  background: #0a192f;
   padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(8, 185, 202, 0.25);
+  border-radius: 4px;
+  border: 1px solid var(--border-dark);
+  pointer-events: none;
 }
-.brain-live-stream {
+.topology-ticker {
   position: absolute;
-  bottom: 10px; left: 14px; right: 14px;
-  background: rgba(6, 22, 55, 0.88);
-  border: 1px solid rgba(8, 185, 202, 0.35);
-  border-radius: 8px;
+  bottom: 10px; left: 10px; right: 10px;
+  background: #0a192f;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
   padding: 6px 12px;
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: #a5f3fc;
+  color: #e2e8f0;
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow: hidden;
   white-space: nowrap;
+  overflow: hidden;
 }
-.thought-dot {
+.ticker-indicator {
   width: 8px; height: 8px;
   background: var(--dm-yellow);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--dm-yellow);
+  border-radius: 2px;
   flex-shrink: 0;
 }
-.brain-info-side {
+.topology-info {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
-.brain-info-side h2 {
+.topology-info h2 {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   margin: 0;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
-.brain-info-side p {
-  font-size: 13.5px;
+.topology-info p {
+  font-size: 13px;
   color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
 }
-.brain-stats-mini {
+.topology-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-.mini-stat {
-  background: rgba(13, 34, 71, 0.6);
+.topology-metric-box {
+  background: #0d2247;
   border: 1px solid var(--border-dark);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 10px 12px;
 }
-.mini-stat-num {
+.topology-metric-val {
   font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   color: #ffffff;
 }
-.mini-stat-label {
+.topology-metric-lbl {
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
-/* Hero Stats Bar */
+/* Metric Cards Grid */
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -424,31 +373,11 @@ main {
   margin-bottom: 24px;
 }
 .stat-card {
-  background: rgba(13, 34, 71, 0.75);
-  backdrop-filter: blur(10px);
+  background: #0a192f;
   border: 1px solid var(--border-dark);
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 18px 20px;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.15s ease, border-color 0.15s ease;
 }
-.stat-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(8, 185, 202, 0.4);
-}
-.stat-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--dm-cyan);
-}
-.stat-card.blue::before { background: var(--dm-blue); }
-.stat-card.purple::before { background: var(--dm-purple); }
-.stat-card.green::before { background: var(--success); }
-.stat-card.yellow::before { background: var(--dm-yellow); }
 .stat-header {
   display: flex;
   align-items: center;
@@ -456,28 +385,27 @@ main {
   margin-bottom: 6px;
 }
 .stat-title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 .stat-tag {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
-  background: rgba(8, 185, 202, 0.1);
+  background: #0d2247;
   color: var(--dm-cyan);
-  border: 1px solid rgba(8, 185, 202, 0.25);
+  border: 1px solid var(--border-dark);
 }
 .stat-value {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   color: #ffffff;
-  letter-spacing: -0.02em;
   margin: 4px 0;
 }
 .stat-desc {
@@ -486,16 +414,15 @@ main {
   margin: 0;
 }
 
-/* Nav Tabs Bar (Suporte Standard) */
+/* Navigation Tabs */
 .nav-tabs {
   display: flex;
-  gap: 8px;
-  background: rgba(13, 34, 71, 0.6);
-  backdrop-filter: blur(8px);
+  gap: 6px;
+  background: #0a192f;
   border: 1px solid var(--border-dark);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 6px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 .nav-tab {
@@ -508,57 +435,47 @@ main {
   padding: 8px 16px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 6px;
   font-family: var(--font);
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 .nav-tab:hover {
   color: #ffffff;
-  background: rgba(30, 58, 109, 0.4);
+  background: #0d2247;
 }
 .nav-tab.active {
   background: #0d2247;
   color: #ffffff;
-  border-color: rgba(8, 185, 202, 0.4);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-color: var(--dm-cyan);
 }
 .nav-tab .badge {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
   padding: 2px 6px;
-  border-radius: 10px;
-  background: rgba(8, 185, 202, 0.2);
+  border-radius: 4px;
+  background: #061637;
   color: var(--dm-cyan);
+  border: 1px solid var(--border-dark);
 }
 .nav-tab.active .badge {
   background: var(--dm-cyan);
-  color: var(--bg-deep);
+  color: #061637;
 }
 
 /* Tab Panels */
-.tab-panel {
-  display: none;
-  animation: tabFade 0.2s ease;
-}
+.tab-panel { display: none; }
 .tab-panel.active { display: block; }
-@keyframes tabFade {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
 /* Content Box Cards */
 .content-box {
-  background: rgba(13, 34, 71, 0.75);
-  backdrop-filter: blur(10px);
+  background: #0a192f;
   border: 1px solid var(--border-dark);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: var(--shadow);
   margin-bottom: 24px;
 }
 .content-box-header {
@@ -594,24 +511,22 @@ main {
 }
 .search-input-wrap {
   flex: 1 1 340px;
-  position: relative;
 }
 .search-input-wrap input {
   width: 100%;
   min-height: 46px;
   padding: 10px 16px;
   font: inherit;
-  font-size: 14.5px;
-  background: rgba(6, 22, 55, 0.85);
+  font-size: 14px;
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
+  border-radius: 6px;
   color: #ffffff;
 }
 .search-input-wrap input:focus,
 select:focus {
   outline: none;
   border-color: var(--dm-cyan);
-  box-shadow: 0 0 0 3px rgba(8, 185, 202, 0.2);
 }
 select {
   min-height: 46px;
@@ -619,9 +534,9 @@ select {
   font: inherit;
   font-size: 13.5px;
   font-weight: 500;
-  background: rgba(6, 22, 55, 0.85);
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
+  border-radius: 6px;
   color: #ffffff;
   cursor: pointer;
 }
@@ -634,7 +549,7 @@ select {
 }
 .chips-label {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
@@ -645,16 +560,15 @@ select {
   padding: 4px 12px;
   font-size: 12px;
   font-weight: 500;
-  background: rgba(13, 34, 71, 0.8);
+  background: #0d2247;
   border: 1px solid var(--border-dark);
-  border-radius: 6px;
+  border-radius: 4px;
   color: #93c5fd;
   cursor: pointer;
-  transition: all 0.12s ease;
 }
 .chip:hover {
   background: var(--dm-cyan);
-  color: var(--bg-deep);
+  color: #061637;
   border-color: var(--dm-cyan);
 }
 
@@ -665,16 +579,13 @@ select {
   gap: 12px;
 }
 .result-card {
-  background: rgba(6, 22, 55, 0.75);
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 18px 20px;
-  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 .result-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(8, 185, 202, 0.5);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  border-color: var(--dm-cyan);
 }
 .result-card-header {
   display: flex;
@@ -706,32 +617,33 @@ select {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 3px 8px;
-  border-radius: 5px;
-  border: 1px solid transparent;
+  border-radius: 4px;
+  border: 1px solid var(--border-dark);
+  background: #0d2247;
 }
-.pill.project { background: rgba(30, 64, 175, 0.25); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
-.pill.authority { background: rgba(8, 185, 202, 0.2); color: #a5f3fc; border-color: rgba(8, 185, 202, 0.3); }
-.pill.score { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+.pill.project { color: #93c5fd; }
+.pill.authority { color: #a5f3fc; }
+.pill.score { color: #cbd5e1; }
 .result-snippet {
   font-size: 13px;
   line-height: 1.6;
-  color: #cbd5e1;
-  background: rgba(13, 34, 71, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  color: #e2e8f0;
+  background: #0a192f;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
   padding: 12px 14px;
   margin-bottom: 12px;
 }
 .result-snippet mark, .result-snippet b {
-  background: rgba(255, 197, 41, 0.3);
+  background: #854d0e;
   font-weight: 700;
   color: #fef08a;
   padding: 1px 3px;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 /* Candidate Inbox */
@@ -754,16 +666,15 @@ select {
   font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
-  background: rgba(6, 22, 55, 0.6);
+  background: #061637;
   color: var(--text-muted);
   border: 1px solid var(--border-dark);
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.12s ease;
 }
 .filter-tab-btn.active {
   background: var(--dm-cyan);
-  color: var(--bg-deep);
+  color: #061637;
   border-color: var(--dm-cyan);
 }
 .candidates-grid {
@@ -772,9 +683,9 @@ select {
   gap: 12px;
 }
 .candidate-card {
-  background: rgba(6, 22, 55, 0.75);
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 18px 20px;
 }
 .candidate-card-top {
@@ -794,7 +705,7 @@ select {
 }
 .candidate-desc {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-muted);
   margin: 4px 0 10px;
 }
@@ -815,13 +726,14 @@ select {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-radius: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-dark);
 }
-.tag.candidate { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
-.tag.verified { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-.tag.quarantined { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
-.tag.canonical { background: rgba(139, 53, 209, 0.25); color: #d8b4fe; border: 1px solid rgba(139, 53, 209, 0.3); }
-.tag.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.tag.candidate { background: #1e3a6d; color: #93c5fd; }
+.tag.verified { background: #064e3b; color: #6ee7b7; border-color: #059669; }
+.tag.quarantined { background: #78350f; color: #fde68a; border-color: #d97706; }
+.tag.canonical { background: #581c87; color: #e9d5ff; border-color: #7e22ce; }
+.tag.rejected { background: #7f1d1d; color: #fca5a5; border-color: #dc2626; }
 
 /* Project Explorer */
 .projects-grid {
@@ -830,18 +742,16 @@ select {
   gap: 16px;
 }
 .project-card {
-  background: rgba(6, 22, 55, 0.75);
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 .project-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(8, 185, 202, 0.4);
+  border-color: var(--dm-cyan);
 }
 .project-card-header {
   display: flex;
@@ -868,52 +778,53 @@ select {
   display: flex;
   justify-content: space-between;
   padding: 5px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Guide / Como Usar */
+/* Guide */
 .guide-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 .guide-card {
-  background: rgba(6, 22, 55, 0.75);
+  background: #061637;
   border: 1px solid var(--border-dark);
-  border-radius: 14px;
-  padding: 22px;
+  border-radius: 8px;
+  padding: 20px;
 }
 .guide-card-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  background: rgba(8, 185, 202, 0.15);
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  background: #0d2247;
+  border: 1px solid var(--border-dark);
   color: var(--dm-cyan);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .guide-card h3 {
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 16px;
   color: #ffffff;
   margin: 0 0 8px;
 }
 .guide-card p {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin: 0 0 14px;
+  line-height: 1.5;
+  margin: 0 0 12px;
 }
 .code-snippet {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  background: #040e24;
+  background: #030a1c;
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 12px;
   color: #7dd3fc;
   overflow-x: auto;
@@ -930,7 +841,7 @@ select {
   font-size: 13.5px;
 }
 .system-table td:first-child {
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
   width: 240px;
   text-transform: uppercase;
@@ -939,7 +850,7 @@ select {
 }
 .system-table td:last-child {
   font-family: var(--font-mono);
-  color: #94a3b8;
+  color: #cbd5e1;
   word-break: break-all;
 }
 
@@ -947,34 +858,27 @@ select {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(6, 22, 55, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(3, 10, 26, 0.85);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 200;
   padding: 24px;
 }
 .modal-backdrop.open { display: flex; }
 .modal {
-  background: #0a1f4d;
-  border: 1px solid rgba(8, 185, 202, 0.4);
-  border-radius: 16px;
+  background: #0a192f;
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
   max-width: 980px;
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   overflow: hidden;
-  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.96) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-header {
-  padding: 18px 24px;
+  padding: 16px 20px;
   background: #061637;
   border-bottom: 1px solid var(--border-dark);
   display: flex;
@@ -984,17 +888,17 @@ select {
 .modal-header h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #ffffff;
 }
 .modal-body {
-  padding: 20px 24px;
+  padding: 20px;
   overflow-y: auto;
   flex: 1;
 }
 .modal-footer {
-  padding: 16px 24px;
+  padding: 14px 20px;
   background: #061637;
   border-top: 1px solid var(--border-dark);
   display: flex;
@@ -1005,11 +909,11 @@ select {
 .code-viewer {
   font-family: var(--font-mono);
   font-size: 12px;
-  background: #040e24;
+  background: #030a1c;
   color: #e2e8f0;
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 6px;
+  padding: 14px;
   white-space: pre-wrap;
   word-break: break-word;
   max-height: 500px;
@@ -1022,60 +926,53 @@ select {
   position: fixed;
   top: 80px;
   right: 24px;
-  z-index: 120;
+  z-index: 250;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 .toast {
   min-height: 44px;
-  padding: 12px 18px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   gap: 10px;
-  animation: toastIn 0.25s ease;
 }
 .toast.ok { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
 .toast.error { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 36px 20px;
   color: var(--text-muted);
   border: 1px dashed var(--border-dark);
-  border-radius: 12px;
-  background: rgba(6, 22, 55, 0.4);
+  border-radius: 8px;
+  background: #061637;
 }
-.empty-state p { margin: 6px 0 0; font-size: 13.5px; }
+.empty-state p { margin: 6px 0 0; font-size: 13px; }
 
 /* Institutional Footer */
 .main-footer {
   margin-top: 40px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.6;
 }
 .main-footer a {
   color: var(--dm-cyan);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 .main-footer a:hover {
   text-decoration: underline;
-  color: #38bdf8;
 }
 
 @media (max-width: 900px) {
-  .brain-hero-card { grid-template-columns: 1fr; }
+  .topology-card { grid-template-columns: 1fr; }
   header { padding: 12px 16px; }
   main { padding: 0 16px 40px; }
   .header-container { flex-direction: column; align-items: stretch; }
@@ -1115,9 +1012,9 @@ select {
       </div>
     </div>
     <div class="header-actions">
-      <button id="reindex-btn" class="btn-dm sm secondary" type="button" title="Reindexar arquivos no disco">Reindexar Mem&oacute;ria</button>
-      <button id="setup-2fa-btn" class="btn-dm sm secondary" type="button" title="Configura&ccedil;&otilde;es 2FA">2FA Ativo</button>
-      <button id="logout-btn" class="btn-dm sm danger" type="button" title="Encerrar sess&atilde;o">Sair</button>
+      <button id="reindex-btn" class="btn-dm sm secondary" type="button">Reindexar Mem&oacute;ria</button>
+      <button id="setup-2fa-btn" class="btn-dm sm secondary" type="button">2FA Ativo</button>
+      <button id="logout-btn" class="btn-dm sm danger" type="button">Sair</button>
     </div>
   </div>
 </header>
@@ -1125,62 +1022,62 @@ select {
 <main>
   <div id="flash"></div>
 
-  <!-- 3D Brain & Neural Network Simulation Card -->
-  <section class="brain-hero-card">
-    <div class="brain-canvas-wrap">
+  <!-- Knowledge Topology Card -->
+  <section class="topology-card">
+    <div class="topology-canvas-wrap">
       <canvas id="brainCanvas"></canvas>
-      <div class="brain-overlay-hud">3D NEURAL TOPOLOGY &middot; ROTATE &amp; ZOOM</div>
-      <div class="brain-live-stream">
-        <span class="thought-dot"></span>
-        <span id="thought-stream-text">Conectando ao grafo de sinapses do Cerberus...</span>
+      <div class="topology-hud">TOPOLOGIA DE MEMÓRIA &middot; NÓS E SINAPSES</div>
+      <div class="topology-ticker">
+        <span class="ticker-indicator"></span>
+        <span id="thought-stream-text">Conectado à malha de projetos e chunks do Cerberus.</span>
       </div>
     </div>
-    <div class="brain-info-side">
+    <div class="topology-info">
       <div>
-        <h2>C&eacute;rebro Neural Ativo</h2>
-        <p>O Cerberus conecta 12 projetos e 1.254 fragmentos de conhecimento em uma rede sem&acirc;ntica 3D unificada.</p>
+        <h2>Base de Conhecimento Ativa</h2>
+        <p>O Cerberus indexa e cruza regras de negócio, ADRs, arquitetura e aprendizados de todos os projetos da Dev Maniac's.</p>
       </div>
-      <div class="brain-stats-mini">
-        <div class="mini-stat">
-          <div class="mini-stat-num" id="mini-stat-nodes">12</div>
-          <div class="mini-stat-label">N&oacute;s de Projeto</div>
+      <div class="topology-metrics">
+        <div class="topology-metric-box">
+          <div class="topology-metric-val" id="mini-stat-nodes">12</div>
+          <div class="topology-metric-lbl">Projetos</div>
         </div>
-        <div class="mini-stat">
-          <div class="mini-stat-num" id="mini-stat-synapses">1.254</div>
-          <div class="mini-stat-label">Sinapses &amp; Chunks</div>
+        <div class="topology-metric-box">
+          <div class="topology-metric-val" id="mini-stat-synapses">1.254</div>
+          <div class="topology-metric-lbl">Chunks &amp; Sinapses</div>
         </div>
       </div>
-      <button class="btn-dm sm" id="hero-explore-btn" type="button">Explorar Base de Mem&oacute;ria &rarr;</button>
+      <button class="btn-dm sm" id="hero-explore-btn" type="button">Pesquisar Mem&oacute;ria &rarr;</button>
     </div>
   </section>
 
-  <!-- Hero Metrics -->
+  <!-- Metric Cards Grid -->
   <section class="hero-grid">
     <div class="stat-card">
       <div class="stat-header">
-        <span class="stat-title">Arquivos Rastreados</span>
+        <span class="stat-title">Arquivos Monitorados</span>
         <span class="stat-tag" id="stat-projects-count">0 PROJETOS</span>
       </div>
       <div class="stat-value" id="m-files">&mdash;</div>
       <p class="stat-desc">Arquivos no reposit&oacute;rio can&ocirc;nico</p>
     </div>
-    <div class="stat-card blue">
+    <div class="stat-card">
       <div class="stat-header">
         <span class="stat-title">Documentos &amp; Chunks</span>
         <span class="stat-tag">FTS5 + VETORES</span>
       </div>
       <div class="stat-value" id="m-docs">&mdash;</div>
-      <p class="stat-desc">Indexados em banco SQLite FTS5</p>
+      <p class="stat-desc">Fragmentos indexados em banco SQLite</p>
     </div>
-    <div class="stat-card yellow">
+    <div class="stat-card">
       <div class="stat-header">
-        <span class="stat-title">Candidatos na Inbox</span>
+        <span class="stat-title">Candidatos Inbox</span>
         <span class="stat-tag">AUTO-CAPTURE</span>
       </div>
       <div class="stat-value" id="m-inbox">&mdash;</div>
       <p class="stat-desc">Aprendizados pendentes de aprova&ccedil;&atilde;o</p>
     </div>
-    <div class="stat-card green">
+    <div class="stat-card">
       <div class="stat-header">
         <span class="stat-title">Motor de Busca</span>
         <span class="stat-tag" id="m-fts">ONLINE</span>
@@ -1190,7 +1087,7 @@ select {
     </div>
   </section>
 
-  <!-- Nav Tabs Bar -->
+  <!-- Nav Tabs -->
   <nav class="nav-tabs" aria-label="Navega&ccedil;&atilde;o principal">
     <button class="nav-tab active" data-tab="tab-search" type="button">
       <span>Busca &amp; Intelig&ecirc;ncia</span>
@@ -1210,13 +1107,13 @@ select {
     </button>
   </nav>
 
-  <!-- Tab 1: Busca & Memória -->
+  <!-- Tab 1: Busca -->
   <section id="tab-search" class="tab-panel active">
     <div class="content-box">
       <div class="content-box-header">
         <div>
           <h2>Busca H&iacute;brida de Mem&oacute;ria</h2>
-          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es de todos os agentes da Dev Maniac's.</p>
+          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es corporativas.</p>
         </div>
       </div>
 
@@ -1248,19 +1145,19 @@ select {
       <div id="search-results">
         <div class="empty-state">
           <strong>Pronto para pesquisar</strong>
-          <p>Digite uma pergunta ou selecione uma hashtag acima para navegar pela mem&oacute;ria do Cerberus.</p>
+          <p>Digite uma pergunta ou clique em um atalho acima para consultar a base.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Tab 2: Caixa de Entrada & Candidatos -->
+  <!-- Tab 2: Caixa de Entrada -->
   <section id="tab-inbox" class="tab-panel">
     <div class="content-box">
       <div class="content-box-header">
         <div>
           <h2>Caixa de Entrada &amp; Candidatos (Inbox)</h2>
-          <p>Pipeline de captura autom&aacute;tica de aprendizados gerados pelos agentes de IA.</p>
+          <p>Aprendizados e decisões capturados automaticamente pelos agentes de IA.</p>
         </div>
         <button id="refresh-btn" class="btn-dm sm secondary" type="button">Atualizar Inbox</button>
       </div>
@@ -1274,9 +1171,6 @@ select {
           <button class="filter-tab-btn" data-status="CANONICAL" type="button">CANONICAL</button>
           <button class="filter-tab-btn" data-status="REJECTED" type="button">REJECTED</button>
         </div>
-        <select id="inbox-filter" style="display:none;" aria-label="Filtro de status">
-          <option value="">(todos)</option>
-        </select>
       </div>
 
       <div id="inbox-table">
@@ -1303,13 +1197,13 @@ select {
     </div>
   </section>
 
-  <!-- Tab 4: Como Usar o Cérebro (Guia Completo) -->
+  <!-- Tab 4: Como Usar o Cérebro -->
   <section id="tab-guide" class="tab-panel">
     <div class="content-box">
       <div class="content-box-header">
         <div>
           <h2>Como Usar o C&eacute;rebro (Cerberus Intelligence)</h2>
-          <p>Entenda como humanos e agentes de IA consultam, aprendem e colaboram com a mem&oacute;ria.</p>
+          <p>Entenda como humanos e agentes de IA consultam e promovem memória.</p>
         </div>
       </div>
 
@@ -1317,9 +1211,8 @@ select {
         <div class="guide-card">
           <div class="guide-card-icon">1</div>
           <h3>Como a IA Consulta a Mem&oacute;ria</h3>
-          <p>Os agentes aut&ocirc;nomos (Gemini Maestro, Codex, MiniMax M3, GLM) acessam o Cerberus via protocolo MCP ou REST API antes de qualquer tarefa de c&oacute;digo.</p>
+          <p>Agentes aut&ocirc;nomos (Gemini Maestro, Codex, MiniMax M3, GLM) acessam o Cerberus via MCP ou REST antes de programar.</p>
           <div class="code-snippet">
-            // Chamada MCP pelo Agente:<br>
             cerberus_get_context_pack({<br>
             &nbsp;&nbsp;project: "dm-erp",<br>
             &nbsp;&nbsp;task_type: "backend_feature"<br>
@@ -1330,27 +1223,26 @@ select {
         <div class="guide-card">
           <div class="guide-card-icon">2</div>
           <h3>Como o Humano Consulta &amp; Audita</h3>
-          <p>Use esta interface web para fazer pesquisas r&aacute;pidas por regras de neg&oacute;cio, arquitetura e ADRs, ou auditar os aprendizados dos agentes na aba <strong>Caixa de Entrada</strong>.</p>
+          <p>Faça pesquisas na aba <strong>Busca &amp; Inteligência</strong> ou audite novos aprendizados na aba <strong>Caixa de Entrada</strong>.</p>
           <div class="code-snippet">
-            // Exemplo de busca r&aacute;pida:<br>
-            "Como funciona o isolamento multi-tenant?"<br>
-            Modo: H&iacute;brido (FTS5 + Vetores RRF)
+            Busca: "Como funciona o isolamento multi-tenant?"<br>
+            Modo: Híbrido (FTS5 BM25 + Vetores RRF)
           </div>
         </div>
 
         <div class="guide-card">
           <div class="guide-card-icon">3</div>
-          <h3>Ciclo de Vida do Aprendizado</h3>
-          <p>Quando um agente resolve um bug ou cria um padr&atilde;o, ele envia para o Cerberus como <code>CANDIDATE</code>. O QA valida (<code>VERIFIED</code>) e o PO Helbert promove para <code>CANONICAL</code> com 1 clique.</p>
+          <h3>Ciclo de Aprendizado</h3>
+          <p>O agente envia como <code>CANDIDATE</code>, o QA verifica (<code>VERIFIED</code>) e o PO Helbert promove para <code>CANONICAL</code>.</p>
           <div class="code-snippet">
-            CANDIDATE &rarr; VERIFIED &rarr; CANONICAL (Promover)
+            CANDIDATE &rarr; VERIFIED &rarr; CANONICAL (Promovido)
           </div>
         </div>
 
         <div class="guide-card">
           <div class="guide-card-icon">4</div>
-          <h3>Uso Direto no Terminal (CLI)</h3>
-          <p>Voc&ecirc; tamb&eacute;m pode consultar a mem&oacute;ria diretamente da linha de comando na pasta do projeto:</p>
+          <h3>Comandos no Terminal (CLI)</h3>
+          <p>Consulte diretamente da linha de comando na raiz do projeto:</p>
           <div class="code-snippet">
             python bin/cerberus search "multi-tenant"<br>
             python bin/cerberus status<br>
@@ -1377,7 +1269,7 @@ select {
           <tr><td>Motor SQLite FTS5</td><td id="sys-fts">&mdash;</td></tr>
           <tr><td>Embeddings &amp; Vetores</td><td>HashingDenseEmbeddingProvider (256-dim feature hashing, L2 normalized)</td></tr>
           <tr><td>Rank Fusion</td><td>Reciprocal Rank Fusion (RRF k=60, determin&iacute;stico)</td></tr>
-          <tr><td>Seguran&ccedil;a &amp; Autentica&ccedil;&atilde;o</td><td>Cookie de Sess&atilde;o Assinado HMAC-SHA256 &middot; 2FA TOTP RFC 6238 &middot; Rate Limiting Ativo</td></tr>
+          <tr><td>Seguran&ccedil;a &amp; Autentica&ccedil;&atilde;o</td><td>Cookie de Sess&atilde;o HMAC-SHA256 &middot; 2FA TOTP RFC 6238 &middot; Rate Limiting</td></tr>
         </tbody>
       </table>
     </div>
@@ -1412,23 +1304,25 @@ select {
 </div>
 
 <script>
-(function () {
+document.addEventListener("DOMContentLoaded", function () {
   "use strict";
   const flash = document.getElementById("flash");
   function notice(kind, msg) {
-    if (!msg) return;
+    if (!msg || !flash) return;
     const div = document.createElement("div");
     div.className = "toast " + (kind === "ok" ? "ok" : "error");
-    div.innerHTML = (kind === "ok" ? "[OK] " : "[AVISO] ") + esc(msg);
+    div.textContent = (kind === "ok" ? "[OK] " : "[AVISO] ") + msg;
     flash.appendChild(div);
     setTimeout(() => { div.remove(); }, 4000);
   }
+
   async function getJSON(url) {
     const r = await fetch(url, { headers: { "Accept": "application/json" } });
     const text = await r.text();
     if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
     return JSON.parse(text);
   }
+
   async function postJSON(url, body) {
     const r = await fetch(url, {
       method: "POST",
@@ -1442,246 +1336,240 @@ select {
     if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
     return JSON.parse(text);
   }
+
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   }
+
   function statusTag(status) {
     const s = String(status || "").toUpperCase();
     return '<span class="tag ' + esc(s.toLowerCase()) + '">' + esc(s) + '</span>';
   }
 
-  // ------- 3D Neural Brain & Synaptic Simulation -------
-  function initBrainSimulation() {
-    const canvas = document.getElementById("brainCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let width = (canvas.width = canvas.parentElement.clientWidth);
-    let height = (canvas.height = canvas.parentElement.clientHeight);
-
-    window.addEventListener("resize", () => {
-      if (!canvas.parentElement) return;
-      width = canvas.width = canvas.parentElement.clientWidth;
-      height = canvas.height = canvas.parentElement.clientHeight;
+  // ------- 1. Tab Switching (Isolated & Fail-Safe) -------
+  try {
+    const tabs = document.querySelectorAll(".nav-tab");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const targetId = tab.dataset.tab;
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        const activePanel = document.getElementById(targetId);
+        if (activePanel) activePanel.classList.add("active");
+      });
     });
-
-    const projectLabels = ["DM-ERP", "BIOLAR", "HELPDEV", "TEENUS", "_GLOBAL", "_SHARED", "DMPDV", "APAE", "DESK", "ORCH", "VECTORS", "FTS5"];
-    const nodes = [];
-    const nodeCount = projectLabels.length;
-
-    // Distribute nodes in a 3D sphere (Fibonacci lattice)
-    for (let i = 0; i < nodeCount; i++) {
-      const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-      const radius = 100;
-      nodes.push({
-        x: radius * Math.sin(phi) * Math.cos(theta),
-        y: radius * Math.sin(phi) * Math.sin(theta),
-        z: radius * Math.cos(phi),
-        label: projectLabels[i],
-        color: i % 4 === 0 ? "#08b9ca" : (i % 4 === 1 ? "#ff4c4c" : (i % 4 === 2 ? "#ffc529" : "#8b35d1")),
-        size: 5 + (i % 3) * 2
+    const exploreBtn = document.getElementById("hero-explore-btn");
+    if (exploreBtn) {
+      exploreBtn.addEventListener("click", () => {
+        const searchTab = document.querySelector('.nav-tab[data-tab="tab-search"]');
+        if (searchTab) searchTab.click();
       });
     }
-
-    // Generate ambient neural particles
-    const particles = [];
-    for (let i = 0; i < 40; i++) {
-      const r = 40 + Math.random() * 85;
-      const p = Math.random() * Math.PI * 2;
-      const t = Math.random() * Math.PI;
-      particles.push({
-        x: r * Math.sin(t) * Math.cos(p),
-        y: r * Math.sin(t) * Math.sin(p),
-        z: r * Math.cos(t),
-        size: 1.5 + Math.random() * 1.5
-      });
-    }
-
-    let rotX = 0.2;
-    let rotY = 0.3;
-    let isDragging = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-
-    canvas.addEventListener("mousedown", e => {
-      isDragging = true;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-    });
-    window.addEventListener("mouseup", () => isDragging = false);
-    window.addEventListener("mousemove", e => {
-      if (!isDragging) return;
-      const dx = e.clientX - lastMouseX;
-      const dy = e.clientY - lastMouseY;
-      rotY += dx * 0.008;
-      rotX += dy * 0.008;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-    });
-
-    let pulseTime = 0;
-    function render3D() {
-      ctx.clearRect(0, 0, width, height);
-      if (!isDragging) {
-        rotY += 0.005;
-        rotX += 0.002;
-      }
-      pulseTime += 0.04;
-
-      const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-      const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-
-      function project(p3) {
-        // Rotate Y
-        let x1 = p3.x * cosY + p3.z * sinY;
-        let z1 = -p3.x * sinY + p3.z * cosY;
-        // Rotate X
-        let y2 = p3.y * cosX - z1 * sinX;
-        let z2 = p3.y * sinX + z1 * cosX;
-
-        const fov = 260;
-        const scale = fov / (fov + z2 + 130);
-        return {
-          x: width / 2 + x1 * scale,
-          y: height / 2 + y2 * scale,
-          scale: scale,
-          z: z2
-        };
-      }
-
-      // Draw Synaptic Filaments
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y, nodes[i].z - nodes[j].z);
-          if (dist < 160) {
-            const p1 = project(nodes[i]);
-            const p2 = project(nodes[j]);
-            const alpha = Math.max(0.08, (1 - dist / 160) * 0.4);
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(8, 185, 202, ${alpha})`;
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-
-            // Synapse energy pulse traveling along axon
-            const pulsePos = (Math.sin(pulseTime + i * 2 + j) + 1) / 2;
-            const px = p1.x + (p2.x - p1.x) * pulsePos;
-            const py = p1.y + (p2.y - p1.y) * pulsePos;
-            ctx.beginPath();
-            ctx.arc(px, py, 2, 0, Math.PI * 2);
-            ctx.fillStyle = "#ffc529";
-            ctx.fill();
-          }
-        }
-      }
-
-      // Draw Particles
-      particles.forEach(p => {
-        const pr = project(p);
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, p.size * pr.scale, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139, 53, 209, ${0.3 * pr.scale})`;
-        ctx.fill();
-      });
-
-      // Draw Nodes (sorted by Z depth)
-      const projectedNodes = nodes.map(n => ({ ...n, pr: project(n) }));
-      projectedNodes.sort((a, b) => b.pr.z - a.pr.z);
-
-      projectedNodes.forEach(n => {
-        const pr = n.pr;
-        // Node Glow
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, n.size * pr.scale * 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = n.color + "33";
-        ctx.fill();
-
-        // Node Body
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, n.size * pr.scale, 0, Math.PI * 2);
-        ctx.fillStyle = n.color;
-        ctx.fill();
-
-        // Label
-        if (pr.scale > 0.7) {
-          ctx.font = `600 ${Math.max(9, Math.round(11 * pr.scale))}px 'Space Grotesk', sans-serif`;
-          ctx.fillStyle = "#ffffff";
-          ctx.fillText(n.label, pr.x + 8 * pr.scale, pr.y + 4 * pr.scale);
-        }
-      });
-
-      requestAnimationFrame(render3D);
-    }
-    render3D();
-
-    // Live Thought Stream Rotation
-    const thoughts = [
-      "[Gemini Maestro] Orquestrando pipeline de memória multi-agente... [OK]",
-      "[Cerberus Engine] 1.254 chunks indexados em SQLite FTS5 + Vetores RRF...",
-      "[MiniMax M3] Consultando regras de negócio do RadierHUB e Teenus...",
-      "[Codex GPT-5.6] Validando embeddings densos (256-dim L2)...",
-      "[GLM-5.3 Max] Auditando isolamento estrutural multi-tenant...",
-      "[Auto-Capture] Monitorando novas decisões arquiteturais (ADRs)..."
-    ];
-    let thoughtIdx = 0;
-    setInterval(() => {
-      thoughtIdx = (thoughtIdx + 1) % thoughts.length;
-      const el = document.getElementById("thought-stream-text");
-      if (el) el.textContent = thoughts[thoughtIdx];
-    }, 4000);
+  } catch (err) {
+    console.error("Tab setup error:", err);
   }
 
-  // ------- Tabs Switching -------
-  const tabs = document.querySelectorAll(".nav-tab");
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      const targetId = tab.dataset.tab;
-      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-      const activePanel = document.getElementById(targetId);
-      if (activePanel) activePanel.classList.add("active");
-    });
-  });
+  // ------- 2. Knowledge Topology Canvas (Solid & Interactive) -------
+  function initTopologyCanvas() {
+    try {
+      const canvas = document.getElementById("brainCanvas");
+      if (!canvas || !canvas.parentElement) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-  document.getElementById("hero-explore-btn").addEventListener("click", () => {
-    document.querySelector('.nav-tab[data-tab="tab-search"]').click();
-  });
+      let width = (canvas.width = canvas.parentElement.clientWidth || 600);
+      let height = (canvas.height = canvas.parentElement.clientHeight || 280);
 
-  // ------- Status & Metrics -------
-  let serverProjects = [];
+      window.addEventListener("resize", () => {
+        if (!canvas.parentElement) return;
+        width = canvas.width = canvas.parentElement.clientWidth || 600;
+        height = canvas.height = canvas.parentElement.clientHeight || 280;
+      });
+
+      const projectLabels = ["DM-ERP", "BIOLAR", "HELPDEV", "TEENUS", "_GLOBAL", "_SHARED", "DMPDV", "APAE", "DESK", "ORCH", "VECTORS", "FTS5"];
+      const nodes = [];
+      const nodeCount = projectLabels.length;
+
+      for (let i = 0; i < nodeCount; i++) {
+        const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        const radius = 90;
+        nodes.push({
+          x: radius * Math.sin(phi) * Math.cos(theta),
+          y: radius * Math.sin(phi) * Math.sin(theta),
+          z: radius * Math.cos(phi),
+          label: projectLabels[i],
+          color: i % 4 === 0 ? "#08b9ca" : (i % 4 === 1 ? "#ff4c4c" : (i % 4 === 2 ? "#ffc529" : "#1e40af")),
+          size: 6
+        });
+      }
+
+      let rotX = 0.2;
+      let rotY = 0.3;
+      let isDragging = false;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+
+      canvas.addEventListener("mousedown", e => {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      });
+      window.addEventListener("mouseup", () => isDragging = false);
+      window.addEventListener("mousemove", e => {
+        if (!isDragging) return;
+        const dx = e.clientX - lastMouseX;
+        const dy = e.clientY - lastMouseY;
+        rotY += dx * 0.008;
+        rotX += dy * 0.008;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      });
+
+      let pulseTime = 0;
+      function renderLoop() {
+        try {
+          ctx.fillStyle = "#061637";
+          ctx.fillRect(0, 0, width, height);
+
+          if (!isDragging) {
+            rotY += 0.004;
+            rotX += 0.001;
+          }
+          pulseTime += 0.03;
+
+          const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+          const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+          function project(p3) {
+            let x1 = p3.x * cosY + p3.z * sinY;
+            let z1 = -p3.x * sinY + p3.z * cosY;
+            let y2 = p3.y * cosX - z1 * sinX;
+            let z2 = p3.y * sinX + z1 * cosX;
+
+            const fov = 260;
+            const scale = fov / (fov + z2 + 130);
+            return {
+              x: width / 2 + x1 * scale,
+              y: height / 2 + y2 * scale,
+              scale: scale,
+              z: z2
+            };
+          }
+
+          // Connections
+          for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+              const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y, nodes[i].z - nodes[j].z);
+              if (dist < 150) {
+                const p1 = project(nodes[i]);
+                const p2 = project(nodes[j]);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = "rgba(30, 58, 109, 0.7)";
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                const pulsePos = (Math.sin(pulseTime + i + j) + 1) / 2;
+                const px = p1.x + (p2.x - p1.x) * pulsePos;
+                const py = p1.y + (p2.y - p1.y) * pulsePos;
+                ctx.beginPath();
+                ctx.arc(px, py, 2, 0, Math.PI * 2);
+                ctx.fillStyle = "#08b9ca";
+                ctx.fill();
+              }
+            }
+          }
+
+          // Nodes
+          const projectedNodes = nodes.map(n => ({ ...n, pr: project(n) }));
+          projectedNodes.sort((a, b) => b.pr.z - a.pr.z);
+
+          projectedNodes.forEach(n => {
+            const pr = n.pr;
+            ctx.beginPath();
+            ctx.arc(pr.x, pr.y, n.size * pr.scale, 0, Math.PI * 2);
+            ctx.fillStyle = n.color;
+            ctx.fill();
+
+            if (pr.scale > 0.7) {
+              ctx.font = "bold 11px 'Space Grotesk', sans-serif";
+              ctx.fillStyle = "#ffffff";
+              ctx.fillText(n.label, pr.x + 8, pr.y + 4);
+            }
+          });
+
+          requestAnimationFrame(renderLoop);
+        } catch (e) {
+          console.error("Render loop error:", e);
+        }
+      }
+      renderLoop();
+
+      // Thought stream ticker
+      const streamMessages = [
+        "[Cerberus] 822 chunks indexados em SQLite FTS5 + Vetores RRF...",
+        "[Gemini Maestro] Orquestrando governança e pipelines multi-agente...",
+        "[MiniMax M3] Consultando regras de negócio do RadierHUB e Teenus...",
+        "[Codex GPT-5.6] Validando integridade relacional e embeddings...",
+        "[Auto-Capture] Monitorando novas decisões de arquitetura (ADRs)..."
+      ];
+      let msgIdx = 0;
+      setInterval(() => {
+        msgIdx = (msgIdx + 1) % streamMessages.length;
+        const ticker = document.getElementById("thought-stream-text");
+        if (ticker) ticker.textContent = streamMessages[msgIdx];
+      }, 4000);
+    } catch (err) {
+      console.error("Topology init error:", err);
+    }
+  }
+
+  // ------- 3. Status & Metrics Engine -------
   async function refreshStatus() {
     try {
       const s = await getJSON("/api/status");
-      document.getElementById("m-files").textContent = s.files;
-      document.getElementById("m-docs").textContent = s.documents;
-      document.getElementById("m-inbox").textContent = s.inbox_count;
-      document.getElementById("nav-inbox-badge").textContent = s.inbox_count;
-      document.getElementById("m-fts").textContent = s.fts5 ? "ONLINE" : "OFFLINE";
-      document.getElementById("stat-projects-count").textContent = (s.projects ? s.projects.length : 0) + " PROJETOS";
-      
+      const elFiles = document.getElementById("m-files");
+      if (elFiles) elFiles.textContent = s.files;
+      const elDocs = document.getElementById("m-docs");
+      if (elDocs) elDocs.textContent = s.documents;
+      const elInbox = document.getElementById("m-inbox");
+      if (elInbox) elInbox.textContent = s.inbox_count;
+      const elNavBadge = document.getElementById("nav-inbox-badge");
+      if (elNavBadge) elNavBadge.textContent = s.inbox_count;
+      const elFts = document.getElementById("m-fts");
+      if (elFts) elFts.textContent = s.fts5 ? "ONLINE" : "OFFLINE";
+      const elCount = document.getElementById("stat-projects-count");
+      if (elCount) elCount.textContent = (s.projects ? s.projects.length : 0) + " PROJETOS";
+
       const miniSynapses = document.getElementById("mini-stat-synapses");
       if (miniSynapses) miniSynapses.textContent = s.documents;
       const miniNodes = document.getElementById("mini-stat-nodes");
       if (miniNodes) miniNodes.textContent = s.projects ? s.projects.length : 12;
 
-      document.getElementById("sys-bind").textContent = esc(s.bind_host) + ":" + s.bind_port + " (Cloudflare Argo Tunnel)";
-      document.getElementById("sys-root").textContent = esc(s.canonical_root);
-      document.getElementById("sys-fts").textContent = s.fts5 ? "SQLite FTS5 Ativo (Tokenize: porter unicode61)" : "FTS5 Indisponível";
+      const sysBind = document.getElementById("sys-bind");
+      if (sysBind) sysBind.textContent = esc(s.bind_host) + ":" + s.bind_port + " (Cloudflare Argo Tunnel)";
+      const sysRoot = document.getElementById("sys-root");
+      if (sysRoot) sysRoot.textContent = esc(s.canonical_root);
+      const sysFts = document.getElementById("sys-fts");
+      if (sysFts) sysFts.textContent = s.fts5 ? "SQLite FTS5 Ativo (Tokenize: porter unicode61)" : "FTS5 Indisponível";
 
-      serverProjects = s.projects || [];
       const sel = document.getElementById("search-project");
-      sel.innerHTML = '<option value="">(todos os projetos)</option>';
-      serverProjects.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p;
-        opt.textContent = p;
-        sel.appendChild(opt);
-      });
+      if (sel) {
+        sel.innerHTML = '<option value="">(todos os projetos)</option>';
+        (s.projects || []).forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p;
+          opt.textContent = p;
+          sel.appendChild(opt);
+        });
+      }
 
       renderProjectsGrid(s);
     } catch (e) {
+      console.error("Status error:", e);
       notice("error", "Erro ao carregar status: " + e.message);
     }
   }
@@ -1691,7 +1579,7 @@ select {
     if (!container) return;
     const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
     const indexed = stats.indexed_projects || [];
-    
+
     container.innerHTML = projects.map(p => {
       const isIndexed = indexed.includes(p);
       return `
@@ -1716,33 +1604,41 @@ select {
     container.querySelectorAll(".filter-project-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const proj = btn.dataset.project;
-        document.getElementById("search-project").value = proj;
-        document.querySelector('.nav-tab[data-tab="tab-search"]').click();
+        const selProj = document.getElementById("search-project");
+        if (selProj) selProj.value = proj;
+        const tabBtn = document.querySelector('.nav-tab[data-tab="tab-search"]');
+        if (tabBtn) tabBtn.click();
         runSearch();
       });
     });
   }
 
-  // ------- Search Execution -------
+  // ------- 4. Search Execution Engine -------
   async function runSearch() {
-    const q = document.getElementById("search-q").value.trim();
-    const project = document.getElementById("search-project").value;
-    const mode = document.getElementById("search-mode").value;
+    const inputQ = document.getElementById("search-q");
+    const selectProj = document.getElementById("search-project");
+    const selectMode = document.getElementById("search-mode");
+    const out = document.getElementById("search-results");
+    if (!out) return;
+
+    const q = inputQ ? inputQ.value.trim() : "";
+    const project = selectProj ? selectProj.value : "";
+    const mode = selectMode ? selectMode.value : "hybrid";
+
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (project) params.set("project", project);
     params.set("mode", mode);
-    
-    const out = document.getElementById("search-results");
-    out.innerHTML = '<div class="empty-state"><strong>Buscando na base de conhecimento...</strong><p>Executando busca vetorial e léxica com rank fusion.</p></div>';
-    
+
+    out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base vetorial e léxica.</p></div>';
+
     try {
       const r = await getJSON("/api/search?" + params.toString());
       if (!r.results || !r.results.length) {
         out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova o filtro de projeto.</p></div>';
         return;
       }
-      
+
       const cards = r.results.map(item => `
         <div class="result-card">
           <div class="result-card-header">
@@ -1762,7 +1658,7 @@ select {
           <div class="result-snippet">${item.snippet || '(sem snippet)'}</div>
         </div>
       `).join("");
-      
+
       out.innerHTML = `<div class="results-grid">${cards}</div>`;
       out.querySelectorAll(".view-doc-btn").forEach(btn => {
         btn.addEventListener("click", () => openDocument(btn.dataset.id));
@@ -1775,22 +1671,35 @@ select {
   // Quick Chips
   document.querySelectorAll(".chip").forEach(chip => {
     chip.addEventListener("click", () => {
-      document.getElementById("search-q").value = chip.dataset.query;
+      const inputQ = document.getElementById("search-q");
+      if (inputQ) inputQ.value = chip.dataset.query;
       runSearch();
     });
   });
 
-  // ------- Candidate Inbox -------
+  const searchBtn = document.getElementById("search-btn");
+  if (searchBtn) searchBtn.addEventListener("click", runSearch);
+  const searchInput = document.getElementById("search-q");
+  if (searchInput) {
+    searchInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") runSearch();
+    });
+  }
+
+  // ------- 5. Candidate Inbox Engine -------
   let activeInboxFilter = "";
   async function refreshInbox() {
-    const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
     const out = document.getElementById("inbox-table");
-    
+    if (!out) return;
+    const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
+
     try {
       const r = await getJSON(url);
       const list = r.candidates || [];
-      document.getElementById("nav-inbox-badge").textContent = list.length;
-      document.getElementById("m-inbox").textContent = list.length;
+      const badge = document.getElementById("nav-inbox-badge");
+      if (badge) badge.textContent = list.length;
+      const mInbox = document.getElementById("m-inbox");
+      if (mInbox) mInbox.textContent = list.length;
 
       if (!list.length) {
         out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com o status selecionado.</p></div>';
@@ -1827,7 +1736,6 @@ select {
     }
   }
 
-  // Filter tab buttons
   document.querySelectorAll(".filter-tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
@@ -1837,11 +1745,10 @@ select {
     });
   });
 
-  // Direct Candidate Actions
   async function promoteCandidateDirect(id) {
     try {
-      const r = await postJSON("/api/inbox/" + encodeURIComponent(id) + "/promote");
-      notice("ok", "Item promovido para a memória canônica com sucesso.");
+      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/promote");
+      notice("ok", "Item promovido para a memória canônica.");
       refreshInbox();
       refreshStatus();
     } catch (e) { notice("error", "Erro ao promover: " + e.message); }
@@ -1856,125 +1763,152 @@ select {
     } catch (e) { notice("error", "Erro ao rejeitar: " + e.message); }
   }
 
-  // ------- Modals (Document & Candidate) -------
+  // ------- 6. Modal Windows -------
   let currentCandidate = null;
   async function openCandidate(id) {
     try {
       const c = await getJSON("/api/inbox/" + encodeURIComponent(id));
       currentCandidate = c;
-      document.getElementById("modal-title").textContent = c.title + " (" + c.candidate_id + ")";
+      const title = document.getElementById("modal-title");
+      if (title) title.textContent = c.title + " (" + c.candidate_id + ")";
       const body = document.getElementById("modal-body");
-      body.innerHTML = `
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
-          ${statusTag(c.status)}
-          <span class="pill project">${esc(c.project_id)}</span>
-          <span class="pill authority">Task: ${esc(c.task_id)}</span>
-          <span class="pill score">Agente: ${esc(c.agent)}</span>
-        </div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Conteúdo do Aprendizado</h4>
-        <div class="code-viewer">${esc(c.content)}</div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Diff de Promoção Canônica</h4>
-        <div class="code-viewer">${esc(c.diff || '(nenhum diff registrado)')}</div>
-      `;
-      
+      if (body) {
+        body.innerHTML = `
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+            ${statusTag(c.status)}
+            <span class="pill project">${esc(c.project_id)}</span>
+            <span class="pill authority">Task: ${esc(c.task_id)}</span>
+            <span class="pill score">Agente: ${esc(c.agent)}</span>
+          </div>
+          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Conteúdo</h4>
+          <div class="code-viewer">${esc(c.content)}</div>
+          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Diff Canônico</h4>
+          <div class="code-viewer">${esc(c.diff || '(nenhum diff registrado)')}</div>
+        `;
+      }
       const promoteBtn = document.getElementById("modal-promote");
       const rejectBtn = document.getElementById("modal-reject");
-      promoteBtn.style.display = (c.status === "VERIFIED") ? "inline-flex" : "none";
-      rejectBtn.style.display = (c.status !== "CANONICAL") ? "inline-flex" : "none";
-      
-      document.getElementById("modal").classList.add("open");
+      if (promoteBtn) promoteBtn.style.display = (c.status === "VERIFIED") ? "inline-flex" : "none";
+      if (rejectBtn) rejectBtn.style.display = (c.status !== "CANONICAL") ? "inline-flex" : "none";
+      const modal = document.getElementById("modal");
+      if (modal) modal.classList.add("open");
     } catch (e) { notice("error", "Erro ao abrir candidato: " + e.message); }
   }
 
   async function openDocument(id) {
     try {
       const doc = await getJSON("/api/document?id=" + encodeURIComponent(id));
-      document.getElementById("modal-title").textContent = doc.title;
+      const title = document.getElementById("modal-title");
+      if (title) title.textContent = doc.title;
       const body = document.getElementById("modal-body");
-      body.innerHTML = `
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
-          <span class="pill project">${esc(doc.project_id)}</span>
-          <span class="pill authority">Autoridade: ${esc(doc.authority_level)}</span>
-          <span class="pill score">Tipo: ${esc(doc.source_type)}</span>
-          <span class="pill score">${esc(doc.source_path)}</span>
-        </div>
-        <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Texto Completo do Documento</h4>
-        <div class="code-viewer">${esc(doc.full_text || doc.snippet || '(sem texto)')}</div>
-      `;
-      document.getElementById("modal-promote").style.display = "none";
-      document.getElementById("modal-reject").style.display = "none";
-      document.getElementById("modal").classList.add("open");
+      if (body) {
+        body.innerHTML = `
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+            <span class="pill project">${esc(doc.project_id)}</span>
+            <span class="pill authority">Autoridade: ${esc(doc.authority_level)}</span>
+            <span class="pill score">Tipo: ${esc(doc.source_type)}</span>
+            <span class="pill score">${esc(doc.source_path)}</span>
+          </div>
+          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Texto Completo</h4>
+          <div class="code-viewer">${esc(doc.full_text || doc.snippet || '(sem texto)')}</div>
+        `;
+      }
+      const promoteBtn = document.getElementById("modal-promote");
+      const rejectBtn = document.getElementById("modal-reject");
+      if (promoteBtn) promoteBtn.style.display = "none";
+      if (rejectBtn) rejectBtn.style.display = "none";
+      const modal = document.getElementById("modal");
+      if (modal) modal.classList.add("open");
     } catch (e) {
       notice("error", "Erro ao carregar documento: " + e.message);
     }
   }
 
-  function closeModal() { document.getElementById("modal").classList.remove("open"); }
-  document.getElementById("modal-close").addEventListener("click", closeModal);
-  document.getElementById("modal-close-x").addEventListener("click", closeModal);
-  document.getElementById("modal").addEventListener("click", e => {
-    if (e.target.id === "modal") closeModal();
-  });
+  function closeModal() {
+    const modal = document.getElementById("modal");
+    if (modal) modal.classList.remove("open");
+  }
+  const closeBtn = document.getElementById("modal-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  const closeBtnX = document.getElementById("modal-close-x");
+  if (closeBtnX) closeBtnX.addEventListener("click", closeModal);
+  const modalElem = document.getElementById("modal");
+  if (modalElem) {
+    modalElem.addEventListener("click", e => {
+      if (e.target.id === "modal") closeModal();
+    });
+  }
   window.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-  document.getElementById("modal-promote").addEventListener("click", async () => {
-    if (!currentCandidate) return;
-    await promoteCandidateDirect(currentCandidate.candidate_id);
-    closeModal();
-  });
-  document.getElementById("modal-reject").addEventListener("click", async () => {
-    if (!currentCandidate) return;
-    await rejectCandidateDirect(currentCandidate.candidate_id);
-    closeModal();
-  });
+  const modalPromote = document.getElementById("modal-promote");
+  if (modalPromote) {
+    modalPromote.addEventListener("click", async () => {
+      if (!currentCandidate) return;
+      await promoteCandidateDirect(currentCandidate.candidate_id);
+      closeModal();
+    });
+  }
+  const modalReject = document.getElementById("modal-reject");
+  if (modalReject) {
+    modalReject.addEventListener("click", async () => {
+      if (!currentCandidate) return;
+      await rejectCandidateDirect(currentCandidate.candidate_id);
+      closeModal();
+    });
+  }
 
-  // Re-indexing
-  document.getElementById("reindex-btn").addEventListener("click", async () => {
-    const btn = document.getElementById("reindex-btn");
-    btn.disabled = true;
-    btn.textContent = "Reindexando...";
-    try {
-      const res = await postJSON("/api/reindex");
-      notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
-      await refreshStatus();
-      await refreshInbox();
-    } catch (e) {
-      notice("error", "Erro ao reindexar: " + e.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Reindexar Memória";
-    }
-  });
+  // ------- 7. Re-indexing & Auth Handlers -------
+  const reindexBtn = document.getElementById("reindex-btn");
+  if (reindexBtn) {
+    reindexBtn.addEventListener("click", async () => {
+      reindexBtn.disabled = true;
+      reindexBtn.textContent = "Reindexando...";
+      try {
+        const res = await postJSON("/api/reindex");
+        notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
+        await refreshStatus();
+        await refreshInbox();
+      } catch (e) {
+        notice("error", "Erro ao reindexar: " + e.message);
+      } finally {
+        reindexBtn.disabled = false;
+        reindexBtn.textContent = "Reindexar Memória";
+      }
+    });
+  }
 
-  // Listeners
-  document.getElementById("refresh-btn").addEventListener("click", refreshInbox);
-  document.getElementById("search-btn").addEventListener("click", runSearch);
-  document.getElementById("search-q").addEventListener("keydown", e => {
-    if (e.key === "Enter") runSearch();
-  });
+  const refreshBtn = document.getElementById("refresh-btn");
+  if (refreshBtn) refreshBtn.addEventListener("click", refreshInbox);
 
-  document.getElementById("logout-btn").addEventListener("click", async () => {
-    try {
-      await postJSON("/auth/logout");
-      window.location.href = "/auth/login";
-    } catch (e) {
-      window.location.href = "/auth/login";
-    }
-  });
-  document.getElementById("setup-2fa-btn").addEventListener("click", () => {
-    window.location.href = "/auth/setup-2fa";
-  });
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await postJSON("/auth/logout");
+        window.location.href = "/auth/login";
+      } catch (e) {
+        window.location.href = "/auth/login";
+      }
+    });
+  }
+
+  const setup2faBtn = document.getElementById("setup-2fa-btn");
+  if (setup2faBtn) {
+    setup2faBtn.addEventListener("click", () => {
+      window.location.href = "/auth/setup-2fa";
+    });
+  }
 
   if (window.location.search.includes("setup=ok")) {
     notice("ok", "2FA configurado com sucesso.");
   }
 
-  // Initial Boot
-  initBrainSimulation();
+  // ------- 8. Boot Sequence -------
+  initTopologyCanvas();
   refreshStatus();
   refreshInbox();
   runSearch();
-})();
+});
 </script>
 </body>
 </html>
