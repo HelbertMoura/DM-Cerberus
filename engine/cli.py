@@ -105,6 +105,23 @@ def main():
     # Command: mcp
     p_mcp = subparsers.add_parser("mcp", help="Iniciar servidor MCP stdio")
 
+    # Command: ui / serve (Phase P3 - Localhost Inspector)
+    for cmd_name, cmd_help in (
+        ("ui", "Iniciar o Inspector Web UI (loopback-only por padrão)"),
+        ("serve", "Alias de 'ui' para o Inspector Web UI"),
+    ):
+        p_ui = subparsers.add_parser(cmd_name, help=cmd_help)
+        p_ui.add_argument("--host", type=str, default=None,
+                          help=f"Bind host (default: 127.0.0.1; loopback-only)")
+        p_ui.add_argument("--port", type=int, default=None,
+                          help="Bind port (default: 7331)")
+        p_ui.add_argument("--no-browser", action="store_true",
+                          help="Não abrir o browser do sistema no launch")
+        p_ui.add_argument("--open-browser", action="store_true", default=False,
+                          help="Abrir o browser do sistema no launch")
+        p_ui.add_argument("--canonical-root", type=str, default=None,
+                          help="Override CERBERUS_ROOT para esta sessão")
+
     # Command: session-context (Phase P2 - Orchestrator integration)
     p_sess = subparsers.add_parser(
         "session-context",
@@ -147,6 +164,22 @@ def main():
         server = CerberusMCPServer()
         server.run_stdio()
         return
+
+    if args.command in {"ui", "serve"}:
+        from engine.server import (
+            DEFAULT_HOST, DEFAULT_PORT,
+            make_server, run_from_args,
+        )
+        host = args.host or os.environ.get("CERBERUS_UI_HOST", DEFAULT_HOST)
+        port = args.port or int(os.environ.get("CERBERUS_UI_PORT", str(DEFAULT_PORT)))
+        from types import SimpleNamespace
+        ns = SimpleNamespace(
+            host=host, port=port,
+            canonical_root=args.canonical_root,
+            no_browser=args.no_browser,
+            open_browser=args.open_browser,
+        )
+        return run_from_args(ns)
 
     roots = [r for r in get_default_roots() if r.exists()]
     canonical_root = roots[0] if roots else Path(__file__).resolve().parent.parent

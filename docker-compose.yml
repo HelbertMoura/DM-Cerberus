@@ -1,0 +1,82 @@
+# Cerberus Memory Intelligence — Inspector (Production Stack)
+# Phase P3.5 · docker compose v2
+#
+# Usage:
+#   cp .env.example .env   # edit CERBERUS_SECRET_KEY + CLOUDFLARE_TUNNEL_TOKEN
+#   docker compose up -d
+#   open http://127.0.0.1:7331 in the browser
+#
+# Notes:
+#   * The Inspector binds 127.0.0.1:7331 INSIDE the container by default.
+#     For LAN access, set CERBERUS_UI_ALLOW_LAN=1 in .env and restart.
+#   * `cloudflared` runs as a NAMED tunnel (requires
+#     `CLOUDFLARE_TUNNEL_TOKEN` from the Cloudflare Zero Trust dashboard).
+#     The Quick-Tunnel profile is also retained under `quick-tunnel` for
+#     ad-hoc demos; remove it in production.
+
+services:
+
+  cerberus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cerberus-inspector:local
+    container_name: cerberus-inspector
+    restart: unless-stopped
+    environment:
+      CERBERUS_ROOT: /data
+      CERBERUS_UI_HOST: 0.0.0.0
+      CERBERUS_UI_PORT: "7331"
+      CERBERUS_UI_ALLOW_LAN: "1"
+      CERBERUS_AUTH_DISABLE: "0"
+      CERBERUS_SECRET_KEY: ${CERBERUS_SECRET_KEY:?set a strong secret in .env}
+      CERBERUS_ADMIN_EMAIL: ${CERBERUS_ADMIN_EMAIL:-helbert.moura@devmaniacs.com.br}
+      CERBERUS_ADMIN_PASSWORD: ${CERBERUS_ADMIN_PASSWORD:?set an initial admin password}
+      # FIX-007: trust proxy headers + secure cookies when behind CF.
+      CERBERUS_TRUST_PROXY: ${CERBERUS_TRUST_PROXY:-1}
+      CERBERUS_SECURE_COOKIES: ${CERBERUS_SECURE_COOKIES:-1}
+    volumes:
+      - cerberus-data:/data
+    networks:
+      - cerberus-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "-w", "%{http_code}\n",
+             "http://127.0.0.1:7331/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  cloudflared:                # Named tunnel — recommended for production.
+    image: cloudflare/cloudflared:2024.12.2
+    container_name: cerberus-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set the named-tunnel token from Cloudflare Zero Trust}
+    networks:
+      - cerberus-net
+    depends_on:
+      cerberus:
+        condition: service_healthy
+    profiles: ["tunnel", "default"]      # default-on when token provided
+
+  cloudflared-quick:          # Quick Tunnel — opt-in for demos.
+    image: cloudflare/cloudflared:2024.12.2
+    container_name: cerberus-cloudflared-quick
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --metrics 0.0.0.0:2000
+    networks:
+      - cerberus-net
+    depends_on:
+      - cerberus
+    profiles: ["quick-tunnel"]
+
+volumes:
+  cerberus-data:
+    name: cerberus-data
+
+networks:
+  cerberus-net:
+    name: cerberus-net
+    driver: bridge
