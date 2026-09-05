@@ -46,6 +46,9 @@ Regras que valem para **TODOS** os produtos Dev Maniac's. Ficam em `global/`:
 | [`global/security-baseline.md`](./global/security-baseline.md) | Baseline de segurança que todo produto deve atender. |
 | [`global/parallel-agents.md`](./global/parallel-agents.md) | Regra de paralelismo entre agentes (sem shared worktree, sem shared prod, etc.). |
 | [`global/documentation-policy.md`](./global/documentation-policy.md) | Política de documentação: frontmatter, nomenclatura, one-topic-one-file, ADR, learnings. |
+| [`global/langflow-rag-mcp-guide.md`](./global/langflow-rag-mcp-guide.md) | Padrão arquitetural de RAG visual com Langflow e exportação de servidores MCP para produtos. |
+| [`global/public-apis-catalog.md`](./global/public-apis-catalog.md) | Catálogo canônico de 1.400+ APIs públicas gratuitas (Brasil, clima, CEP, CNPJ, câmbio). |
+| [`global/skills-catalog.md`](./global/skills-catalog.md) | Catálogo canônico de skills externas adotadas (Ponytail, Osmani cherry-pick, Graphify), licenças e guardrails. |
 
 **Ponteiros para fontes canônicas externas (não duplicar):**
 

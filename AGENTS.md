@@ -44,6 +44,7 @@ Você é um agente (humano ou IA) chegando ao **DM-CEREBRO** — o Segundo Cére
 | **Tarefa de banco/dados** | AGENTS.md → INDEX.md → projects/<proj>/database.md (QUANDO PRESENTE) → architecture.md (QUANDO PRESENTE) → decisions (QUANDO PRESENTE) |
 | **Tarefa de frontend/UX** | AGENTS.md → INDEX.md → projects/<proj>/project-state.md (QUANDO PRESENTE) → architecture.md (QUANDO PRESENTE) → ux/accessibility docs (QUANDO PRESENTE) |
 | **Tarefa de IA/governança** | AGENTS.md → INDEX.md → global/ai-governance.md → global/model-routing.md → global/parallel-agents.md → global/qa-policy.md |
+| **Tarefa com uso de skills/automação** | AGENTS.md → INDEX.md → global/skills-catalog.md → skills/<skill>/SKILL.md |
 | **Tarefa de deploy/infra** | AGENTS.md → INDEX.md → global/deploy-governance.md → global/security-baseline.md → projects/<proj>/deployment* (QUANDO PRESENTE) |
 
 > O `projects/<proj>/index.md` é o **mapa de roteamento** do projeto — não é conteúdo. Ele diz **o que ler** para cada tipo de tarefa.
@@ -128,6 +129,8 @@ O mesmo princípio vale para qualquer modelo futuro. Sem exceção.
 | Baseline de segurança | [`global/security-baseline.md`](./global/security-baseline.md) |
 | Regra de paralelismo | [`global/parallel-agents.md`](./global/parallel-agents.md) |
 | Política de documentação | [`global/documentation-policy.md`](./global/documentation-policy.md) |
+| Arquitetura RAG & MCP (Langflow) | [`global/langflow-rag-mcp-guide.md`](./global/langflow-rag-mcp-guide.md) |
+| Catálogo de APIs Públicas Gratuitas | [`global/public-apis-catalog.md`](./global/public-apis-catalog.md) |
 | Memória executiva global | [`MEMORY.md`](./MEMORY.md) |
 | Decisões globais (ADRs) | [`DECISIONS.md`](./DECISIONS.md) |
 | Lições globais | [`LEARNINGS.md`](./LEARNINGS.md) |
