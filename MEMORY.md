@@ -24,9 +24,10 @@ status: ativo
 
 ---
 
-## 🎨 Prioridade 1: Design Iterativo com MiniMax M3
-* **Motor de UI Oficial:** O **MiniMax M3** é o especialista canônico de Frontend, UI/UX e Godot 4.x.
-* **Processo Iterativo de Design:** Construção de interfaces com componentes atômicos reutilizáveis, tokens de design consolidados, validação visual contínua (live preview / screenshots) e acessibilidade WCAG.
+## 🎨 Prioridade 1: Design Profissional Anti-Vibecode & Inteligência Frontend
+* **Papel de Frontend:** Conduzido pelo Implementation Engineer alocado, guiado pelo `DESIGN.md` do projeto e pela `frontend-toolbox`.
+* **Anti-AI Aesthetic:** Proibição de clichês automáticos (gradiente roxo/azul genérico, glassmorphism em tudo, cards flutuantes idênticos, bento grids sem função). Foco em hierarquia tipográfica forte, densidade adequada ao caso de uso, ritmo visual orgânico e acessibilidade WCAG.
+* **Componentes Reutilizáveis:** Não reinventar primitivas complexas (tabelas densas, combobox, date pickers) quando bibliotecas maduras e acessíveis estiverem disponíveis na Toolbox. A biblioteca fornece capacidade; a identidade visual vem do `DESIGN.md`.
 
 ---
 

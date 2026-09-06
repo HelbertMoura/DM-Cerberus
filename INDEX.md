@@ -47,13 +47,19 @@ Regras que valem para **TODOS** os produtos Dev Maniac's. Ficam em `global/`:
 | [`global/parallel-agents.md`](./global/parallel-agents.md) | Regra de paralelismo entre agentes (sem shared worktree, sem shared prod, etc.). |
 | [`global/documentation-policy.md`](./global/documentation-policy.md) | Política de documentação: frontmatter, nomenclatura, one-topic-one-file, ADR, learnings. |
 | [`global/langflow-rag-mcp-guide.md`](./global/langflow-rag-mcp-guide.md) | Padrão arquitetural de RAG visual com Langflow e exportação de servidores MCP para produtos. |
-| [`global/public-apis-catalog.md`](./global/public-apis-catalog.md) | Catálogo canônico de 1.400+ APIs públicas gratuitas (Brasil, clima, CEP, CNPJ, câmbio). |
 | [`global/skills-catalog.md`](./global/skills-catalog.md) | Catálogo canônico de skills externas adotadas (Ponytail, Osmani cherry-pick, Graphify), licenças e guardrails. |
+| [`global/taxonomy.md`](./global/taxonomy.md) | Taxonomia canônica V2: distinção entre Knowledge, Skill, Task, Memory, Tool, Library, Pattern, Reference e Model + regra anti-bloat. |
 
-**Ponteiros para fontes canônicas externas (não duplicar):**
+---
 
-- **dm-erp (RadierHUB)**: `docs/brain/wiki/protocolo-equipe-ai.md` é a fonte canônica multimodelo. `global/ai-governance.md` e `global/model-routing.md` deste cérebro **referenciam** essa fonte.
-- **Governança AI oficial registrada:** TASK-GOV-AI-008 (26/08/2026) · ADR-014 no dm-erp.
+## 2.1 Padrões de Interface (UI Pattern Library)
+
+Padrões canônicos reutilizáveis de UX/UI mantidos em [`ui-patterns/`](./ui-patterns/):
+- [`ui-patterns/navigation.md`](./ui-patterns/navigation.md) — Tabs, bottom nav, mobile safe areas, drawer.
+- [`ui-patterns/forms.md`](./ui-patterns/forms.md) — Progressive forms, inline validation, masked inputs.
+- [`ui-patterns/overlays.md`](./ui-patterns/overlays.md) — Dialogs, sheets, popovers, command palettes.
+- [`ui-patterns/data-display.md`](./ui-patterns/data-display.md) — Master-detail, data grids densos, interactive cards.
+- [`ui-patterns/interaction.md`](./ui-patterns/interaction.md) — Feedback, active indicators, purposeful motion.
 
 ---
 
@@ -77,29 +83,27 @@ Cada projeto da Dev Maniac's tem sua pasta `projects/<slug>/` com **pelo menos**
 
 ---
 
-## 4. Read Order Canônico (canonical read order)
+## 4. Read Order Canônico V2 (Minimal Persistent Context & Progressive Loading)
 
-Para **qualquer tarefa**, a sequência mínima é:
+A leitura do cérebro é **estritamente proporcional ao escopo da tarefa**:
 
 ```text
-1. /AGENTS.md                ← entry point universal
-2. /INDEX.md                 ← este arquivo
-3. /global/<doc aplicável>   ← governança
-4. /projects/<slug>/index.md ← mapa do projeto
-5. /projects/<slug>/project-state.md  ← estado atual (QUANDO PRESENTE)
-6. /projects/<slug>/handover.md      ← continuidade operacional (QUANDO PRESENTE)
-7. docs específicos da tarefa
+TAREFA TRIVIAL (typo, 1 linha, estilo isolado)
+→ Ler apenas o arquivo alvo + teste local imediato. Zero overhead.
+
+TAREFA NORMAL DE COMPONENTE / FEATURE (via Task Contract)
+1. Task Contract (recebido do Maestro)
+2. Arquivos-alvo do escopo + DESIGN.md (se UI)
+3. Referências específicas sob demanda (ex: ui-patterns/ ou skills/<skill>/references/)
+4. Testes locais e correlacionados
+
+TAREFA ESTRUTURAL / ARQUITETURA / SEGURANÇA
+1. /AGENTS.md + /global/security-baseline.md ou /global/ai-governance.md
+2. /projects/<slug>/index.md + architecture.md / decisions.md
+3. Gate formal e suíte abrangente
 ```
 
-> **Regra sobre arquivos opcionais:** `project-state.md`, `handover.md`, `architecture.md`, `decisions.md`, `learnings.md`, `roadmap.md`, `security.md`, `database.md`, `api.md`, etc. **só devem ser lidos se existirem** no `projects/<slug>/` do projeto. Se ausentes, o `index.md` age como router único e você **NÃO** deve inventar arquivos vazios só para satisfazer o read order.
-
-**Exemplos:**
-
-- **Tarefa de NOC/SOC** (hipotética, em dm-desk): ler `dm-desk/noc-soc.md` + `dm-desk/ai-operations.md` + `global/security-baseline.md`.
-- **Tarefa de SEFAZ em Biolar**: ler `biolar/arquitetura.md` + `biolar/deploy.md` + `global/security-baseline.md` + `wiki/fiscal-sefaz-a1.md` (legado global).
-- **Tarefa de UI/accessibility em dev-maniacs-site**: ler `dev-maniacs-site/index.md` (se preenchido) + `global/qa-policy.md`.
-
-> **Não** preload o cérebro inteiro. Cada `index.md` traz um **Document Routing Guide** explícito.
+> **Regra V2 de Ouro:** NUNCA force o agente a reler o cérebro inteiro para consertar um botão. Carregue apenas o que o Task Contract delimitar.
 
 ---
 

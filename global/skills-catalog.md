@@ -32,6 +32,17 @@ status: ativo
 2. **QA/gate de segurança (5.3, auditoria) NUNCA usa grafo** — lê código real, sempre.
 3. Build code-only direto por CLI exige os passos A/B/C da skill (fast path: semantic vazio + merge + build); reconstrução por cache AST documentada em `migra/scratch/seg-glm-20260903/graphify-from-cache.py`.
 
+## 4. saiforanocode (Dev Maniac's · Metodologia Canônica V2 · MIT)
+
+**O quê:** Roteador progressivo anti-vibecode, enriquecimento AEO/GEO e qualidade frontend. Purgou o monólito de 1.082 linhas em um roteador raiz (<80 linhas) com 8 referências e 5 workflows carregados sob demanda.
+**Instalada em:** `DM-Cerebro/skills/saiforanocode/` e espelhada nos runtimes Claude e Gemini.
+**Guardrails:** *Audit-first, fix-on-approval*; anonimização técnica obrigatória; pt-BR impecável; clichês de IA (gradiente roxo, glassmorphism, bento grids gratuitos) proibidos como escolhas automáticas.
+
+## 5. frontend-toolbox (Dev Maniac's · Catálogo de Capacidades V2)
+
+**O quê:** Matriz de decisão de engenharia frontend. Integra primitivas maduras (Radix, Base UI, TanStack), ferramentas especializadas (**Shader Gradient**), referências visuais (**Refero Styles**) e bibliotecas opcionais (**Cult UI**).
+**Guardrails:** Component library NÃO define a identidade visual (quem define é o `DESIGN.md`); **Manus** é referência externa experimental, NÃO integrado ao core; nunca instalar biblioteca pesada para botão simples.
+
 ## Pendências avaliadas (adiadas pelo PO em 04/09)
 
 - **i-have-adhd** (formato ação-primeiro, MIT) — instalar quando quiser (risco zero).

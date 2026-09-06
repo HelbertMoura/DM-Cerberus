@@ -14,75 +14,74 @@ status: ativo
 
 ---
 
-## 🎯 1. O que você DEVE fazer ao chegar aqui
+## 🎯 1. Princípio de Contexto Mínimo Persistente (Minimal Persistent Context)
 
-Você é um agente (humano ou IA) chegando ao **DM-CEREBRO** — o Segundo Cérebro corporativo da Dev Maniac's. Para **NÃO** perder tempo nem quebrar regras:
+Modelos modernos não precisam ler a empresa inteira antes de consertar um botão. Carregue permanentemente **apenas as regras universais**:
 
-```text
-1. Ler este AGENTS.md (você está aqui)
-2. Ler /INDEX.md                         (mapa do cérebro)
-3. Identificar o PROJETO da tarefa
-4. Ler /global/* (governança aplicável)
-5. Ler /projects/<projeto>/index.md
-6. Ler /projects/<projeto>/project-state.md (QUANDO PRESENTE — se ausente, use apenas o index)
-7. Ler /projects/<projeto>/handover.md     (QUANDO PRESENTE — se ausente, use apenas o index)
-8. Ler SÓ os docs task-relevant
+1. **Invariantes Arquiteturais:** Multi-tenant estrito (`TenantAwareModel`), i18n 100% (PT/EN/ES sem strings hardcoded), UI Industrial Solid-State (sem emojis em botões/tabelas).
+2. **Boundaries Inegociáveis:** Proibido commit, push, deploy ou tocar produção sem aprovação humana do PO; proibido versionar credenciais/segredos; proibido mover ou deletar arquivos destrutivamente sem autorização.
+3. **Escada Ponytail (Diff Mínimo):** `Deletar (YAGNI)` ➔ `Reaproveitar` ➔ `Nativo/Stdlib` ➔ `Dependência instalada` ➔ `1 linha antes de 50`.
+4. **Taxonomia Canônica (`global/taxonomy.md`):** Respeitar a separação entre `KNOWLEDGE`, `SKILL`, `TASK`, `MEMORY`, `TOOL`, `LIBRARY`, `UI PATTERN`, `REFERENCE` e `MODEL`.
+
+---
+
+## 📋 2. O Task Contract (Padrão de Delegação Maestro ➔ Executor)
+
+Toda tarefa delegada pelo Maestro utiliza o contrato conciso:
+
+```markdown
+TASK: <resultado desejado claro e direto>
+CONTEXT: <apenas contexto não óbvio indispensável>
+SCOPE: <arquivos e módulos específicos>
+ACCEPTANCE: <critérios verificáveis de sucesso>
+BOUNDARIES: <restrições críticas / o que não pode ser alterado>
+DONE WHEN: <condição objetiva de parada>
 ```
 
-**NÃO preload o cérebro inteiro.** Ler tudo é proibido — a menos que a tarefa seja literalmente "revisar governança" (e mesmo assim, seletivo).
-
-> **Regra sobre arquivos opcionais:** `project-state.md`, `handover.md`, `security.md`, `database.md`, `architecture.md`, `decisions.md`, `learnings.md`, `roadmap.md`, etc. **só devem ser lidos se existirem** no `projects/<slug>/` do projeto. Se ausentes, o `index.md` age como router único e você **NÃO** deve inventar arquivos vazios só para satisfazer o read order.
+> **Autonomia do Executor:** O executor decide **COMO** executar. O Maestro não escreve receitas de 100 passos microgerenciando o código.
 
 ---
 
-## 📚 2. Ordem Canônica de Leitura (canonical read order)
+## 🔄 3. Ciclo Autônomo de Execução
 
-| Tarefa | Ordem de leitura |
+Para qualquer tarefa dentro do escopo autorizado pelo Task Contract, o executor tem autonomia total para seguir o ciclo contínuo:
+
+```text
+EXPLORE ➔ IMPLEMENT ➔ VALIDATE ➔ FIX ➔ REVALIDATE ➔ DONE
+```
+
+* **Não pare após a primeira implementação:** inspecione o resultado, rode a validação proporcional e corrija eventuais falhas autonomamente até atingir os critérios de aceite (`DONE WHEN`).
+* **Não peça aprovação intermediária** para passos previstos no escopo da sandbox local.
+* **Pare SOMENTE diante de:**
+  - Decisão genuína de produto não especificada;
+  - Ação destrutiva não autorizada (exclusão de dados, wipe);
+  - Gate de autorização obrigatório (commit, push, deploy);
+  - Credencial ou variável indispensável ausente;
+  - Bloqueio real intransponível.
+
+---
+
+## 🧪 4. Validação Proporcional ao Risco
+
+Elimine a sobrecarga de "rodar todos os testes sempre". A validação deve ser calibrada pelo impacto real da mudança:
+
+| Tipo de Mudança | Validação Mínima Exigida |
 | :--- | :--- |
-| **Tarefa normal de produto** | AGENTS.md → INDEX.md → global/* → projects/<proj>/index.md → project-state.md (QUANDO PRESENTE) → handover.md (QUANDO PRESENTE) → docs específicos |
-| **Tarefa de segurança** | AGENTS.md → INDEX.md → global/security-baseline.md → projects/<proj>/security.md (QUANDO PRESENTE) → architecture.md (QUANDO PRESENTE) → decisions (QUANDO PRESENTE) |
-| **Tarefa de banco/dados** | AGENTS.md → INDEX.md → projects/<proj>/database.md (QUANDO PRESENTE) → architecture.md (QUANDO PRESENTE) → decisions (QUANDO PRESENTE) |
-| **Tarefa de frontend/UX** | AGENTS.md → INDEX.md → projects/<proj>/project-state.md (QUANDO PRESENTE) → architecture.md (QUANDO PRESENTE) → ux/accessibility docs (QUANDO PRESENTE) |
-| **Tarefa de IA/governança** | AGENTS.md → INDEX.md → global/ai-governance.md → global/model-routing.md → global/parallel-agents.md → global/qa-policy.md |
-| **Tarefa com uso de skills/automação** | AGENTS.md → INDEX.md → global/skills-catalog.md → skills/<skill>/SKILL.md |
-| **Tarefa de deploy/infra** | AGENTS.md → INDEX.md → global/deploy-governance.md → global/security-baseline.md → projects/<proj>/deployment* (QUANDO PRESENTE) |
-
-> O `projects/<proj>/index.md` é o **mapa de roteamento** do projeto — não é conteúdo. Ele diz **o que ler** para cada tipo de tarefa.
+| **Typo / Documentação / Ajuste de 1 linha** | Validação sintática local (`git diff`, checagem visual ou linter focal). |
+| **Componente de UI / Micro-tarefa** | Testes do componente ou módulo alterado + verificação visual pontual. |
+| **Feature / Serviço / Backend Endpoint** | Testes unitários do recurso + testes de integração diretamente afetados. |
+| **Mudança Estrutural / Banco / Model** | Migrations em sandbox + suíte de regressão do módulo + validação de integridade. |
+| **Segurança / Autenticação / Multi-tenant** | Testes de isolamento de tenant + gates de segurança do Cerberus. |
+| **Release / Deploy de Produção** | Suíte completa de testes + smoke checks + Gate formal do PO. |
 
 ---
 
-## 🧭 3. Princípio de Contexto Seletivo
+## 📚 5. Carregamento Progressivo de Conhecimento (Lazy Loading)
 
-> **Minimum sufficient context.** Se a tarefa é sobre autenticação de um único tenant, NÃO leia BDI, Curva S, ou Rateio. Leia `security.md` + `architecture.md` + `decisions` de auth. Só.
-
-Cada `index.md` traz um **Document Routing Guide** explícito. Use-o.
-
----
-
-## 🧱 4. Regras Universais (NÃO NEGOCIÁVEIS)
-
-1. **Não versionar segredos.** Nenhuma senha, token, key, `.env` real. Usar placeholder `[CONFIGURADO VIA ENV]` ou armazenar em gerenciador externo.
-2. **Não mover/deletar arquivos destrutivamente** sem aprovação explícita do PO. Preferir referência nova, redirect, ou migration gradual (ver `global/documentation-policy.md`).
-3. **Não reescrever ADRs antigos** para refletir a realidade atual. Mudança = criar **novo** ADR superseding. Histórico é histórico.
-4. **Não inventar detalhes técnicos.** Se não existe, marque como `UNKNOWN — NOT DOCUMENTED — NEEDS PO DECISION`. Cérebro prefere lacuna honesta a fabricacão.
-5. **Não aplicar suposições de um projeto a outro.** Biolar não herda pressupostos de canteirohub. Cada `projects/<slug>/` é um **silo técnico isolado**. Regras globais (auth, deploy, governança AI) aplicam; detalhes de produto não.
-6. **Não commitar/pushar/deployar** sem autorização explícita do PO. Read-only é livre. Tudo o que altera estado do repositório ou produção exige gate.
-7. **Markdown simples.** Sem frameworks, sem build steps, sem dependências. Este cérebro tem que abrir em qualquer editor de texto, Obsidian, VSCode ou terminal `cat`.
-8. **Frontmatter YAML opcional mas recomendado** (YAML leve: `titulo`, `tags`, `atualizado`, `status`).
-
----
-
-## 🤖 5. Contrato do Agente (ler antes de agir)
-
-Antes de qualquer tarefa técnica substantiva:
-
-1. **Ler** `INDEX.md` + governança global aplicável + `projects/<proj>/index.md` + `project-state.md` (QUANDO PRESENTE) + `handover.md` (QUANDO PRESENTE).
-2. **Confirmar escopo** com o PO se a tarefa tocar mais de um projeto ou `auth/`/`tenant/`/`deploy/`/`security/`/`database`.
-3. **Classificar risco** (1–4) conforme `global/model-routing.md` (alinhado a `AI-GOV-STACK-HIERARCHY-008` do dm-erp).
-4. **Emitir bloco `MODEL ROUTING`** (template em `templates/task.md`).
-5. **Executar** somente com arquivos permitidos.
-6. **Atualizar** o cérebro ao concluir: handover entry + status + learnings (se houver) + ADR (se houver decisão nova).
-7. **Não commitar** sem PO. A entrega do agente = mudanças no working tree, prontas para revisão.
+Consulte documentação especializada **apenas quando a tarefa exigir**:
+- Tarefa de Frontend/Design: consulte [`global/frontend-design.md`](./global/frontend-design.md), `DESIGN.md` do projeto e [`ui-patterns/`](./ui-patterns/).
+- Tarefa de Skills/Workflows: consulte [`global/skills-catalog.md`](./global/skills-catalog.md) e a pasta da respectiva skill.
+- Tarefa de Banco/SEFAZ/Multi-tenant: consulte a documentação do módulo em `projects/<slug>/`.
 
 ---
 

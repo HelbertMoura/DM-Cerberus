@@ -12,21 +12,31 @@ status: ativo
 
 ---
 
-## 1. Equipe de IA Oficial (resumo)
+## 1. Papéis Canônicos Universais (Model-Agnostic)
 
-| Cargo | Modelo | Função | Notas |
-| :--- | :--- | :--- | :--- |
-| **PO / CEO** | Helbert Moura (humano) | Visão, prioridades, gates, deploy | Autoridade final |
-| **CTO / Principal Architect / Security Architect** | `GLM-5.3 Max` (Z.ai / GLM) | Arquitetura, segurança estrutural, modelagem complexa, ADRs, GO/NO-GO (Risk 3–4) | Premium/scarce — uso sob justificativa |
-| **Staff Engineer / Operational Architect** | `GLM-5.3-Flash` (Z.ai / GLM) | Raciocínio técnico cotidiano, frontend, backend, debug, refactor médio, planning, recovery (Risk 1–2) | **Modos `MEDIUM` / `HIGH` / `MAX`** declarados no `MODE` do `MODEL ROUTING` |
-| **Project Manager / Resident AI Orchestrator** | `Gemini` | Decomposição, Context Packs, **bloco `MODEL ROUTING` obrigatório**, gates | Quando Gemini indisponível por cota → `GLM-5.3-Flash MODE: HIGH` como PM Interino |
-| **Senior Developer / Heavy Implementation Engine** | `MiniMax M3` | Implementador **padrão** (substitui M2.7 como default em tarefas triviais) | Backend, frontend, migrations, testes, refactor extenso |
-| **Fast Operational Agent** | `MiniMax M2.7-Highspeed` | **Opcional / não-core** — usar só quando velocidade trouxer vantagem operacional real | Preferir M3 sempre que operacionalmente mais simples |
-| **QA Engineer / Reviewer** | `Gemini QA` (sessão logicamente separada) | Validação independente | Se Gemini indisponível → nova sessão `GLM-5.3-Flash` dedicada a QA |
-| **Opportunistic Capacity / Overflow** | `Opus 4.6 / Antigravity` | **NÃO-core** — aproveitar quando disponível | Gerar HANDOVER antes de sair por cota |
-| **Deep Reasoning & Architecture (Token Plan)** | `Qwen 3.8 Max / DeepSeek V4` (Alibaba / Bailian) | **Capacidade Ativa** — Raciocínio profundo, 980k context, refatoração pesada | Disponível no OpenCode / Qwen Code / Maestri |
+A arquitetura define **responsabilidades e contratos**, não marcas de inteligência artificial. Os papéis do ecossistema são:
 
-> Para o detalhamento completo (modos da Flash, gates por risco, paralelismo, worktree, deploy state machine, failover), ler o **canônico** em `protocolo-equipe-ai.md` dentro do repositório `dm-erp` (registrado como `TASK-GOV-AI-008` / **ADR-014 (dm-erp)**).
+| Papel Universal | Responsabilidade Primária | O que NÃO faz |
+| :--- | :--- | :--- |
+| **👑 Maestro / Lead Architect** | Decomposição em micropassos, emissão de **Task Contracts**, seleção de contexto mínimo, coordenação de gates. | Não escreve código de implementação diretamente; não microgerencia passos óbvios do executor. |
+| **🛠️ Implementation Engineer** | Execução de código (frontend/backend/migrations/testes) com autonomia no ciclo `EXPLORE ➔ DONE` e escada Ponytail. | Não altera arquitetura estrutural sem gate; não comita ou dá deploy sem autorização humana. |
+| **🔎 QA Engineer / Reviewer** | Validação independente contra critérios de aceite, testes de estresse, segurança e veredito PASS/FAIL. | Não aprova a própria implementação; não emite opiniões sem evidências de teste/diff. |
+| **🧠 Principal Architect & Gatekeeper** | Decretos de arquitetura, contratos de API/DB, invariants de segurança e aprovação formal de release (Risk 3–4). | Não faz tarefas braçais de rotina quando delegáveis ao executor padrão. |
+
+---
+
+## 1.1 Matriz de Alocação Operacional de Modelos (Configuração Atual)
+
+Os modelos atuam como **motores de raciocínio intercambiáveis** alocados aos papéis acima conforme capacidade e cota:
+
+| Papel | Motor Primário Atual | Motor Alternativo / Reserva |
+| :--- | :--- | :--- |
+| **Maestro & Orquestrador** | `Gemini / Antigravity` | `GLM-5.3-Flash` (Modo High) / `Claude` |
+| **Implementation Engineer (Braçal)** | `MiniMax M3` | `MiniMax M2.7` (tarefas de 1 arquivo) / `GLM-5.3-Flash` |
+| **QA Engineer / Reviewer** | `GLM-5.3-Flash` (effort high) | `Gemini QA` / `Argus` (Codex sob demanda do PO) |
+| **Principal Architect & Gatekeeper** | `GLM-5.3 Max` | `Qwen 3.8 Max` (Reserva temporária) / `Claude Opus` |
+
+> **Princípio Model-Agnostic:** Se amanhã um novo modelo (ex: GPT-6 Astra, Claude 3.7) for plugado no pool, ele herda o **contrato do papel**, sem necessidade de reescrever a governança corporativa.
 
 ---
 
