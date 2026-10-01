@@ -36,6 +36,6 @@
 - **Protocolo MCP stdio:** Servidor nativo JSON-RPC 2.0 integrado ao Claude Code, Codex, Cursor e OpenCode expondo ferramentas seguras somente-leitura.
 
 ### Defeitos nasceram de briefing sub-especificado do maestro, não de execução do worker
-> **Proveniência:** Task `RADIERHUB-CAMPANHA-20260908` · Agente `QWEN-MAESTRO` · Projeto `canteirohub` · Capturado `2026-09-08T23:27:51.442487+00:00` · Fingerprint `528d6db616ff31d673632287940dcb8998e3631c39caddc7e617c2a7a27d6279`
+> **Proveniência:** Task `TASK-ECOMM-042` · Agente `ARCHITECT` · Projeto `ecommerce-platform` · Capturado `2026-09-08T23:27:51.442487+00:00` · Fingerprint `528d6db616ff31d673632287940dcb8998e3631c39caddc7e617c2a7a27d6279`
 
-Na campanha RadierHUB v4, 4 defeitos de implementação nasceram de briefing sub-especificado (preload sem peso, fonte duplicada, font-stretch errado, px fixo onde era clamp) e 2 de generalizar valor específico de contexto (aspect-ratio e cor de label). Todos DORMENTES: passavam em teste, build e lint — só QA independente e leitura da fonte primária pegaram.
+Em esteiras de IA autônomas, defeitos sutis de implementação frequentemente nascem de briefing sub-especificado no nível do maestro (ex: ausência de restrições de tipografia, tokens rígidos ou contratos de API vagos). Testes automatizados e linting comumente passam, sendo indispensável a triagem e verificação canônica por QA humano no Inbox do Cerberus.

@@ -1836,7 +1836,7 @@ UI_HTML = """<!doctype html>
   // ===== Topology =====
   function refreshTopologyModel() {
     getJSON("/api/status").then(function (s) {
-      var rawProjects = (s && s.projects && s.projects.length) ? s.projects : ["_global", "_shared", "dm-erp", "core-engine", "api-gateway", "agents"];
+      var rawProjects = (s && s.projects && s.projects.length) ? s.projects : ["_global", "_shared", "ecommerce-platform", "mobile-app", "analytics-pipeline", "design-system"];
       var projects = Array.from(new Set(rawProjects));
       var nodes = [];
       var edges = [];
@@ -1846,15 +1846,13 @@ UI_HTML = """<!doctype html>
         nodes.push({ id: "p:" + p, label: p, kind: "project", x: Math.round(Math.cos(angle) * radius), y: Math.round(Math.sin(angle) * radius) });
       });
       var coreDocs = [
-        { id: "d:brain", label: "BRAIN.md", project: "_global", kind: "document" },
         { id: "d:arch", label: "ARCHITECTURE.md", project: "_global", kind: "document" },
-        { id: "d:rules", label: "BUSINESS_RULES.md", project: "_global", kind: "document" },
+        { id: "d:standards", label: "STANDARDS.md", project: "_global", kind: "document" },
         { id: "d:db", label: "DATABASE.md", project: "_global", kind: "document" },
-        { id: "d:adr14", label: "ADR-014 Pipeline AI", project: "_global", kind: "decision" },
-        { id: "d:sec1", label: "SEC-CRIT-001 RBAC", project: "_global", kind: "decision" },
+        { id: "d:adr1", label: "ADR-001 Architecture", project: "_global", kind: "decision" },
+        { id: "d:sec1", label: "SEC-001 Security Baseline", project: "_global", kind: "decision" },
         { id: "d:api1", label: "API-REST-Specs.md", project: "_global", kind: "document" },
-        { id: "d:desk1", label: "System Service SLA", project: "_global", kind: "document" },
-        { id: "d:mcp1", label: "MCP Protocol Specs", project: "_global", kind: "document" }
+        { id: "d:mcp1", label: "MCP-Protocol.md", project: "_global", kind: "document" }
       ];
       coreDocs.forEach(function (doc, i) {
         var targetProj = "p:" + doc.project;
@@ -3470,7 +3468,7 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
     def _current_user(self):
         if not self.auth or self.auth.auth_disabled:
             from engine.auth import User
-            return User(email="admin@devmaniacs.com.br", password_hash="", is_active=True, is_admin=True, totp_secret="MOCKTOTP")
+            return User(email="developer@example.com", password_hash="", is_active=True, is_admin=True, totp_secret="")
         session = self.auth.resolve_session(self.headers.get("Cookie"))
         return self.auth.user_store.get(session.user_email) if session else None
 
@@ -3889,12 +3887,9 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
                       "error": str(exc)}
         # Build the list of known projects (alphabetical, with global first).
         known: List[str] = ["_global", "_shared"]
+        known.extend(stats.get("indexed_projects", []))
         try:
-            from engine.integrations.orchestrator import (
-                PROJECT_ALIASES, _configured_allowed_roots,
-                discover_dynamic_projects,
-            )
-            known.extend(sorted({v for v in PROJECT_ALIASES.values()}))
+            from engine.integrations.orchestrator import discover_dynamic_projects
             known.extend(discover_dynamic_projects(self.state.application_root))
         except Exception:
             pass
