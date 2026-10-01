@@ -53,3 +53,18 @@ Use active voice as default. A control should say exactly what happens when it's
 Treat failure and emptiness as moments for direction, not mood. Explain what went wrong and how to fix it, in the interface's voice rather than a person's. Errors don't apologize, and they are never vague about what happened. An empty screen is an invitation to act.
 
 Keep the register conversational and tuned: plain verbs, sentence case, no filler, with tone matched to the brand and the audience. Let each element do exactly one job. A label labels, an example demonstrates, and nothing quietly does double duty.
+
+---
+
+## 🎨 Prioridade 1: Design Iterativo com MiniMax M3 (Open-Design Pattern)
+
+> **Referência:** [github.com/nexu-io/open-design](https://github.com/nexu-io/open-design)
+
+1. **Loop de Feedback Visual Rápido:**
+   * O **MiniMax M3** atua como o motor de design e código de UI oficial da Dev Maniac's.
+   * Não construa interfaces complexas às cegas apenas no código fonte. O fluxo deve iterar com validação visual contínua (live preview, screenshots via Playwright MCP ou visualização local).
+2. **Diretriz de Design Corporativo (Industrial Solid-State):**
+   * **Paleta Oficial:** Azul Aço `#1E40AF`, Chumbo `#0F172A`, Fundo Sólido `#F1F5F9` (sem neon/gradientes excessivos).
+   * **Ícones:** Proibido uso de emojis em botões e tabelas — usar ícones vetoriais (Lucide-React ou Tabler Icons).
+   * **Responsividade:** Validação obrigatória nos viewports 375px (mobile), 768px (tablet), 1366px e 1920px (desktop).
+

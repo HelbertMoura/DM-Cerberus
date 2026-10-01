@@ -1,30 +1,50 @@
-# 🧐 Workflow: Auditoria Estética Anti-Vibecode (Design Quality Gate)
+# 🧐 Workflow: Auditoria Estética Anti-Vibecode & Design Quality Gate
 
-Auditoria objetiva e orientada a evidências para detectar e documentar clichês visuais, layouts de template e estética genérica de IA.
+> **Regra de Rigor:** Toda crítica estética DEVE ser objetiva, técnica e fundamentada em princípios mensuráveis de usabilidade, acessibilidade, identidade de marca ou ergonomia cognitiva. "Não gostei" não é apontamento de engenharia.
 
 ---
 
-## 🛑 Regra de Rigor: Não Audite com Base Apenas em Gosto
+## 1. Estrutura do Relatório de Auditoria
 
-Cada apontamento deve ser fundamentado em **princípios consolidados de UX, usabilidade, acessibilidade ou identidade de marca**.
-
-Para cada inconsistência encontrada, utilize obrigatoriamente a estrutura:
+Todo relatório de auditoria gerado pelo agente DEVE seguir rigorosamente este formato:
 
 ```markdown
-### [ITEM-00X] <Título Curto da Não-Conformidade>
-- **PROBLEM:** <Descrição exata do problema visual ou estrutural observado>.
-- **WHY IT MATTERS:** <Impacto negativo concreto no usuário, na conversão ou na credibilidade da marca>.
-- **EVIDENCE:** <Caminho do arquivo, linha de código, print ou seletor CSS específico>.
-- **RECOMMENDATION:** <Sugestão técnica e direta de correção baseada no DESIGN.md e nas bibliotecas maduras>.
+# 📋 Relatório de Auditoria Anti-Vibecode: [Nome da Aplicação/Tela]
+
+## 1. Sumário Executivo & Diagnóstico
+- **Data da Auditoria:** [Data]
+- **Tipo de Sistema:** [Marketing / Showcase / Landing] OU [ERP / Dashboard / Operacional]
+- **Vibecode Risk Score:** [X / 100] — Classificação: [Pristine / Low / Moderate / High / Critical]
+- **Veredito:** [Aprovado / Aprovação com Ressalvas / Bloqueado para Produção]
+
+---
+
+## 2. Não-Conformidades Identificadas
+
+### [VIBE-001] <Título Curto da Não-Conformidade>
+- **PROBLEM:** <Descrição exata do vício visual, layout de IA, card abuse ou quebra detectada>.
+- **WHY IT MATTERS:** <Impacto negativo concreto na credibilidade, conversão, usabilidade ou cansaço visual do operador>.
+- **EVIDENCE:** <Arquivo, linha de código, seletor CSS, viewport (ex: 375px) ou print de tela>.
+- **RECOMMENDATION:** <Solução técnica cirúrgica baseada nas referências do arsenal e tokens do DESIGN.md>.
 - **PRIORITY:** P0 (Blocker) | P1 (Alta) | P2 (Média) | P3 (Polimento)
+
+---
+
+## 3. Matriz dos 5 Pilares de Inspeção
+
+| Pilar | Status | Pontos Críticos Avaliados |
+| :--- | :---: | :--- |
+| **1. Autenticidade & Marca** | [PASS/FAIL] | Ausência de gradientes roxo/azul clichês, fotos autênticas, assinatura visual presente. |
+| **2. Densidade & Layout** | [PASS/FAIL] | Ausência de card abuse, hierarquia semântica, sem bento grid decorativo vazio. |
+| **3. Ergonomia & Teclado** | [PASS/FAIL] | Foco visível (`focus-visible`), touch targets de 48px, atalhos de teclado em ERPs. |
+| **4. Dados & Formulários** | [PASS/FAIL] | Alinhamento numérico à direita (`tabular-nums`), labels explícitos, validação inline. |
+| **5. Estados & Resiliência** | [PASS/FAIL] | Tríade obrigatória: Empty State acolhedor, Skeletons proporcionais e Error recovery. |
 ```
 
 ---
 
-## Critérios de Inspeção
+## 2. Ação Pós-Auditoria
 
-1. **Autenticidade vs Template:** O layout parece ter sido desenhado para este negócio específico ou é uma colagem genérica de cards com bordas arredondadas e gradiente roxo?
-2. **Hierarquia & Densidade:** O olhar do usuário sabe imediatamente onde focar? A densidade é adequada à função da página?
-3. **Ergonomia & Interatividade:** Os botões possuem feedback claro? Modais e gavetas prendem o foco?
-4. **Alinhamento & Espaçamento:** Os espaçamentos obedecem a uma grade matemática consistente?
-5. **Acessibilidade Visível:** O contraste de texto atende à WCAG? Há foco visível por teclado?
+1. **Score ≤ 15 (Pristine):** Aprovado diretamente para publicação/merge.
+2. **Score 16 a 35 (Low Risk):** Correções pontuais (P2/P3) executadas no mesmo branch.
+3. **Score ≥ 36 (Moderate/High/Critical):** Bloqueio imediato do merge. Disparar **Modo Reparo** (`workflows/audit-existing.md`) atacando primeiramente os itens P0 e P1.

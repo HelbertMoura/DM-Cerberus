@@ -121,21 +121,29 @@ class TOTP:
     """RFC 6238 TOTP with HMAC-SHA1."""
 
     secret: bytes
+    digits: int = TOTP_DIGITS
 
     def __post_init__(self) -> None:
         if not isinstance(self.secret, (bytes, bytearray)):
             raise TypeError("secret must be bytes")
         if len(self.secret) < 10:
             raise ValueError("secret must be at least 10 bytes")
+        if self.digits not in {6, 8}:
+            raise ValueError("digits must be 6 or 8")
 
     @classmethod
-    def generate(cls) -> "TOTP":
+    def generate(cls, *, digits: int = TOTP_DIGITS) -> "TOTP":
         """Return a fresh TOTP instance with a random 20-byte secret."""
-        return cls(secret=secrets.token_bytes(20))
+        return cls(secret=secrets.token_bytes(20), digits=digits)
 
     @classmethod
-    def from_base32(cls, encoded: str) -> "TOTP":
-        return cls(secret=_b32decode(encoded))
+    def generate_secret(cls) -> str:
+        """Return a fresh RFC 4648 base32 secret for enrollment APIs."""
+        return cls.generate().to_base32()
+
+    @classmethod
+    def from_base32(cls, encoded: str, *, digits: int = TOTP_DIGITS) -> "TOTP":
+        return cls(secret=_b32decode(encoded), digits=digits)
 
     def to_base32(self) -> str:
         return _b32encode(self.secret)
@@ -153,8 +161,8 @@ class TOTP:
             | (hmac_digest[offset + 2] & 0xFF) << 8
             | (hmac_digest[offset + 3] & 0xFF)
         )
-        code = truncated % (10 ** TOTP_DIGITS)
-        return str(code).zfill(TOTP_DIGITS)
+        code = truncated % (10 ** self.digits)
+        return str(code).zfill(self.digits)
 
     def now(self) -> str:
         counter = int(time.time()) // TOTP_STEP_SECONDS
@@ -168,7 +176,7 @@ class TOTP:
             int(code)
         except ValueError:
             return False
-        if len(code) != TOTP_DIGITS:
+        if len(code) != self.digits:
             return False
         reference = int(at if at is not None else time.time()) // TOTP_STEP_SECONDS
         for offset in range(-window, window + 1):
@@ -181,7 +189,7 @@ class TOTP:
         label = f"{issuer}:{account}" if issuer else account
         params = (
             f"secret={self.to_base32()}"
-            f"&algorithm=SHA1&digits={TOTP_DIGITS}&period={TOTP_STEP_SECONDS}"
+            f"&algorithm=SHA1&digits={self.digits}&period={TOTP_STEP_SECONDS}"
             f"&issuer={_urlquote(issuer)}"
         )
         return f"otpauth://totp/{_urlquote(label)}?{params}"
@@ -196,7 +204,8 @@ def _urlquote(value: str) -> str:
 # ===========================================================================
 # TOTP QR code (SVG) — pure stdlib, no external deps
 # ===========================================================================
-def totp_qr_svg(uri: str, *, size: int = 220) -> str:
+def totp_qr_svg(value: str, account: Optional[str] = None, *,
+                issuer: str = "Cerberus", size: int = 220) -> str:
     """
     Render a self-contained SVG card for TOTP enrollment.
 
@@ -208,6 +217,11 @@ def totp_qr_svg(uri: str, *, size: int = 220) -> str:
 
     Returns a self-contained `<svg>` string.
     """
+    uri = value
+    if account is not None:
+        uri = TOTP.from_base32(value, digits=6).provisioning_uri(
+            account, issuer=issuer
+        )
     width = 320
     height = 200
     # Wrap the URI in <tspan> for a clean mono block.
@@ -316,7 +330,7 @@ class SessionStore:
 # When the password is absent, a cryptographically random process-local
 # password is generated for first-run/dev bootstrap and printed once when the
 # user store is created. There is deliberately no static fallback credential.
-DEFAULT_DEV_ADMIN_EMAIL = "helbert.moura@devmaniacs.com.br"
+DEFAULT_DEV_ADMIN_EMAIL = "admin@devmaniacs.com.br"
 DEFAULT_DEV_ADMIN_PASSWORD = secrets.token_urlsafe(16)
 
 
@@ -355,7 +369,7 @@ class UserStore:
 
     The initial admin is seeded strictly from environment variables:
 
-      * `CERBERUS_ADMIN_EMAIL` (default: ``helbert.moura@devmaniacs.com.br``)
+      * `CERBERUS_ADMIN_EMAIL` (default: ``admin@devmaniacs.com.br``)
       * `CERBERUS_ADMIN_PASSWORD` (random ephemeral value when absent)
 
     Operators in production MUST set both env vars with strong credentials.
@@ -447,6 +461,13 @@ class UserStore:
             if user is None:
                 raise KeyError(email)
             user.totp_secret = secret_b32
+            self._save()
+
+    def set_password(self, email: str, password_hash: str) -> None:
+        """Persist a pre-hashed password while holding the store lock."""
+        with self._lock:
+            user = self._users[email.casefold()]
+            user.password_hash = password_hash
             self._save()
 
 

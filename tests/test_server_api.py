@@ -191,8 +191,8 @@ class TestServerLifecycle(unittest.TestCase):
     def test_ui_html_contains_required_affordances(self) -> None:
         # Static checks on the served HTML — verifies the spec.
         self.assertIn("min-height: 44px", UI_HTML)
-        self.assertIn("#0F172A", UI_HTML)
-        self.assertIn("#1E40AF", UI_HTML)
+        self.assertIn("#191C1D", UI_HTML)
+        self.assertIn("#A82833", UI_HTML)
         # No emoji in UI copy (defensive: prevent the banned glyph set).
         banned = ["🎯", "🚀", "✅", "❌", "⚠", "🛡", "🔒", "📦"]
         for glyph in banned:
@@ -442,11 +442,14 @@ class TestSearchEndpoint(unittest.TestCase):
         )
         self.assertIn("SEFAZ", joined.upper())
 
-    def test_search_requires_query(self) -> None:
+    def test_search_without_query_returns_empty_result(self) -> None:
         with self._open() as srv:
             status, body, _ = srv.request("GET", "/api/search")
-        self.assertEqual(400, status)
-        self.assertIn("q", json.loads(body)["error"])
+        self.assertEqual(200, status)
+        self.assertEqual(
+            {"query": "", "count": 0, "results": []},
+            json.loads(body),
+        )
 
     def test_search_filters_by_project(self) -> None:
         with self._open() as srv:

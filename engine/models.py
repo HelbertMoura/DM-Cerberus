@@ -134,6 +134,7 @@ class SearchResult:
     rrf_score: float = 0.0
     lexical_rank: Optional[int] = None
     semantic_rank: Optional[int] = None
+    priority_rank: Optional[int] = None
     search_mode: str = "lexical"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -144,8 +145,8 @@ class SearchResult:
             "source_type": self.item.source_type.value if isinstance(self.item.source_type, SourceType) else str(self.item.source_type),
             "title": self.item.title,
             "authority_level": self.item.authority_level,
-            "final_score": round(self.final_score, 4),
-            "lexical_score": round(self.lexical_score, 4),
+            "final_score": self.final_score,
+            "lexical_score": self.lexical_score,
             "semantic_score": round(self.semantic_score, 4),
             "rrf_score": round(self.rrf_score, 6),
             "lexical_rank": self.lexical_rank,
@@ -169,6 +170,8 @@ class ContextPack:
     relevant_learnings: List[MemoryItem] = field(default_factory=list)
     recent_handoff: List[MemoryItem] = field(default_factory=list)
     token_estimate: int = 0
+    budget_chars: int = 6000
+    truncated: bool = False
 
     def to_markdown(self) -> str:
         lines = []

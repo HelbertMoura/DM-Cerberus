@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from engine.models import MemoryItem, SearchResult, ContextPack, SourceType, AuthorityLevel
 from engine.index import SQLiteMemoryIndex
+from engine.context_budget import fit_context_pack, MIN_CONTEXT_TOKENS, MAX_CONTEXT_TOKENS
 
 
 class CerberusMemoryService:
@@ -14,6 +15,15 @@ class CerberusMemoryService:
         self.index = index or SQLiteMemoryIndex()
         from engine.search import HybridSearchEngine
         self.hybrid_search = HybridSearchEngine(self.index)
+
+    def _project_first(self, query: str, project_id: str, *, source_types: List[str],
+                       limit: int, min_authority: int = 0) -> List[SearchResult]:
+        results = self.index.search(query, project_id=project_id, source_types=source_types,
+                                    limit=limit, min_authority=min_authority, include_global=False)
+        if project_id != "_global" and len(results) < limit:
+            results.extend(self.index.search(query, project_id="_global", source_types=source_types,
+                limit=limit - len(results), min_authority=min_authority, include_global=False))
+        return results
 
     def search(
         self,
@@ -87,6 +97,11 @@ class CerberusMemoryService:
         """
         Constructs a compact, budget-aware Context Pack tailored to a specific task and role.
         """
+        if type(max_tokens) is not int or not MIN_CONTEXT_TOKENS <= max_tokens <= MAX_CONTEXT_TOKENS:
+            raise ValueError("max_tokens must be an integer between 256 and 1500 (estimated budget)")
+        # Query input is not a reason to scan or render an arbitrarily large prompt.
+        from engine.capture import redact_secrets
+        query_task, _ = redact_secrets(task_summary[:1500])
         # 1. Mandatory Rules (Global Governance & Security)
         gov_results = self.index.search(
             query="governance modelo routing autoridade",
@@ -97,8 +112,8 @@ class CerberusMemoryService:
         mandatory_rules = [r.item for r in gov_results]
 
         # 2. Relevant Decisions (ADRs matching task summary)
-        adr_results = self.index.search(
-            query=f"{task_summary} ADR decisao",
+        adr_results = self._project_first(
+            query=query_task,
             project_id=project_id,
             source_types=[SourceType.CANONICAL_ADR.value],
             limit=3,
@@ -107,8 +122,8 @@ class CerberusMemoryService:
         relevant_decisions = [r.item for r in adr_results]
 
         # 3. Relevant Architecture
-        arch_results = self.index.search(
-            query=f"{task_summary} arquitetura stack banco",
+        arch_results = self._project_first(
+            query=query_task,
             project_id=project_id,
             source_types=[SourceType.ARCHITECTURE.value, SourceType.WIKI.value],
             limit=2
@@ -116,8 +131,8 @@ class CerberusMemoryService:
         relevant_architecture = [r.item for r in arch_results]
 
         # 4. Relevant Learnings & Gotchas
-        learning_results = self.index.search(
-            query=f"{task_summary} gotchas gotcha erro licao",
+        learning_results = self._project_first(
+            query=query_task,
             project_id=project_id,
             source_types=[SourceType.LEARNING.value],
             limit=2
@@ -125,16 +140,12 @@ class CerberusMemoryService:
         relevant_learnings = [r.item for r in learning_results]
 
         # 5. Recent Handoff
-        handoff_results = self.get_recent_handoff(project_id=project_id)
+        handoff_results = self._project_first(
+            query="handover continuidade estado atual", project_id=project_id,
+            source_types=[SourceType.HANDOVER.value], limit=1)
         recent_handoff = [r.item for r in handoff_results[:1]]
 
-        # Estimate tokens (~4 chars per token)
-        total_chars = sum(len(item.snippet) + len(item.title) for item in (
-            mandatory_rules + relevant_decisions + relevant_architecture + relevant_learnings + recent_handoff
-        ))
-        token_estimate = total_chars // 4
-
-        return ContextPack(
+        pack = ContextPack(
             project_id=project_id,
             task_summary=task_summary,
             role=role,
@@ -143,5 +154,5 @@ class CerberusMemoryService:
             relevant_architecture=relevant_architecture,
             relevant_learnings=relevant_learnings,
             recent_handoff=recent_handoff,
-            token_estimate=token_estimate
         )
+        return fit_context_pack(pack, max_tokens)

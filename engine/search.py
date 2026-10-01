@@ -12,7 +12,7 @@ from engine.embeddings import (
     VectorStore,
 )
 from engine.index import SQLiteMemoryIndex
-from engine.models import MemoryItem, SearchResult
+from engine.models import MemoryItem, MemoryStatus, SearchResult
 
 
 VALID_SEARCH_MODES = {"hybrid", "lexical", "semantic"}
@@ -28,18 +28,24 @@ class FusedRank:
 
 def reciprocal_rank_fusion(lexical_ids: Iterable[str],
                            semantic_ids: Iterable[str], *,
+                           priority_ids: Optional[Iterable[str]] = None,
                            k: int = 60,
                            lexical_weight: float = 1.0,
-                           semantic_weight: float = 1.0) -> List[FusedRank]:
-    if k < 0 or lexical_weight < 0 or semantic_weight < 0:
+                           semantic_weight: float = 1.0,
+                           priority_weight: float = 3.0) -> List[FusedRank]:
+    if k < 0 or lexical_weight < 0 or semantic_weight < 0 or priority_weight < 0:
         raise ValueError("RRF parameters must be non-negative")
     lexical = {doc_id: rank for rank, doc_id in enumerate(lexical_ids, 1)}
     semantic = {doc_id: rank for rank, doc_id in enumerate(semantic_ids, 1)}
+    priority = {doc_id: rank for rank, doc_id in enumerate(priority_ids or [], 1)}
     fused = []
-    for doc_id in lexical.keys() | semantic.keys():
+    for doc_id in lexical.keys() | semantic.keys() | priority.keys():
         lexical_rank = lexical.get(doc_id)
         semantic_rank = semantic.get(doc_id)
         score = 0.0
+        priority_rank = priority.get(doc_id)
+        if priority_rank is not None:
+            score += priority_weight / (k + priority_rank)
         if lexical_rank is not None:
             score += lexical_weight / (k + lexical_rank)
         if semantic_rank is not None:
@@ -54,13 +60,15 @@ class HybridSearchEngine:
                  vector_store: Optional[VectorStore] = None,
                  rrf_k: int = 60,
                  lexical_weight: float = 1.0,
-                 semantic_weight: float = 1.0) -> None:
+                 semantic_weight: float = 1.0,
+                 priority_weight: float = 3.0) -> None:
         self.index = index
         self.provider = provider or HashingDenseEmbeddingProvider()
         self.vector_store = vector_store or VectorStore(index.db_path)
         self.rrf_k = rrf_k
         self.lexical_weight = lexical_weight
         self.semantic_weight = semantic_weight
+        self.priority_weight = priority_weight
 
     @staticmethod
     def _embedding_text(item: MemoryItem) -> str:
@@ -68,7 +76,9 @@ class HybridSearchEngine:
                           item.snippet, item.full_text))
 
     def ensure_indexed(self) -> None:
-        items = self.index.all_items()
+        # Keep obsolete/draft documents available to administrative inspection,
+        # but remove their derived vectors from operational retrieval.
+        items = [item for item in self.index.all_items() if item.status == MemoryStatus.ACTIVE]
         stored_fingerprints = self.vector_store.fingerprints()
         current = {}
         for item in items:
@@ -100,7 +110,7 @@ class HybridSearchEngine:
         results = []
         for rank, match in enumerate(matches, 1):
             item = by_id.get(match.doc_id)
-            if item is None or item.authority_level < min_authority:
+            if item is None or item.status != MemoryStatus.ACTIVE or item.authority_level < min_authority:
                 continue
             if source_types and str(item.source_type.value) not in source_types:
                 continue
@@ -141,12 +151,16 @@ class HybridSearchEngine:
         )
         if mode == "semantic":
             return semantic[:limit]
+        priority_ids = [result.item.memory_id for result in lexical if result.priority_rank]
         fused = reciprocal_rank_fusion(
-            [result.item.memory_id for result in lexical],
+            [result.item.memory_id for result in lexical if not result.priority_rank],
             [result.item.memory_id for result in semantic],
+            priority_ids=priority_ids,
             k=self.rrf_k, lexical_weight=self.lexical_weight,
             semantic_weight=self.semantic_weight,
+            priority_weight=self.priority_weight,
         )
+        priority_rank_by_id = {doc_id: rank for rank, doc_id in enumerate(priority_ids, 1)}
         lexical_by_id: Dict[str, SearchResult] = {
             result.item.memory_id: result for result in lexical
         }
@@ -168,6 +182,7 @@ class HybridSearchEngine:
                 rrf_score=entry.score,
                 lexical_rank=entry.lexical_rank,
                 semantic_rank=entry.semantic_rank,
+                priority_rank=priority_rank_by_id.get(entry.doc_id),
                 search_mode="hybrid",
                 matched_snippets=base.matched_snippets,
             ))

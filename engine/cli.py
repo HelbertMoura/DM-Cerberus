@@ -98,6 +98,9 @@ def main():
 
     # Command: install-mcp
     p_inst = subparsers.add_parser("install-mcp", help="Instalar/atualizar MCP em todos os Agentes e IDEs")
+    p_hooks = subparsers.add_parser("install-hooks", help="Instalar hooks de contexto/captura do Codex")
+    p_hooks.add_argument("--dry-run", action="store_true", help="Mostrar o escopo sem gravar configurações")
+    p_hooks.add_argument("--codex-home", type=str, default=None, help="Diretório de configuração do Codex")
 
     # Command: status
     p_stat = subparsers.add_parser("status", help="Métricas e status do índice")
@@ -156,6 +159,43 @@ def main():
     p_qa.add_argument("--task", type=str, default=None,
                       help="ID da task (verifica todos os candidatos da task)")
 
+    # Commands: handoff-* (claim-exactly-once delegation protocol)
+    p_hcreate = subparsers.add_parser(
+        "handoff-create",
+        help="Criar handoff tipado para delegação (estado OPEN)"
+    )
+    p_hcreate.add_argument("--task", type=str, required=True, help="ID da task")
+    p_hcreate.add_argument("--project", type=str, required=True, help="Slug do projeto")
+    p_hcreate.add_argument("--summary", type=str, required=True, help="Resumo do que deve ser feito")
+    p_hcreate.add_argument("--from-agent", type=str, required=True, help="Agente/role que delega")
+    p_hcreate.add_argument("--to-role", type=str, default="", help="Role reservada (opcional; vazio = qualquer)")
+
+    p_hclaim = subparsers.add_parser(
+        "handoff-claim",
+        help="Reivindicar handoff OPEN (apenas 1 agente consegue; atômico)"
+    )
+    p_hclaim.add_argument("handoff_id")
+    p_hclaim.add_argument("--agent", type=str, required=True, help="Agente/role que reivindica")
+
+    p_hdone = subparsers.add_parser(
+        "handoff-done",
+        help="Concluir handoff CLAIMED (somente o agente que reivindicou)"
+    )
+    p_hdone.add_argument("handoff_id")
+    p_hdone.add_argument("--agent", type=str, required=True)
+    p_hdone.add_argument("--result", type=str, default="", help="Resumo do resultado")
+
+    p_hcancel = subparsers.add_parser(
+        "handoff-cancel",
+        help="Cancelar handoff OPEN/CLAIMED (CLAIMED: só o dono do claim)"
+    )
+    p_hcancel.add_argument("handoff_id")
+    p_hcancel.add_argument("--agent", type=str, required=True)
+
+    p_hlist = subparsers.add_parser("handoff-list", help="Listar handoffs (filtro opcional por status)")
+    p_hlist.add_argument("--status", type=str, default=None,
+                         choices=["OPEN", "CLAIMED", "DONE", "CANCELLED"])
+
     args = parser.parse_args()
 
     # Validate the MCP root before constructing SQLiteMemoryIndex; otherwise an
@@ -180,6 +220,14 @@ def main():
             open_browser=args.open_browser,
         )
         return run_from_args(ns)
+
+    if args.command == "install-hooks":
+        from engine.installer import CerberusEnvironmentInstaller
+        installer = CerberusEnvironmentInstaller()
+        result = installer.install_codex_hooks(dry_run=args.dry_run,
+            codex_home=Path(args.codex_home or os.environ.get("CODEX_HOME")) if args.codex_home or os.environ.get("CODEX_HOME") else None)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
 
     roots = [r for r in get_default_roots() if r.exists()]
     canonical_root = roots[0] if roots else Path(__file__).resolve().parent.parent
@@ -273,6 +321,7 @@ def main():
             print(json.dumps(engine.reject(args.candidate_id), ensure_ascii=False))
 
     elif args.command == "doctor":
+        from engine.agent_hooks import get_hook_health, inspect_codex_hooks
         fts5 = False
         try:
             con = sqlite3.connect(":memory:")
@@ -291,6 +340,8 @@ def main():
             "candidate_inbox": str(inbox),
             "candidate_count": len(list(inbox.glob("*.json"))) if inbox.exists() else 0,
             "write_permissions": {"inbox": os.access(inbox if inbox.exists() else inbox.parent, os.W_OK)},
+            "codex_hooks": inspect_codex_hooks(canonical_root),
+            "hook_health": get_hook_health(canonical_root),
         }
         print(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -341,6 +392,24 @@ def main():
         result = adapter.on_qa_approved(
             candidate_id=args.candidate, task_id=args.task
         )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+
+    elif args.command in {"handoff-create", "handoff-claim", "handoff-done",
+                          "handoff-cancel", "handoff-list"}:
+        from engine.handoffs import HandoffStore
+        store = HandoffStore(cerebro_root=canonical_root)
+        if args.command == "handoff-create":
+            result = store.create(project_id=args.project, task_id=args.task,
+                                  summary=args.summary, from_agent=args.from_agent,
+                                  to_role=args.to_role)
+        elif args.command == "handoff-claim":
+            result = store.claim(args.handoff_id, agent=args.agent)
+        elif args.command == "handoff-done":
+            result = store.complete(args.handoff_id, agent=args.agent, result=args.result)
+        elif args.command == "handoff-cancel":
+            result = store.cancel(args.handoff_id, agent=args.agent)
+        else:
+            result = [item for item in store.list(status=args.status)]
         print(json.dumps(result, ensure_ascii=False, indent=2))
 
     else:

@@ -50,10 +50,9 @@ ENV CERBERUS_ROOT=/data \
 
 EXPOSE 7331
 
-# Healthcheck: the dashboard must serve 200/401 on GET /.
+# Public healthcheck does not require an authenticated browser session.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -fsS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:7331/ \
-    | grep -E '^(200|303)$' >/dev/null || exit 1
+  CMD curl -fsS http://127.0.0.1:7331/api/health || exit 1
 
 USER cerberus
 

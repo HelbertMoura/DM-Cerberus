@@ -43,11 +43,44 @@ status: ativo
 **O quê:** Matriz de decisão de engenharia frontend. Integra primitivas maduras (Radix, Base UI, TanStack), ferramentas especializadas (**Shader Gradient**), referências visuais (**Refero Styles**) e bibliotecas opcionais (**Cult UI**).
 **Guardrails:** Component library NÃO define a identidade visual (quem define é o `DESIGN.md`); **Manus** é referência externa experimental, NÃO integrado ao core; nunca instalar biblioteca pesada para botão simples.
 
+## 6. skill-creator (Anthropic Official · Meta-Skill Administrativa · Apache-2.0 / MIT)
+
+**O quê:** Meta-Skill oficial de engenharia de skills da Anthropic (`anthropics/skills`). Suporta criação, testes, evals quantitativos/qualitativos, benchmarks com análise de variância, otimização de triggers e empacotamento `.skill`.
+**Origem Upstream:** `https://github.com/anthropics/skills/tree/main/skills/skill-creator` (Marketplace: `anthropic-agent-skills`, commit `41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f`).
+**Instalação (06/09/2026):**
+- Marketplace registrado no Claude Code: `claude plugin marketplace add anthropics/skills`.
+- **Instalação cirúrgica:** Apenas a pasta `skills/skill-creator/` foi instalada (evitando instalar em bloco o plugin `example-skills` que traria 11 skills não solicitadas).
+- Canônico versionado em: `C:\DevManiacs\DM-Cerebro\skills\skill-creator/`.
+- Runtimes espelhados: `~/.claude/skills/skill-creator/` e `~/.gemini/config/skills/skill-creator/`.
+**Papel Arquitetural:**
+- **META-SKILL ADMINISTRATIVA DO MAESTRO**: Não é contexto padrão dos agentes executores (M3, M2.7, Flash).
+- **Sob demanda estrita**: Carregada APENAS em operações de governança: `CREATE SKILL`, `AUDIT SKILL`, `REFACTOR SKILL`, `MERGE SKILLS`, `SPLIT SKILL`, `DEPRECATE SKILL`.
+**Guardrails Inegociáveis (Brain Architecture V2):**
+1. **DEFAULT = NÃO CRIAR NOVA SKILL**: Seguir a árvore de taxonomia de `global/taxonomy.md` e o checklist de 6 perguntas antes de qualquer `CREATE`.
+2. **Brain Architecture V2 é política superior**: A `skill-creator` provê a mecânica de scaffolding, validação (`quick_validate.py`) e empacotamento; as decisões de existência, escopo e progressive disclosure pertencem à governança Dev Maniac's.
+3. **Windows note:** Ao rodar os scripts de automação em terminal Windows, utilizar `$env:PYTHONUTF8="1"` para suportar a saída de logs em UTF-8.
+
+## 7. Context7 MCP (@upstash/context7-mcp · Apache-2.0)
+
+**O quê:** Servidor MCP oficial da Upstash para busca de documentação técnica oficial atualizada em tempo real (Pydantic v2, FastAPI, Godot 4.x, Flutter 3.x, Tailwind v4, etc.).
+**Como usar:** Integrado ao `~/.claude/settings.json` via comando `npx -y @upstash/context7-mcp`. Quando um agente precisar de sintaxe oficial exata ou exemplos de bibliotecas atualizadas, usa o trigger `"use context7"`.
+**Guardrails:** Não injeta código no projeto; opera como ferramenta de consulta de documentação sob demanda.
+
+## 8. PostgreSQL MCP — Protocolo de Segurança (Read-Only)
+
+**O quê:** Protocolo de conexão segura para inspeção de esquemas e tuning de queries (`EXPLAIN ANALYZE`).
+**Aviso de Segurança (2025/2026):** O pacote histórico `@modelcontextprotocol/server-postgres` foi arquivado/descontinuado por vulnerabilidade de SQL injection.
+**Padrão Inegociável Dev Maniac's:**
+1. A proteção de somente-leitura reside na **Role do Banco de Dados** (`dev_readonly`), e não em flags de cliente.
+2. Comandos autorizados: estritamente `SELECT` e `EXPLAIN`.
+3. Proibição absoluta: `INSERT`, `UPDATE`, `DELETE`, `CREATE`, `DROP`, `ALTER`, `TRUNCATE`.
+4. Em instâncias remotas (ex: servidor Linux dedicado), o acesso ocorre estritamente via SSH tunelado ou conexão local segura.
+
 ## Pendências avaliadas (adiadas pelo PO em 04/09)
 
 - **i-have-adhd** (formato ação-primeiro, MIT) — instalar quando quiser (risco zero).
-- **OpenSEO** (MCP SEO/rank) — pós-cutover RadierHUB.
-- **Strix** (pentest autônomo com PoC) — só com inspeção de código e SÓ em local/homolog; candidato a complementar a lane Codex · Adversarial nos Risk 3 do dm-erp.
+- **OpenSEO** (MCP SEO/rank) — pós-cutover de produção.
+- **Strix** (pentest autônomo com PoC) — só com inspeção de código e SÓ em local/homolog.
 
 ## Processo de adoção (para futuras)
 

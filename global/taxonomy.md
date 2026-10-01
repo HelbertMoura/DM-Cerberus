@@ -48,10 +48,50 @@ DESCOBERTA
 ```
 
 ### 🛑 Regras de Ouro
-1. **Um componente bonito NÃO é uma skill.** É uma referência ou padrão de UI.
-2. **Uma biblioteca NÃO é uma skill.** É uma dependência declarada em `frontend-toolbox`.
-3. **Uma ferramenta web NÃO é uma skill.** É registrada na Toolbox ou documentada como tool.
-4. **Uma skill só é criada se:**
-   - Possuir uma capacidade ou workflow operacional reutilizável;
-   - Ter descrição curta e precisa (sem "pick me energy");
-   - Adotar **Progressive Disclosure** (`SKILL.md` como router enxuto + referências sob demanda).
+
+1. **DEFAULT = NÃO CRIAR NOVA SKILL.**
+   - Uma nova skill somente deve existir quando representar uma capacidade ou workflow especializado, recorrente, reutilizável e com intenção suficientemente distinta para routing confiável.
+2. **Um componente bonito NÃO é uma skill.** É uma referência (`REFERENCE`) ou padrão de interface (`UI PATTERN`).
+3. **Uma biblioteca NÃO é uma skill.** É uma dependência declarada (`LIBRARY` em `frontend-toolbox`).
+4. **Uma ferramenta web ou executável NÃO é uma skill.** É uma ferramenta externa (`TOOL`).
+5. **Uma regra de negócio ou modelo de dados NÃO é uma skill.** É conhecimento permanente (`KNOWLEDGE`).
+
+---
+
+## 3. Checklist Obrigatório Pré-CREATE (Governança do Maestro)
+
+Antes de autorizar a criação de qualquer nova skill via `skill-creator`, o Maestro deve responder obrigatoriamente às 6 perguntas:
+
+1. **Já existe skill equivalente no ecossistema?**
+2. **Uma skill existente pode absorver isso mantendo alta coesão interna?**
+3. **Deveria ser apenas uma referência (`references/`) ou workflow (`workflows/`) de uma skill existente?** (ex: o caso do `saiforanocode`)
+4. **É somente uma tool, library, UI pattern ou referência externa?**
+5. **Será realmente reutilizado em múltiplas sprints e projetos corporativos?**
+6. **Possui trigger suficientemente distinto e discriminativo contra skills semanticamente próximas?**
+
+---
+
+## 4. Governança da Meta-Skill `skill-creator`
+
+A **`skill-creator`** oficial da Anthropic opera no ecossistema Dev Maniac's como **META-SKILL ADMINISTRATIVA DO MAESTRO**.
+
+### Diretrizes de Isolamento:
+- **NÃO é contexto padrão:** Agentes executores (M3, M2.7, Flash) **nunca** recebem a `skill-creator` em seu prompt ou contexto inicial.
+- **Carregamento sob demanda:** Carregada exclusivamente pelo Maestro diante de uma das 6 necessidades formais de ciclo de vida:
+  1. `CREATE SKILL`
+  2. `AUDIT SKILL`
+  3. `REFACTOR SKILL`
+  4. `MERGE SKILLS`
+  5. `SPLIT SKILL`
+  6. `DEPRECATE SKILL`
+
+### Padrão para Criação e Refatoração de Skills:
+- **Descrição curta e discriminativa** no frontmatter YAML;
+- **Trigger claro e específico** (evitar "catch-all" ou "pick me energy");
+- **Seção explícita de "Quando usar" e "Quando NÃO usar"**;
+- **`SKILL.md` mínimo** atuando como roteador progressivo;
+- **Progressive disclosure:** subdiretórios `references/` e `workflows/` carregados sob demanda;
+- **Zero duplicação** de documentação canônica já existente no repositório;
+- **Zero scaffolding obsoleto** destinado a limitações de modelos legados;
+- **Zero instruções model-specific no core** (a skill deve ser model-agnostic);
+- **Validação técnica obrigatória** com `scripts/quick_validate.py` e testes de routing.

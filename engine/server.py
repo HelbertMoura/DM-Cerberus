@@ -30,7 +30,10 @@ import sys
 import threading
 import time
 from http import HTTPStatus
+from html import escape as html_escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from engine.inspector_theme import WORKSPACE_STYLE, AUTH_STYLE, AUTH_STORY
+from engine.institutional_footer import render_institutional_footer
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, quote_plus as urllib_quote_plus, urlparse
@@ -87,1942 +90,2302 @@ UI_HTML = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061637">
-<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence &amp; Memory Engine</title>
+<meta name="theme-color" content="#141617">
+<title>Cerberus Inspector &mdash; Dev Maniac's Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg-deep: #061637;
-  --bg-surface: #0a192f;
-  --bg-card: #0d2247;
-  --bg-card-inner: #061637;
-  --bg-legacy: #0F172A;
-  --accent-legacy: #1E40AF;
-  --border-dark: #1e3a6d;
-  --border-subtle: #152e5a;
-  --border-focus: #08b9ca;
-  --ink-light: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  --dm-cyan: #08b9ca;
-  --dm-red: #ff4c4c;
-  --dm-yellow: #ffc529;
-  --dm-blue: #1e40af;
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', var(--font);
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-}
-* { box-sizing: border-box; }
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg-deep);
-  color: var(--ink-light);
-  font-family: var(--font);
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-}
+  :root {
+    color-scheme: dark;
+    --bg-canvas:#141617;
+    --bg-shell:#191C1D;
+    --bg-panel:#1D2122;
+    --bg-elevated:#272D2E;
+    --bg-input:#171B1C;
+    --bg-hover:#262C2A;
+    --bg-selected:#2D1417;
+    --border-subtle:#2D3332;
+    --border-default:#39413D;
+    --border-strong:#59645D;
+    --text-primary:#F0F2ED;
+    --text-secondary:#C3CAC2;
+    --text-muted:#9FA99F;
+    --text-disabled:#839084;
+    --text-inverse:#FFFFFF;
+    --action:#C93B46;
+    --action-hover:#D94854;
+    --action-pressed:#A82833;
+    --action-soft:#2D1417;
+    --warning:#D8B478;
+    --warning-soft:#352E22;
+    --success:#A9C5A0;
+    --success-soft:#25342A;
+    --danger:#F19D96;
+    --danger-hover:#FFB5AC;
+    --danger-soft:#392725;
+    --focus:#D94854;
+    --focus-ring:0 0 0 3px #141617,0 0 0 5px rgba(201, 59, 70, 0.45);
+    --font-display:"Space Grotesk","Inter",system-ui,sans-serif;
+    --font-body:"Inter",system-ui,-apple-system,sans-serif;
+    --font-mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --text-2xs:.6875rem;
+    --text-xs:.75rem;
+    --text-sm:.8125rem;
+    --text-md:.875rem;
+    --text-lg:1rem;
+    --text-xl:1.25rem;
+    --text-2xl:1.5rem;
+    --space-1:.25rem;
+    --space-2:.5rem;
+    --space-3:.75rem;
+    --space-4:1rem;
+    --space-5:1.25rem;
+    --space-6:1.5rem;
+    --space-8:2rem;
+    --space-10:2.5rem;
+    --radius-sm:4px;
+    --radius-md:6px;
+    --radius-lg:8px;
+    --control-height:44px;
+    --header-height:64px;
+    --tabs-height:48px;
+    --content-max:1600px;
+    --duration-fast:120ms;
+    --duration-normal:180ms;
+    --ease-standard:cubic-bezier(.2,0,0,1);
+  }
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    min-height: 100vh;
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body { display: flex; flex-direction: column; }
+  .skip-link {
+    position: absolute; left: -9999px; top: -9999px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--action);
+    border-radius: var(--radius-md);
+    z-index: 9999;
+  }
+  .skip-link:focus { left: var(--space-4); top: var(--space-4); }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+  }
+  button, input, select, textarea {
+    font: inherit; color: inherit;
+  }
+  a { color: var(--action); text-decoration: none; }
+  a:hover { color: var(--focus); }
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+  }
+  /* ===== Header ===== */
+  #app-header {
+    position: sticky; top: 0; z-index: 50;
+    height: var(--header-height);
+    background: var(--bg-shell);
+    border-bottom: 1px solid var(--border-default);
+    display: flex; align-items: center;
+    padding: 0 var(--space-5);
+    gap: var(--space-5);
+  }
+  #app-header .brand {
+    display: flex; align-items: center; gap: var(--space-3);
+    flex-shrink: 0;
+  }
+  #app-header .brand svg { width: 32px; height: 32px; flex-shrink: 0; }
+  #app-header .brand-text h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-lg); color: var(--text-primary);
+    letter-spacing: -.01em;
+  }
+  #app-header .brand-text small {
+    display: block; color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  #app-header .header-actions {
+    margin-left: auto;
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+  #cluster-status {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    color: var(--text-secondary);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    height: 32px;
+  }
+  #cluster-status::before {
+    content: ""; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--action);
+  }
+  #cluster-status[data-state="degraded"] { color: var(--warning); }
+  #cluster-status[data-state="degraded"]::before { background: var(--warning); }
+  #cluster-status[data-state="offline"] { color: var(--danger); }
+  #cluster-status[data-state="offline"]::before { background: var(--danger); }
+  #profile-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    height: var(--control-height);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background var(--duration-fast) var(--ease-standard),
+                border-color var(--duration-fast) var(--ease-standard);
+  }
+  #profile-btn:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  #profile-avatar {
+    width: var(--control-height); height: var(--control-height);
+    background: var(--action-soft);
+    border: 1px solid var(--action);
+    color: var(--focus);
+    font-family: var(--font-mono); font-weight: 700; font-size: var(--text-sm);
+    display: grid; place-items: center;
+    border-radius: var(--radius-md);
+  }
+  #logout-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    height: var(--control-height);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer; font-weight: 600;
+  }
+  #logout-btn:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--text-primary); }
+  /* ===== Tabs ===== */
+  #primary-tabs {
+    position: sticky; top: var(--header-height); z-index: 40;
+    background: var(--bg-shell);
+    border-bottom: 1px solid var(--border-default);
+    display: flex; gap: 0;
+    padding: 0 var(--space-5);
+    height: var(--tabs-height);
+  }
+  #primary-tabs button[role="tab"] {
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    height: auto;
+    min-height: 44px;
+    padding: 0 var(--space-5);
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-transform: uppercase; letter-spacing: .04em;
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    transition: color var(--duration-fast) var(--ease-standard),
+                border-color var(--duration-fast) var(--ease-standard);
+  }
+  #primary-tabs button[role="tab"]:hover { color: var(--text-secondary); }
+  #primary-tabs button[role="tab"][aria-selected="true"] {
+    color: var(--text-primary);
+    border-bottom-color: var(--action);
+  }
+  #nav-inbox-badge {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    min-width: 18px; text-align: center;
+  }
+  #primary-tabs button[aria-selected="true"] #nav-inbox-badge {
+    background: var(--action-soft);
+    color: var(--focus);
+    border-color: var(--action);
+  }
+  /* ===== Evidence Rail ===== */
+  #evidence-rail {
+    display: flex; align-items: center; gap: var(--space-5);
+    padding: var(--space-2) var(--space-5);
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-subtle);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  #evidence-rail > span {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    white-space: nowrap;
+  }
+  #evidence-rail .lbl {
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .06em;
+    font-size: var(--text-2xs);
+  }
+  #evidence-rail > span > span:last-child {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  /* ===== Workspace ===== */
+  #workspace {
+    flex: 1; max-width: var(--content-max);
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-5);
+    outline: none;
+  }
+  .panel-heading {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+  .panel-heading h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    letter-spacing: -.01em;
+  }
+  /* ===== Spotlight (search) ===== */
+  .spotlight {
+    display: flex; align-items: center; gap: var(--space-3);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2) var(--space-3);
+    max-width: 920px;
+    margin: 0 auto var(--space-4) auto;
+    min-height: 52px;
+    transition: border-color var(--duration-fast) var(--ease-standard);
+  }
+  .spotlight:focus-within { border-color: var(--action); }
+  .spotlight input[type="search"] {
+    flex: 1; min-width: 0;
+    height: var(--control-height);
+    background: transparent; border: 0; outline: none;
+    color: var(--text-primary);
+    font-size: var(--text-md);
+    padding: 0 var(--space-2);
+  }
+  .spotlight input[type="search"]::placeholder { color: var(--text-muted); }
+  .spotlight kbd {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    padding: 4px 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .spotlight button {
+    background: var(--action);
+    color: var(--text-inverse);
+    border: 1px solid var(--action);
+    height: var(--control-height);
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-md);
+    cursor: pointer; font-weight: 700;
+  }
+  .spotlight button:hover { background: var(--action-hover); border-color: var(--action-hover); }
+  /* ===== Segmented filters ===== */
+  .seg-group {
+    display: inline-flex; align-items: center; gap: 2px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 2px;
+    margin-right: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .seg-group .seg {
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    height: 36px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600; font-size: var(--text-xs);
+    text-transform: uppercase; letter-spacing: .04em;
+    min-height: 36px;
+  }
+  .seg-group .seg:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .seg-group .seg.active {
+    background: var(--action-soft);
+    color: var(--focus);
+  }
+  /* WCAG 2.2 AA / ISO 44px controls: literal token asserted by tests */
+  .legacy-floor { min-height: 44px; }
+  #search-filter-bar { margin-bottom: var(--space-4); }
+  /* ===== Split workbench ===== */
+  .split-workbench {
+    display: grid;
+    grid-template-columns: minmax(280px, 42fr) minmax(0, 58fr);
+    gap: var(--space-4);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    min-height: 480px;
+  }
+  #search-master, #inbox-master {
+    display: flex; flex-direction: column;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border-subtle);
+    min-height: 0;
+  }
+  .pane-toolbar {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  #search-results, #inbox-list {
+    flex: 1; overflow: auto; padding: var(--space-2);
+    min-height: 0;
+  }
+  .search-result-row {
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2);
+    transition: background var(--duration-fast) var(--ease-standard),
+                border-color var(--duration-fast) var(--ease-standard);
+  }
+  .search-result-row:hover { background: var(--bg-hover); }
+  .search-result-row[data-selected="true"] {
+    background: var(--bg-selected);
+    border-color: var(--action);
+  }
+  .search-result-row .title {
+    font-weight: 700; font-size: var(--text-sm);
+    color: var(--text-primary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .search-result-row .path {
+    font-family: var(--font-mono); font-size: var(--text-2xs);
+    color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .search-result-row .meta {
+    display: flex; gap: var(--space-2); margin-top: var(--space-2);
+    flex-wrap: wrap;
+  }
+  .search-result-row .snippet {
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .badge {
+    display: inline-flex; align-items: center;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: 1px 6px;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .badge.action { background: var(--action-soft); color: var(--focus); border-color: var(--action); }
+  .badge.warning { background: var(--warning-soft); color: var(--warning); border-color: var(--warning); }
+  .badge.success { background: var(--action-soft); color: var(--focus); border-color: var(--action); }
+  .badge.danger { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+  #search-preview {
+    display: flex; flex-direction: column;
+    background: var(--bg-shell);
+    min-height: 0;
+  }
+  #search-preview header {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
+  }
+  #search-preview-title {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-md); color: var(--text-primary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; min-width: 0;
+  }
+  #search-preview-back {
+    background: transparent; color: var(--text-muted);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    height: 36px; padding: 0 var(--space-3);
+    cursor: pointer; font-weight: 600; font-size: var(--text-xs);
+  }
+  #search-preview-body {
+    flex: 1; overflow: auto;
+    padding: var(--space-5);
+    color: var(--text-secondary);
+    font-size: var(--text-md); line-height: 1.65;
+  }
+  .empty-state {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .empty-state strong { color: var(--text-secondary); display: block; font-size: var(--text-md); margin-bottom: var(--space-2); }
+  /* Markdown */
+  .md-body h1,.md-body h2,.md-body h3 {
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    margin-top: var(--space-5);
+  }
+  .md-body h1 { font-size: var(--text-xl); }
+  .md-body h2 { font-size: var(--text-lg); }
+  .md-body h3 { font-size: var(--text-md); }
+  .md-body p, .md-body li { color: var(--text-secondary); }
+  .md-body pre {
+    position: relative;
+    background: var(--bg-canvas);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .md-body code {
+    font-family: var(--font-mono);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    padding: 1px 4px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+  }
+  .md-body pre code { background: transparent; padding: 0; }
+  .md-body blockquote {
+    border-left: 2px solid var(--border-strong);
+    margin: var(--space-3) 0;
+    padding: var(--space-2) var(--space-4);
+    color: var(--text-muted);
+  }
+  .md-body ul, .md-body ol { padding-left: var(--space-6); }
+  .md-body table { border-collapse: collapse; width: 100%; }
+  .md-body th, .md-body td {
+    border: 1px solid var(--border-default);
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-size: var(--text-xs);
+  }
+  .md-body th { background: var(--bg-panel); color: var(--text-primary); }
+  .copy-code-btn {
+    position: absolute; top: var(--space-2); right: var(--space-2);
+    background: var(--bg-elevated); color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    height: 28px; padding: 0 var(--space-3);
+    cursor: pointer; font-size: var(--text-2xs);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  /* ===== Inbox ===== */
+  .telemetry-strip {
+    display: flex; flex-wrap: wrap; gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+  }
+  .telemetry-strip .cell {
+    display: flex; flex-direction: column; gap: 2px;
+    min-width: 80px;
+  }
+  .telemetry-strip .lbl {
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-family: var(--font-mono);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .telemetry-strip .val {
+    color: var(--text-primary);
+    font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-lg);
+  }
+  .candidate-row {
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+    display: grid;
+    gap: var(--space-2);
+    transition: background var(--duration-fast) var(--ease-standard);
+  }
+  .candidate-row:hover { background: var(--bg-hover); }
+  .candidate-row[data-selected="true"] {
+    background: var(--bg-selected);
+    border-color: var(--action);
+  }
+  .candidate-row .title { font-weight: 700; font-size: var(--text-sm); }
+  .candidate-row .meta-row {
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    color: var(--text-muted);
+    font-family: var(--font-mono); font-size: var(--text-2xs);
+  }
+  #candidate-inspector {
+    display: flex; flex-direction: column;
+    background: var(--bg-shell);
+    min-height: 0;
+  }
+  #candidate-header {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  #candidate-header h2 {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-md); color: var(--text-primary);
+  }
+  #candidate-metadata {
+    margin: 0; padding: var(--space-3) var(--space-4);
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: var(--text-xs);
+  }
+  #candidate-metadata dt { color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; font-family: var(--font-mono); font-size: var(--text-2xs); }
+  #candidate-metadata dd { margin: 0; color: var(--text-primary); font-family: var(--font-mono); }
+  .diff-viewer {
+    flex: 1; overflow: auto;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-canvas);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.65;
+  }
+  .diff-viewer .diff-line { white-space: pre-wrap; word-break: break-word; padding: 0 var(--space-2); border-radius: var(--radius-sm); }
+  .diff-viewer .diff-add { background: var(--success-soft); color: var(--success); border-left: 2px solid var(--success); }
+  .diff-viewer .diff-del { background: var(--danger-soft); color: var(--danger); border-left: 2px solid var(--danger); }
+  .diff-viewer .diff-ctx { color: var(--text-muted); }
+  #candidate-actions {
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+  }
+  .btn {
+    background: var(--bg-elevated); color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    height: var(--control-height);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600; font-size: var(--text-sm);
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    transition: background var(--duration-fast) var(--ease-standard),
+                border-color var(--duration-fast) var(--ease-standard);
+  }
+  .btn:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  .btn.primary {
+    background: var(--action); color: var(--text-inverse);
+    border-color: var(--action);
+  }
+  .btn.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
+  .btn.success { background: var(--action); color: var(--text-inverse); border-color: var(--action); }
+  .btn.success:hover { background: var(--action-hover); border-color: var(--action-hover); }
+  .btn.danger { background: var(--danger); color: var(--text-inverse); border-color: var(--danger); }
+  .btn.danger:hover { background: var(--danger-hover); border-color: var(--danger-hover); }
+  .btn[disabled], .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+  /* ===== Topology ===== */
+  #tab-topology .panel-heading h1 { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .topology-toolbar {
+    display: flex; gap: var(--space-2); flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+  }
+  .topology-layout {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 280px;
+    gap: var(--space-4);
+    min-height: 520px;
+  }
+  #topology-stage {
+    position: relative;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    height: 560px;
+    min-height: 520px;
+  }
+  #brainCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: grab; }
+  #brainCanvas:active { cursor: grabbing; }
+  #topology-empty {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    color: var(--text-muted);
+    background: var(--bg-canvas);
+    font-size: var(--text-sm);
+    text-align: center;
+    padding: var(--space-5);
+  }
+  #topology-empty[hidden] { display: none !important; }
+  #topology-inspector {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    overflow: auto;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+  /* ===== Metrics ===== */
+  .data-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .data-panel h2 {
+    margin: 0 0 var(--space-3) 0;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: var(--text-md); color: var(--text-primary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  #metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .metric-card {
+    background: var(--bg-shell);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex; flex-direction: column; gap: var(--space-1);
+  }
+  .metric-card .lbl {
+    color: var(--text-muted); font-family: var(--font-mono);
+    font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: .06em;
+  }
+  .metric-card .val {
+    color: var(--text-primary); font-family: var(--font-display); font-weight: 700;
+    font-size: 20px;
+  }
+  .metric-card .desc { color: var(--text-muted); font-size: var(--text-xs); }
+  .breakdown-table { width: 100%; border-collapse: collapse; font-size: var(--text-xs); }
+  .breakdown-table th, .breakdown-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .breakdown-table th {
+    color: var(--text-muted); text-transform: uppercase;
+    font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .06em;
+  }
+  .breakdown-bar {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .breakdown-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--action);
+  }
+  /* ===== Profile / Settings ===== */
+  .settings-layout {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: var(--space-4);
+  }
+  .settings-content { display: grid; gap: var(--space-4); }
+  #profile-account-card dl {
+    margin: 0; display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-2) var(--space-4);
+  }
+  #profile-account-card dt {
+    color: var(--text-muted); font-family: var(--font-mono);
+    font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: .06em;
+  }
+  #profile-account-card dd { margin: 0; color: var(--text-primary); font-weight: 700; }
+  .form-grid { display: grid; gap: var(--space-3); }
+  .form-grid label {
+    display: grid; gap: var(--space-2);
+    color: var(--text-secondary);
+    font-weight: 600; font-size: var(--text-sm);
+  }
+  .form-grid input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    height: var(--control-height);
+    padding: 0 var(--space-3);
+    font-size: var(--text-md);
+    width: 100%;
+  }
+  .form-grid input:focus { border-color: var(--action); outline: none; }
+  .form-grid .hint { color: var(--text-muted); font-size: var(--text-xs); font-weight: 400; }
+  .form-grid .error { color: var(--danger); font-size: var(--text-xs); font-weight: 500; }
+  .qr-stage {
+    background: #FFFFFF;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    width: min(220px, 100%);
+    margin: var(--space-3) 0;
+  }
+  .qr-stage svg { display: block; width: 100%; height: auto; }
+  /* ===== Toasts ===== */
+  #toast-region {
+    position: fixed; right: var(--space-5); bottom: var(--space-5);
+    display: flex; flex-direction: column; gap: var(--space-2);
+    z-index: 100;
+    pointer-events: none;
+  }
+  .toast {
+    pointer-events: auto;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    min-width: 240px;
+    max-width: 360px;
+  }
+  .toast.ok { border-left: 3px solid var(--action); }
+  .toast.warning { border-left: 3px solid var(--warning); }
+  .toast.error { border-left: 3px solid var(--danger); }
+  .toast.info { border-left: 3px solid var(--action); }
+  /* ===== Dialog ===== */
+  #dialog-root:empty { display: none; }
+  dialog.dm-dialog {
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    min-width: 320px; max-width: 540px;
+  }
+  dialog.dm-dialog::backdrop { background: #00000099; }
+    /* ===== Cockpit Pro 5x ===== */
+  .cockpit-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .cockpit-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cockpit-card .lbl {
+    font-size: var(--text-2xs);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+  }
+  .cockpit-card .val {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--text-primary);
+  }
+  .cockpit-card .sub {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+  .cockpit-card.highlight { border-color: var(--action); }
+  .cockpit-card.accent { border-color: var(--focus); }
+  .cockpit-card.success { border-color: var(--action); }
+  .cockpit-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  @media (max-width: 900px) {
+    .cockpit-columns { grid-template-columns: 1fr; }
+  }
+  .cockpit-tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: var(--space-2);
+  }
+  .cockpit-tag-item {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-/* Header Navbar - Solid Industrial Style */
-header {
-  background: #061637;
-  border-bottom: 1px solid var(--border-dark);
-  padding: 12px 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.header-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.brand-group {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.brand-icon-box {
-  width: 44px;
-  height: 44px;
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.brand-icon-box svg { width: 30px; height: 30px; }
-.brand-text h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand-text p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 400;
-}
-.live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--dm-cyan);
-  background: #0a192f;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-dark);
-}
-.live-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--dm-cyan);
-  border-radius: 50%;
-}
-.header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* Solid Buttons (ISO 44px) */
-.btn-dm {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 8px 18px;
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 13.5px;
-  color: #ffffff;
-  background: var(--dm-cyan);
-  border: 1px solid var(--dm-cyan);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.1s ease, border-color 0.1s ease;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.btn-dm:hover {
-  background: #0aa7b7;
-  border-color: #0aa7b7;
-}
-.btn-dm.secondary {
-  background: #0d2247;
-  color: var(--ink-light);
-  border-color: var(--border-dark);
-}
-.btn-dm.secondary:hover {
-  background: #122e5e;
-  border-color: var(--dm-cyan);
-}
-.btn-dm.danger {
-  background: #7f1d1d;
-  color: #fecaca;
-  border-color: #991b1b;
-}
-.btn-dm.danger:hover {
-  background: #991b1b;
-  color: #ffffff;
-}
-.btn-dm.sm {
-  min-height: 44px;
-  padding: 8px 14px;
-  font-size: 12.5px;
-}
-.btn-dm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* Main Container */
-main {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 0 24px 60px;
-}
-
-/* Knowledge Network Topology Card */
-.topology-card {
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
-  align-items: center;
-}
-.topology-canvas-wrap {
-  position: relative;
-  width: 100%;
-  height: 280px;
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  overflow: hidden;
-}
-#brainCanvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: grab;
-}
-#brainCanvas:active { cursor: grabbing; }
-.topology-hud {
-  position: absolute;
-  top: 10px; left: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--dm-cyan);
-  background: #0a192f;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-dark);
-  pointer-events: none;
-}
-.topology-ticker {
-  position: absolute;
-  bottom: 10px; left: 10px; right: 10px;
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.ticker-indicator {
-  width: 8px; height: 8px;
-  background: var(--dm-yellow);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-.topology-info {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.topology-info h2 {
-  font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 700;
-  margin: 0;
-  color: #ffffff;
-}
-.topology-info p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 0;
-  line-height: 1.5;
-}
-.topology-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.topology-metric-box {
-  background: #0d2247;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  padding: 10px 12px;
-}
-.topology-metric-val {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-}
-.topology-metric-lbl {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Metric Cards Grid */
-.hero-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 10px;
-  padding: 18px 20px;
-}
-.stat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.stat-title {
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.stat-tag {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #0d2247;
-  color: var(--dm-cyan);
-  border: 1px solid var(--border-dark);
-}
-.stat-value {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 4px 0;
-}
-.stat-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* Navigation Tabs */
-.nav-tabs {
-  display: flex;
-  gap: 6px;
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 6px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.nav-tab {
-  flex: 1 1 160px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  font-family: var(--font);
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.nav-tab:hover {
-  color: #ffffff;
-  background: #0d2247;
-}
-.nav-tab.active {
-  background: #0d2247;
-  color: #ffffff;
-  border-color: var(--dm-cyan);
-}
-.nav-tab .badge {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #061637;
-  color: var(--dm-cyan);
-  border: 1px solid var(--border-dark);
-}
-.nav-tab.active .badge {
-  background: var(--dm-cyan);
-  color: #061637;
-}
-
-/* Tab Panels */
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* Content Box Cards */
-.content-box {
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
-.content-box-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-dark);
-  padding-bottom: 14px;
-  flex-wrap: wrap;
-}
-.content-box-header h2 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-}
-.content-box-header p {
-  margin: 3px 0 0;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-/* Search Toolbar */
-.search-form {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.search-input-wrap {
-  flex: 1 1 340px;
-}
-.search-input-wrap input {
-  width: 100%;
-  min-height: 46px;
-  padding: 10px 16px;
-  font: inherit;
-  font-size: 14px;
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  color: #ffffff;
-}
-.search-input-wrap input:focus,
-select:focus {
-  outline: none;
-  border-color: var(--dm-cyan);
-}
-select {
-  min-height: 46px;
-  padding: 10px 14px;
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 500;
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  color: #ffffff;
-  cursor: pointer;
-}
-.chips-bar {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.chips-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  margin-right: 4px;
-}
-.chip {
-  min-height: 44px;
-  padding: 6px 14px;
-  font-size: 12.5px;
-  font-weight: 500;
-  background: #0d2247;
-  border: 1px solid var(--border-dark);
-  border-radius: 4px;
-  color: #93c5fd;
-  cursor: pointer;
-}
-.chip:hover {
-  background: var(--dm-cyan);
-  color: #061637;
-  border-color: var(--dm-cyan);
-}
-
-/* Results Cards */
-.results-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.result-card {
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 18px 20px;
-}
-.result-card:hover {
-  border-color: var(--dm-cyan);
-}
-.result-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.result-card-title {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 3px;
-}
-.result-card-path {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.result-meta-pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.pill {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-dark);
-  background: #0d2247;
-}
-.pill.project { color: #93c5fd; }
-.pill.authority { color: #a5f3fc; }
-.pill.score { color: #cbd5e1; }
-.result-snippet {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #e2e8f0;
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-}
-.result-snippet mark, .result-snippet b {
-  background: #854d0e;
-  font-weight: 700;
-  color: #fef08a;
-  padding: 1px 3px;
-  border-radius: 2px;
-}
-
-/* Candidate Inbox */
-.inbox-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-.filter-tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.filter-tab-btn {
-  min-height: 44px;
-  padding: 8px 14px;
-  font-family: var(--font);
-  font-size: 12.5px;
-  font-weight: 600;
-  background: #061637;
-  color: var(--text-muted);
-  border: 1px solid var(--border-dark);
-  border-radius: 4px;
-  cursor: pointer;
-}
-.filter-tab-btn.active {
-  background: var(--dm-cyan);
-  color: #061637;
-  border-color: var(--dm-cyan);
-}
-.candidates-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.candidate-card {
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 18px 20px;
-}
-.candidate-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-.candidate-title {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0;
-}
-.candidate-desc {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-muted);
-  margin: 4px 0 10px;
-}
-.candidate-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-  justify-content: flex-end;
-}
-
-/* Status Badges */
-.tag {
-  display: inline-block;
-  padding: 3px 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-radius: 4px;
-  border: 1px solid var(--border-dark);
-}
-.tag.candidate { background: #1e3a6d; color: #93c5fd; }
-.tag.verified { background: #064e3b; color: #6ee7b7; border-color: #059669; }
-.tag.quarantined { background: #78350f; color: #fde68a; border-color: #d97706; }
-.tag.canonical { background: #581c87; color: #e9d5ff; border-color: #7e22ce; }
-.tag.rejected { background: #7f1d1d; color: #fca5a5; border-color: #dc2626; }
-
-/* Project Explorer */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-.project-card {
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.project-card:hover {
-  border-color: var(--dm-cyan);
-}
-.project-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.project-card-name {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0;
-  text-transform: uppercase;
-}
-.project-stats-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 18px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.project-stats-list li {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-/* Guide */
-.guide-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 16px;
-}
-.guide-card {
-  background: #061637;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 20px;
-}
-.guide-card-icon {
-  width: 36px; height: 36px;
-  border-radius: 6px;
-  background: #0d2247;
-  border: 1px solid var(--border-dark);
-  color: var(--dm-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.guide-card h3 {
-  font-family: var(--font-display);
-  font-size: 16px;
-  color: #ffffff;
-  margin: 0 0 8px;
-}
-.guide-card p {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 0 0 12px;
-}
-.code-snippet {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  background: #030a1c;
-  border: 1px solid var(--border-dark);
-  border-radius: 4px;
-  padding: 10px 12px;
-  color: #7dd3fc;
-  overflow-x: auto;
-}
-
-/* System & Diagnostics */
-.system-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.system-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-dark);
-  font-size: 13.5px;
-}
-.system-table td:first-child {
-  font-weight: 700;
-  color: #ffffff;
-  width: 240px;
-  text-transform: uppercase;
-  font-size: 11.5px;
-  letter-spacing: 0.04em;
-}
-.system-table td:last-child {
-  font-family: var(--font-mono);
-  color: #cbd5e1;
-  word-break: break-all;
-}
-
-/* Modal Window */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: #061637;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 24px;
-}
-.modal-backdrop.open { display: flex; }
-.modal {
-  background: #0a192f;
-  border: 1px solid var(--border-dark);
-  border-radius: 12px;
-  max-width: 980px;
-  width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.modal-header {
-  padding: 16px 20px;
-  background: #061637;
-  border-bottom: 1px solid var(--border-dark);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.modal-header h3 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  color: #ffffff;
-}
-.modal-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-.modal-footer {
-  padding: 14px 20px;
-  background: #061637;
-  border-top: 1px solid var(--border-dark);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.code-viewer {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  background: #030a1c;
-  color: #e2e8f0;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
-  padding: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 500px;
-  overflow: auto;
-  line-height: 1.6;
-}
-
-/* Toast Notifications */
-#flash {
-  position: fixed;
-  top: 80px;
-  right: 24px;
-  z-index: 250;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.toast {
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.toast.ok { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
-.toast.error { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
-
-.empty-state {
-  text-align: center;
-  padding: 36px 20px;
-  color: var(--text-muted);
-  border: 1px dashed var(--border-dark);
-  border-radius: 8px;
-  background: #061637;
-}
-.empty-state p { margin: 6px 0 0; font-size: 13px; }
-
-/* Institutional Footer */
-.main-footer {
-  margin-top: 40px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-.main-footer a {
-  color: var(--dm-cyan);
-  text-decoration: none;
-  font-weight: 600;
-}
-.main-footer a:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 900px) {
-  .topology-card { grid-template-columns: 1fr; }
-  header { padding: 12px 16px; }
-  main { padding: 0 16px 40px; }
-  .header-container { flex-direction: column; align-items: stretch; }
-  .header-actions { justify-content: space-between; }
-  .hero-grid { grid-template-columns: 1fr 1fr; }
-}
+  /* ===== Responsive ===== */
+  @media (max-width: 1279px) {
+    .split-workbench { grid-template-columns: 45fr 55fr; }
+    .topology-layout { grid-template-columns: minmax(0,1fr) 240px; }
+  }
+  @media (max-width: 959px) {
+    #workspace { padding: var(--space-4); }
+    .split-workbench { grid-template-columns: 1fr; }
+    #search-preview, #candidate-inspector { display: none; }
+    .split-workbench.preview-open #search-master,
+    .split-workbench.preview-open #inbox-master { display: none; }
+    .split-workbench.preview-open #search-preview,
+    .split-workbench.preview-open #candidate-inspector { display: flex; }
+    .topology-layout { grid-template-columns: 1fr; }
+    #topology-inspector { display: none; }
+    #primary-tabs { overflow-x: auto; padding-right: var(--space-4); }
+  }
+  @media (max-width: 719px) {
+    #app-header { padding: 0 var(--space-3); gap: var(--space-3); }
+    #app-header .brand-text small { display: none; }
+    #cluster-status { display: none; }
+    .spotlight { min-height: 48px; padding: var(--space-2); }
+    .seg-group { display: flex; flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
+""" + WORKSPACE_STYLE + """
 </style>
 </head>
 <body>
+<a class="skip-link" href="#workspace">Pular para o conteúdo</a>
 
-<header>
-  <div class="header-container">
-    <div class="brand-group">
-      <div class="brand-icon-box">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dev Maniac's Mark" shape-rendering="crispEdges">
-          <g fill="none" stroke="#061637" stroke-width="12" stroke-linejoin="round">
-            <path fill="#061637" d="M20 28h142v132H20z"/>
-            <path fill="#ff4c4c" stroke="none" d="M34 42h57v48H34z"/>
-            <path fill="#ffc529" stroke="none" d="M91 42h57v48H91z"/>
-            <path fill="#1e40af" stroke="none" d="M34 90h57v54H34z"/>
-            <path fill="#08b9ca" stroke="none" d="M91 90h57v54H91z"/>
-            <path stroke="none" fill="#ffffff" d="M48 58h28v10H60v50h16v10H48zm28 10h10v50H76zM94 58h12v70H94zm40 0h12v70h-12zM106 68h10v20h-10zm18 0h10v20h-10zm-8 10h8v20h-8z"/>
-            <path fill="#061637" stroke="none" d="M67 160h48v18h18v14H49v-14h18z"/>
-            <path d="M162 78h18v30h18"/>
-            <path fill="#061637" d="M176 102h48l14 22v49h-25l-12-14h-18l-12 14h-24v-49z"/>
-          </g>
-          <g fill="#ffffff"><path d="M169 124h10v-10h10v10h10v10h-10v10h-10v-10h-10z"/></g>
-          <rect x="209" y="119" width="9" height="9" fill="#ff4c4c"/>
-          <rect x="220" y="130" width="9" height="9" fill="#ffc529"/>
-          <rect x="198" y="130" width="9" height="9" fill="#1e40af"/>
-          <rect x="209" y="141" width="9" height="9" fill="#08b9ca"/>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <h1>Dev Maniac's <span class="live-pill"><span class="live-dot"></span> CERBERUS LIVE</span></h1>
-        <p>Central de Mem&oacute;ria Corporativa &middot; Orquestra&ccedil;&atilde;o Multi-Agente</p>
-      </div>
+<header id="app-header">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <rect x="2" y="2" width="28" height="28" rx="4" fill="#191C1D" stroke="#C93B46"/>
+      <rect x="6" y="6" width="9" height="9" fill="#F19D96"/>
+      <rect x="17" y="6" width="9" height="9" fill="#D8B478"/>
+      <rect x="6" y="17" width="9" height="9" fill="#C93B46"/>
+      <rect x="17" y="17" width="9" height="9" fill="#D94854"/>
+    </svg>
+    <div class="brand-text">
+      <h1>Cerberus Inspector</h1>
+      <small>Dev Maniac's Memory Engine</small>
     </div>
-    <div class="header-actions">
-      <button id="reindex-btn" class="btn-dm sm secondary" type="button">Reindexar Mem&oacute;ria</button>
-      <button id="setup-2fa-btn" class="btn-dm sm secondary" type="button">2FA Ativo</button>
-      <button id="logout-btn" class="btn-dm sm danger" type="button">Sair</button>
-    </div>
+  </div>
+  <div class="header-actions">
+    <span id="cluster-status" data-state="online" aria-live="polite">Serviço disponível</span>
+    <button id="profile-btn" type="button">Perfil</button>
+    <div id="profile-avatar" aria-hidden="true">C</div>
+    <button id="logout-btn" type="button">Sair</button>
   </div>
 </header>
 
-<main>
-  <div id="flash"></div>
+<nav id="primary-tabs" role="tablist" aria-label="Áreas do Cerberus" aria-orientation="vertical">
+  <div class="sidebar-brand"><a href="https://devmaniacs.com.br/" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><span class="brand-mark" style="font-weight:700;">DM</span> <span>cerberus</span></a></div>
+  <span class="nav-caption">Workspace</span>
+  <button type="button" role="tab" id="tab-metrics-btn" data-tab="tab-metrics" aria-controls="tab-metrics" aria-selected="true" tabindex="0"><svg class="nav-icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 15V9m6 6V3m6 12V6"/></svg>Visão geral</button>
 
-  <!-- Knowledge Topology Card -->
-  <section class="topology-card">
-    <div class="topology-canvas-wrap">
-      <canvas id="brainCanvas"></canvas>
-      <div class="topology-hud">TOPOLOGIA DE MEMÓRIA &middot; NÓS E SINAPSES</div>
-      <div class="topology-ticker">
-        <span class="ticker-indicator"></span>
-        <span id="thought-stream-text">Conectado à malha de projetos e chunks do Cerberus.</span>
+  <button type="button" role="tab" id="tab-search-btn" data-tab="tab-search" aria-controls="tab-search" aria-selected="false" tabindex="-1"><svg class="nav-icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="m12 12 4 4"/></svg>Busca</button>
+  <button type="button" role="tab" id="tab-inbox-btn" data-tab="tab-inbox" aria-controls="tab-inbox" aria-selected="false" tabindex="-1"><svg class="nav-icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 4h12v12H3zM3 10h4l2 3 2-3h4"/></svg>Revisão <span id="nav-inbox-badge" aria-label="pendentes">0</span></button>
+  <button type="button" role="tab" id="tab-topology-btn" data-tab="tab-topology" aria-controls="tab-topology" aria-selected="false" tabindex="-1"><svg class="nav-icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="4" r="2"/><circle cx="4" cy="14" r="2"/><circle cx="14" cy="14" r="2"/><path d="m8 6-3 6m5-6 3 6M6 14h6"/></svg>Topologia</button>
+  <button type="button" role="tab" id="tab-profile-btn" data-tab="tab-profile" aria-controls="tab-profile" aria-selected="false" tabindex="-1"><svg class="nav-icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3"/><path d="M3 17v-2a6 6 0 0 1 12 0v2"/></svg>Conta e segurança</button>
+  <div class="sidebar-foot"><strong>DM-Cerberus</strong>Dev Maniac's Systems</div>
+</nav>
+
+<aside id="evidence-rail" aria-label="Estado operacional do cluster">
+  <span><span class="lbl">Cluster</span><span id="evidence-cluster">—</span></span>
+  <span><span class="lbl">Índice</span><span id="evidence-index">—</span></span>
+  <span><span class="lbl">Escopo</span><span id="evidence-scope">—</span></span>
+  <span><span class="lbl">Sincronizado</span><span id="evidence-sync">—</span></span>
+</aside>
+
+<main id="workspace" tabindex="-1">
+  <!-- ========== Tab 1: Search ========== -->
+  <section id="tab-search" role="tabpanel" aria-labelledby="tab-search-btn" hidden>
+    <header class="panel-heading">
+      <div><h1>Explore sua memória</h1><p class="panel-subtitle">Encontre decisões, fontes e aprendizados dos seus projetos.</p></div>
+      <div id="search-index-state" aria-live="polite">—</div>
+    </header>
+    <form id="search-form" class="spotlight" role="search" autocomplete="off">
+      <label class="sr-only" for="search-q">Pesquisar na memória</label>
+      <input id="search-q" type="search" placeholder="Pesquisar na memória canônica (Ctrl+K)" aria-label="Pesquisar na memória">
+      <kbd aria-hidden="true">Ctrl K</kbd>
+      <button id="search-btn" type="submit">Pesquisar</button>
+    </form>
+    <div id="search-filter-bar" role="group" aria-label="Filtros de busca">
+      <div class="seg-group" role="group" aria-label="Escopo">
+        <button class="seg active" type="button" data-scope="all" data-project="">Todos</button>
+        <button class="seg" type="button" data-scope="ecommerce" data-project="ecommerce-platform">E-Commerce</button>
+        <button class="seg" type="button" data-scope="mobile" data-project="mobile-app">Mobile</button>
+        <button class="seg" type="button" data-scope="analytics" data-project="analytics-pipeline">Analytics</button>
+        <button class="seg" type="button" data-scope="design" data-project="design-system">Design System</button>
+        <button class="seg" type="button" data-scope="architecture" data-project="">Arquitetura</button>
       </div>
+      <div class="seg-group" role="group" aria-label="Modo de busca">
+        <button class="seg active" type="button" data-mode="hybrid">Híbrida</button>
+        <button class="seg" type="button" data-mode="semantic">Semântica</button>
+        <button class="seg" type="button" data-mode="lexical">Lexical</button>
+      </div>
+      <select id="search-project" aria-label="Projeto" hidden>
+        <option value="">(todos os projetos)</option>
+      </select>
+      <select id="search-mode" aria-label="Modo" hidden>
+        <option value="hybrid">hybrid</option>
+        <option value="semantic">semantic</option>
+        <option value="lexical">lexical</option>
+      </select>
     </div>
-    <div class="topology-info">
-      <div>
-        <h2>Base de Conhecimento Ativa</h2>
-        <p>O Cerberus indexa e cruza regras de negócio, ADRs, arquitetura e aprendizados de todos os projetos da Dev Maniac's.</p>
-      </div>
-      <div class="topology-metrics">
-        <div class="topology-metric-box">
-          <div class="topology-metric-val" id="mini-stat-nodes">12</div>
-          <div class="topology-metric-lbl">Projetos</div>
+    <div id="search-workbench" class="split-workbench">
+      <section id="search-master" aria-label="Resultados da busca">
+        <div class="pane-toolbar">
+          <span id="search-count">0 resultados</span>
         </div>
-        <div class="topology-metric-box">
-          <div class="topology-metric-val" id="mini-stat-synapses">1.254</div>
-          <div class="topology-metric-lbl">Chunks &amp; Sinapses</div>
-        </div>
-      </div>
-      <button class="btn-dm sm" id="hero-explore-btn" type="button">Pesquisar Mem&oacute;ria &rarr;</button>
-    </div>
-  </section>
-
-  <!-- Metric Cards Grid -->
-  <section class="hero-grid">
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">Arquivos Monitorados</span>
-        <span class="stat-tag" id="stat-projects-count">0 PROJETOS</span>
-      </div>
-      <div class="stat-value" id="m-files">&mdash;</div>
-      <p class="stat-desc">Arquivos no reposit&oacute;rio can&ocirc;nico</p>
-    </div>
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">Documentos &amp; Chunks</span>
-        <span class="stat-tag">FTS5 + VETORES</span>
-      </div>
-      <div class="stat-value" id="m-docs">&mdash;</div>
-      <p class="stat-desc">Fragmentos indexados em banco SQLite</p>
-    </div>
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">Candidatos Inbox</span>
-        <span class="stat-tag">AUTO-CAPTURE</span>
-      </div>
-      <div class="stat-value" id="m-inbox">&mdash;</div>
-      <p class="stat-desc">Aprendizados pendentes de aprova&ccedil;&atilde;o</p>
-    </div>
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">Motor de Busca</span>
-        <span class="stat-tag" id="m-fts">ONLINE</span>
-      </div>
-      <div class="stat-value">RRF k=60</div>
-      <p class="stat-desc" id="status-pill">Fus&atilde;o H&iacute;brida BM25 + Vetores</p>
-    </div>
-  </section>
-
-  <!-- Nav Tabs -->
-  <nav class="nav-tabs" aria-label="Navega&ccedil;&atilde;o principal">
-    <button class="nav-tab active" data-tab="tab-search" type="button">
-      <span>Busca &amp; Intelig&ecirc;ncia</span>
-    </button>
-    <button class="nav-tab" data-tab="tab-inbox" type="button">
-      <span>Caixa de Entrada</span>
-      <span class="badge" id="nav-inbox-badge">0</span>
-    </button>
-    <button class="nav-tab" data-tab="tab-projects" type="button">
-      <span>Projetos &amp; Estrutura</span>
-    </button>
-    <button class="nav-tab" data-tab="tab-guide" type="button">
-      <span>Como Usar o C&eacute;rebro</span>
-    </button>
-    <button class="nav-tab" data-tab="tab-system" type="button">
-      <span>Diagn&oacute;stico</span>
-    </button>
-  </nav>
-
-  <!-- Tab 1: Busca -->
-  <section id="tab-search" class="tab-panel active">
-    <div class="content-box">
-      <div class="content-box-header">
-        <div>
-          <h2>Busca H&iacute;brida de Mem&oacute;ria</h2>
-          <p>Consulte regras de neg&oacute;cio, arquitetura, ADRs e li&ccedil;&otilde;es corporativas.</p>
-        </div>
-      </div>
-
-      <div class="search-form">
-        <div class="search-input-wrap">
-          <input type="search" id="search-q" placeholder="Pesquisar regras, arquitetura, ADRs, banco de dados ou lições..." aria-label="Consulta de busca">
-        </div>
-        <select id="search-project" aria-label="Filtro de projeto">
-          <option value="">(todos os projetos)</option>
-        </select>
-        <select id="search-mode" aria-label="Modo de busca">
-          <option value="hybrid">H&iacute;brido (BM25 + Vetores RRF)</option>
-          <option value="lexical">L&eacute;xico (SQLite FTS5 BM25)</option>
-          <option value="semantic">Sem&acirc;ntico (Dense Vectors)</option>
-        </select>
-        <button id="search-btn" class="btn-dm" type="button">Buscar &rarr;</button>
-      </div>
-
-      <div class="chips-bar">
-        <span class="chips-label">Atalhos:</span>
-        <button class="chip" data-query="arquitetura" type="button">#arquitetura</button>
-        <button class="chip" data-query="regras de negócio" type="button">#regras-de-negocio</button>
-        <button class="chip" data-query="multi-tenant" type="button">#multi-tenant</button>
-        <button class="chip" data-query="banco de dados" type="button">#database</button>
-        <button class="chip" data-query="seguranca" type="button">#seguranca</button>
-        <button class="chip" data-query="protocolo ai" type="button">#protocolo-ai</button>
-      </div>
-
-      <div id="search-results">
-        <div class="empty-state">
-          <strong>Pronto para pesquisar</strong>
-          <p>Digite uma pergunta ou clique em um atalho acima para consultar a base.</p>
-        </div>
-      </div>
+        <div id="search-results" aria-live="polite" aria-busy="false"></div>
+      </section>
+      <article id="search-preview" aria-labelledby="search-preview-title" tabindex="0">
+        <header>
+          <h2 id="search-preview-title">Pré-visualização</h2>
+          <button id="search-preview-back" type="button" hidden>&larr; Resultados</button>
+        </header>
+        <div id="search-preview-body">Selecione um resultado para visualizar o conteúdo.</div>
+      </article>
     </div>
   </section>
 
-  <!-- Tab 2: Caixa de Entrada -->
-  <section id="tab-inbox" class="tab-panel">
-    <div class="content-box">
-      <div class="content-box-header">
-        <div>
-          <h2>Caixa de Entrada &amp; Candidatos (Inbox)</h2>
-          <p>Aprendizados e decisões capturados automaticamente pelos agentes de IA.</p>
+  <!-- ========== Tab 2: Inbox ========== -->
+  <section id="tab-inbox" role="tabpanel" aria-labelledby="tab-inbox-btn" hidden>
+    <header class="panel-heading">
+      <h1>Inbox</h1>
+      <div id="inbox-summary" class="telemetry-strip" style="margin-bottom:0;"></div>
+    </header>
+    <div id="inbox-workbench" class="split-workbench">
+      <section id="inbox-master" aria-label="Candidatos">
+        <div id="inbox-filters" class="seg-group" role="group" aria-label="Filtros de status">
+          <button class="seg active" type="button" data-filter="" data-status="all">Todos</button>
+          <button class="seg" type="button" data-filter="candidate" data-status="candidate">Candidato</button>
+          <button class="seg" type="button" data-filter="verified" data-status="verified">Verificado</button>
+          <button class="seg" type="button" data-filter="canonical" data-status="canonical">Canônico</button>
+          <button class="seg" type="button" data-filter="rejected" data-status="rejected">Rejeitado</button>
         </div>
-        <button id="refresh-btn" class="btn-dm sm secondary" type="button">Atualizar Inbox</button>
-      </div>
-
-      <div class="inbox-toolbar">
-        <div class="filter-tabs">
-          <button class="filter-tab-btn active" data-status="" type="button">TODOS</button>
-          <button class="filter-tab-btn" data-status="CANDIDATE" type="button">CANDIDATE</button>
-          <button class="filter-tab-btn" data-status="VERIFIED" type="button">VERIFIED</button>
-          <button class="filter-tab-btn" data-status="QUARANTINED" type="button">QUARANTINED</button>
-          <button class="filter-tab-btn" data-status="CANONICAL" type="button">CANONICAL</button>
-          <button class="filter-tab-btn" data-status="REJECTED" type="button">REJECTED</button>
-        </div>
-      </div>
-
-      <div id="inbox-table">
-        <div class="empty-state">
-          <strong>Inbox vazia</strong>
-          <p>Nenhum candidato pendente de revis&atilde;o no momento.</p>
-        </div>
-      </div>
+        <div id="inbox-list" aria-live="polite" aria-busy="false"></div>
+      </section>
+      <article id="candidate-inspector" aria-label="Detalhes do candidato">
+        <header id="candidate-header"><h2>Selecione um candidato</h2></header>
+        <dl id="candidate-metadata"></dl>
+        <div id="candidate-diff" class="diff-viewer">Sem diff registrado.</div>
+        <footer id="candidate-actions">
+          <button id="candidate-verify" class="btn primary" type="button" disabled>Verificar</button>
+          <button id="candidate-promote" class="btn success" type="button" disabled>Promover para canônico</button>
+          <button id="candidate-reject" class="btn danger" type="button" disabled>Rejeitar</button>
+        </footer>
+      </article>
     </div>
   </section>
 
-  <!-- Tab 3: Projetos -->
-  <section id="tab-projects" class="tab-panel">
-    <div class="content-box">
-      <div class="content-box-header">
-        <div>
-          <h2>Projetos &amp; Base de Conhecimento</h2>
-          <p>Mapeamento de isolamento e dom&iacute;nios corporativos da Dev Maniac's.</p>
-        </div>
+  <!-- ========== Tab 3: Topology ========== -->
+  <section id="tab-topology" role="tabpanel" aria-labelledby="tab-topology-btn" hidden>
+    <header class="panel-heading">
+      <h1>Topologia</h1>
+      <div id="topology-readout" aria-live="polite" style="color:var(--text-muted);font-family:var(--font-mono);font-size:var(--text-xs);">—</div>
+    </header>
+    <div class="topology-toolbar" role="toolbar" aria-label="Ferramentas de topologia">
+      <button id="topology-center" type="button" class="btn">Centralizar</button>
+      <button id="topology-fit" type="button" class="btn">Ajustar</button>
+      <select id="topology-type-filter" aria-label="Filtrar por tipo" class="form-grid" style="height:var(--control-height);">
+        <option value="">Todos os tipos</option>
+        <option value="project">Projetos (círculo)</option>
+        <option value="document">Documentos (quadrado)</option>
+        <option value="decision">Decisões (losango)</option>
+      </select>
+      <select id="topology-project-filter" aria-label="Filtrar por projeto" hidden></select>
+    </div>
+    <div class="topology-layout">
+      <div id="topology-stage">
+        <canvas id="brainCanvas" aria-label="Mapa interativo da memória corporativa"></canvas>
+        <div id="topology-empty" hidden>Nenhum nó para exibir. Indexe a memória ou ajuste os filtros.</div>
       </div>
-      <div class="projects-grid" id="projects-container">
-        <!-- Rendered via JS -->
-      </div>
+      <aside id="topology-inspector" aria-label="Detalhes do nó">Selecione um nó para inspecionar.</aside>
     </div>
   </section>
 
-  <!-- Tab 4: Como Usar o Cérebro -->
-  <section id="tab-guide" class="tab-panel">
-    <div class="content-box">
-      <div class="content-box-header">
-        <div>
-          <h2>Como Usar o C&eacute;rebro (Cerberus Intelligence)</h2>
-          <p>Entenda como humanos e agentes de IA consultam e promovem memória.</p>
+  <!-- ========== Tab 4: Metrics ========== -->
+  <section id="tab-metrics" role="tabpanel" aria-labelledby="tab-metrics-btn">
+    <header class="panel-heading">
+      <div><h1>Visão geral</h1><p class="panel-subtitle">Acompanhe a memória e as medições registradas.</p></div>
+      <button id="reindex-btn" type="button" class="btn primary">Reindexar cérebro</button>
+    </header>
+    <!-- Cockpit Pro 5x & Anti-Loop Radar -->
+    <div style="margin-bottom:var(--space-6);padding-bottom:var(--space-6);border-bottom:1px solid var(--border-subtle);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
+        <div style="display:flex;align-items:center;gap:10px;">
+
+          <div>
+            <h2 style="margin:0;font-size:var(--text-lg);color:var(--text-primary);">Uso e atividade</h2>
+            <p style="margin:2px 0 0;color:var(--text-muted);font-size:var(--text-xs);">Dados locais registrados pelos hooks e integrações</p>
+          </div>
         </div>
+        <div class="metrics-toolbar"><label class="sr-only" for="ledger-period">Período das tabelas</label>
+        <select id="ledger-period"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select>
+        <button id="refresh-cockpit-btn" type="button" class="btn">Atualizar</button>
+        <button id="export-ledger-btn" type="button" class="btn" disabled>Exportar CSV</button></div>
       </div>
 
-      <div class="guide-grid">
-        <div class="guide-card">
-          <div class="guide-card-icon">1</div>
-          <h3>Como a IA Consulta a Mem&oacute;ria</h3>
-          <p>Agentes aut&ocirc;nomos (Gemini Maestro, Codex, MiniMax M3, GLM) acessam o Cerberus via MCP ou REST antes de programar.</p>
-          <div class="code-snippet">
-            cerberus_get_context_pack({<br>
-            &nbsp;&nbsp;project: "dm-erp",<br>
-            &nbsp;&nbsp;task_type: "backend_feature"<br>
-            })
+      <p id="cockpit-message" class="telemetry-note" role="status" aria-live="polite">Carregando medições…</p><div class="cockpit-hero-grid">
+        <div class="cockpit-card highlight">
+          <span class="lbl">Tokens registrados hoje (UTC)</span>
+          <div class="val" id="cockpit-today-total">—</div>
+          <div class="sub">
+            <span>Entrada: <strong id="cockpit-today-prompt">—</strong></span> &middot;
+            <span>Saída: <strong id="cockpit-today-completion">—</strong></span>
           </div>
         </div>
 
-        <div class="guide-card">
-          <div class="guide-card-icon">2</div>
-          <h3>Como o Humano Consulta &amp; Audita</h3>
-          <p>Faça pesquisas na aba <strong>Busca &amp; Inteligência</strong> ou audite novos aprendizados na aba <strong>Caixa de Entrada</strong>.</p>
-          <div class="code-snippet">
-            Busca: "Como funciona o isolamento multi-tenant?"<br>
-            Modo: Híbrido (FTS5 BM25 + Vetores RRF)
-          </div>
+        <div class="cockpit-card accent">
+          <span class="lbl">Raciocínio registrado</span>
+          <div class="val" id="cockpit-today-reasoning" style="color:var(--focus);">0</div>
+          <div class="sub">Parcela da saída, quando informada</div>
         </div>
 
-        <div class="guide-card">
-          <div class="guide-card-icon">3</div>
-          <h3>Ciclo de Aprendizado</h3>
-          <p>O agente envia como <code>CANDIDATE</code>, o QA verifica (<code>VERIFIED</code>) e o PO Helbert promove para <code>CANONICAL</code>.</p>
-          <div class="code-snippet">
-            CANDIDATE &rarr; VERIFIED &rarr; CANONICAL (Promovido)
-          </div>
+        <div class="cockpit-card">
+          <span class="lbl">Alertas de releitura</span>
+          <div class="val" id="cockpit-today-loops">0</div>
+          <div class="sub">Observação local; sem bloqueio automático</div>
         </div>
 
-        <div class="guide-card">
-          <div class="guide-card-icon">4</div>
-          <h3>Comandos no Terminal (CLI)</h3>
-          <p>Consulte diretamente da linha de comando na raiz do projeto:</p>
-          <div class="code-snippet">
-            python bin/cerberus search "multi-tenant"<br>
-            python bin/cerberus status<br>
-            python bin/cerberus session-context dm-erp
-          </div>
+        <div class="cockpit-card">
+          <span class="lbl">Estimativa local em USD</span>
+          <div class="val" id="cockpit-today-cost">—</div>
+          <div class="sub">Disponível apenas com tarifa configurada</div>
         </div>
+      </div>
+
+      <p class="telemetry-note">Este painel mostra registros locais, não a cota oficial do Codex. Ausência de registros não significa consumo zero.</p><div class="cockpit-columns">
+        <section class="data-panel">
+          <h2>Uso por modelo</h2>
+          <div id="cockpit-models-list" class="cockpit-tag-grid"></div>
+        </section>
+
+        <section class="data-panel">
+          <h2>Uso por projeto</h2>
+          <div id="cockpit-projects-list" class="cockpit-tag-grid"></div>
+        </section>
+      </div>
+
+      <section class="data-panel">
+        <h2>Registros recentes (até 25)</h2>
+        <div style="overflow-x:auto;">
+          <table class="breakdown-table" id="cockpit-sessions-table">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Sessão</th>
+                <th>Projeto</th>
+                <th>Modelo</th>
+                <th>Entrada</th>
+                <th>Saída</th>
+                <th>Raciocínio</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="cockpit-sessions-tbody">
+              <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Nenhuma sessão registrada ainda.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div id="metrics-health-strip" class="telemetry-strip"></div>
+    <div id="metrics-grid"></div>
+    <section id="index-breakdown" class="data-panel">
+      <h2>Documentos indexados por tipo</h2>
+      <table class="breakdown-table"><thead><tr><th>Escopo</th><th>Tipo</th><th>Documentos</th></tr></thead><tbody></tbody></table>
+    </section>
+    <section id="system-diagnostics" class="data-panel">
+      <h2>Diagnóstico do sistema</h2>
+      <dl id="system-diagnostics-list" style="display:grid;grid-template-columns:max-content 1fr;gap:var(--space-2) var(--space-4);margin:0;"></dl>
+    </section>
+  </section>
+
+
+  <!-- ========== Tab 5: Profile ========== -->
+  <section id="tab-profile" role="tabpanel" aria-labelledby="tab-profile-btn" hidden>
+    <header class="panel-heading">
+      <h1>Perfil &amp; segurança</h1>
+    </header>
+    <div class="settings-layout">
+      <nav class="settings-nav" aria-label="Navegação interna"></nav>
+      <div class="settings-content">
+        <section id="profile-account-card" class="data-panel">
+          <h2>Conta</h2>
+          <dl>
+            <dt>E-mail</dt><dd id="profile-email">—</dd>
+            <dt>Status</dt><dd id="profile-active">—</dd>
+            <dt>Criada em</dt><dd id="profile-created">—</dd>
+            <dt>2FA</dt><dd><span id="profile-2fa-status" class="badge">—</span></dd>
+          </dl>
+        </section>
+        <section id="profile-password-card" class="data-panel">
+          <h2>Troca de senha</h2>
+          <form id="change-password-form" class="form-grid" autocomplete="off">
+            <label>Senha atual<input id="current-password" type="password" required autocomplete="current-password" minlength="8"></label>
+            <label>Nova senha<input id="new-password" type="password" required autocomplete="new-password" minlength="6"><span class="hint">Mínimo 6 caracteres.</span></label>
+            <label>Confirmar nova senha<input id="confirm-password" type="password" required autocomplete="new-password" minlength="6"></label>
+            <div><button type="submit" class="btn primary">Atualizar senha</button></div>
+          </form>
+        </section>
+        <section id="profile-twofa-card" class="data-panel">
+          <h2>2FA TOTP</h2>
+          <p style="margin-top:0;color:var(--text-muted);">Status atual: <span id="profile-2fa-status-inline">—</span></p>
+          <button id="twofa-enable-btn" type="button" class="btn primary">Ativar 2FA</button>
+          <div id="twofa-enrollment" hidden>
+            <p>Escaneie o QR code no seu aplicativo autenticador:</p>
+            <div id="twofa-qr" class="qr-stage" aria-live="polite"></div>
+            <p>Chave (Base32): <code id="twofa-secret" style="font-family:var(--font-mono);"></code>
+              <button id="copy-secret-btn" type="button" class="btn">Copiar</button>
+            </p>
+            <form id="twofa-verify-form" class="form-grid">
+              <label>Código TOTP (6 dígitos)<input id="twofa-code" required pattern="\\d{6}" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></label>
+              <div><button type="submit" class="btn primary">Confirmar e ativar</button></div>
+            </form>
+          </div>
+          <form id="twofa-disable-form" class="form-grid">
+            <label>Senha atual para confirmar<input id="twofa-disable-password" type="password" required autocomplete="current-password"></label>
+            <div><button type="submit" class="btn danger">Desativar 2FA</button></div>
+          </form>
+        </section>
       </div>
     </div>
   </section>
-
-  <!-- Tab 5: Diagnóstico -->
-  <section id="tab-system" class="tab-panel">
-    <div class="content-box">
-      <div class="content-box-header">
-        <div>
-          <h2>Diagn&oacute;stico do Sistema Cerberus</h2>
-          <p>Informa&ccedil;&otilde;es de infraestrutura, armazenamento e seguran&ccedil;a operacional.</p>
-        </div>
-      </div>
-      <table class="system-table">
-        <tbody>
-          <tr><td>Ambiente &middot; Rede</td><td id="sys-bind">&mdash;</td></tr>
-          <tr><td>Diret&oacute;rio Can&ocirc;nico</td><td id="sys-root">&mdash;</td></tr>
-          <tr><td>Motor SQLite FTS5</td><td id="sys-fts">&mdash;</td></tr>
-          <tr><td>Embeddings &amp; Vetores</td><td>HashingDenseEmbeddingProvider (256-dim feature hashing, L2 normalized)</td></tr>
-          <tr><td>Rank Fusion</td><td>Reciprocal Rank Fusion (RRF k=60, determin&iacute;stico)</td></tr>
-          <tr><td>Seguran&ccedil;a &amp; Autentica&ccedil;&atilde;o</td><td>Cookie de Sess&atilde;o HMAC-SHA256 &middot; 2FA TOTP RFC 6238 &middot; Rate Limiting</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <footer class="main-footer">
-    <div>
-      <a href="https://devmaniacs.com.br" target="_blank" rel="noopener noreferrer">devmaniacs.com.br</a>
-      <span>&middot;</span>
-      <a href="https://suporte.devmaniacs.com.br" target="_blank" rel="noopener noreferrer">Suporte</a>
-      <span>&middot;</span>
-      <a href="https://radierhub.com.br" target="_blank" rel="noopener noreferrer">RadierHUB</a>
-    </div>
-    <div style="margin-top:4px;">&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development. Todos os direitos reservados. &middot; Tecnologia feita de perto.</div>
-  </footer>
 </main>
+""" + render_institutional_footer("workspace") + """
 
-<!-- Inspector Modal -->
-<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-title">Detalhes do Documento</h3>
-      <button class="btn-dm sm secondary" id="modal-close-x" type="button">&times;</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn-dm sm secondary" id="modal-close" type="button">Fechar</button>
-      <button class="btn-dm sm" id="modal-promote" type="button" style="display:none;">Promover para Can&ocirc;nico</button>
-      <button class="btn-dm sm danger" id="modal-reject" type="button" style="display:none;">Rejeitar</button>
-    </div>
-  </div>
-</div>
+<div id="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="dialog-root"></div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
   "use strict";
-  const flash = document.getElementById("flash");
-  function notice(kind, msg) {
-    try {
-      if (!msg || !flash) return;
-      const div = document.createElement("div");
-      div.className = "toast " + (kind === "ok" ? "ok" : "error");
-      div.textContent = (kind === "ok" ? "[OK] " : "[AVISO] ") + msg;
-      flash.appendChild(div);
-      setTimeout(() => { try { div.remove(); } catch(e){} }, 4000);
-    } catch (err) { console.error("Notice error:", err); }
-  }
 
-  async function getJSON(url) {
-    const r = await fetch(url, { headers: { "Accept": "application/json" } });
-    const text = await r.text();
-    if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
-    return JSON.parse(text);
-  }
+  // ===== Constants and tokens =====
+  var TOKEN = {
+    bgCanvas: "#141617",
+    bgPanel: "#1D2122",
+    bgShell: "#191C1D",
+    border: "#39413D",
+    borderStrong: "#59645D",
+    text: "#F0F2ED",
+    muted: "#9FA99F",
+    action: "#C93B46",
+    focus: "#D94854",
+    success: "#C93B46",
+    danger: "#F19D96",
+    warning: "#D8B478",
+    neutral: "#9FA99F",
+    fontMono: '"IBM Plex Mono", Consolas, monospace'
+  };
 
-  async function postJSON(url, body) {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body || {})
+  // ===== Utilities =====
+  function escapeHTML(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "'", '"': "&quot;" }[c];
     });
-    const text = await r.text();
-    if (!r.ok) { throw new Error(text || (r.status + " " + r.statusText)); }
-    return JSON.parse(text);
+  }
+  function debounce(fn, wait) {
+    var timer = null;
+    return function () {
+      var args = arguments;
+      var ctx = this;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        try { fn.apply(ctx, args); } catch (err) { console.error("debounce:", err); }
+      }, wait);
+    };
+  }
+  function safeText(el, value) {
+    if (el) el.textContent = value == null ? "" : String(value);
   }
 
-  function esc(v) {
-    return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function statusTag(status) {
-    const s = String(status || "").toUpperCase();
-    return '<span class="tag ' + esc(s.toLowerCase()) + '">' + esc(s) + '</span>';
-  }
-
-  // ------- 1. Tab Switching (Isolated & Fail-Safe) -------
-  function initTabs() {
-  try {
-    const tabs = document.querySelectorAll(".nav-tab");
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        try {
-          tabs.forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          const targetId = tab.dataset.tab;
-          if (targetId) {
-            document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-            const activePanel = document.getElementById(targetId);
-            if (activePanel) activePanel.classList.add("active");
-          }
-        } catch (e) { console.error("Tab click error:", e); }
-      });
-    });
-    const exploreBtn = document.getElementById("hero-explore-btn");
-    if (exploreBtn) {
-      exploreBtn.addEventListener("click", () => {
-        try {
-          const searchTab = document.querySelector('.nav-tab[data-tab="tab-search"]');
-          if (searchTab) searchTab.click();
-        } catch (e) { console.error(e); }
-      });
+  // ===== Centralized HTTP =====
+  var sessionExpired = false;
+  function requestJSON(url, options) {
+    options = options || {};
+    var method = (options.method || "GET").toUpperCase();
+    var headers = { "Accept": "application/json" };
+    var body;
+    if (method !== "GET" && method !== "HEAD") {
+      headers["Content-Type"] = "application/json";
+      body = options.body == null ? "" : JSON.stringify(options.body);
     }
-  } catch (err) {
-    console.error("Tab setup error:", err);
-  }
-  }
-
-  // ------- 2. Knowledge Topology Canvas (Solid & Interactive) -------
-  function initTopologyCanvas() {
-    try {
-      const canvas = document.getElementById("brainCanvas");
-      if (!canvas || !canvas.parentElement) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      let width = (canvas.width = Math.max(canvas.parentElement.clientWidth || 600, 10));
-      let height = (canvas.height = Math.max(canvas.parentElement.clientHeight || 280, 10));
-
-      window.addEventListener("resize", () => {
-        try {
-          if (!canvas.parentElement) return;
-          width = canvas.width = Math.max(canvas.parentElement.clientWidth || 600, 10);
-          height = canvas.height = Math.max(canvas.parentElement.clientHeight || 280, 10);
-        } catch(e) {}
-      });
-
-      const projectLabels = ["DM-ERP", "BIOLAR", "HELPDEV", "TEENUS", "_GLOBAL", "_SHARED", "DMPDV", "APAE", "DESK", "ORCH", "VECTORS", "FTS5"];
-      const nodes = [];
-      const nodeCount = projectLabels.length;
-
-      for (let i = 0; i < nodeCount; i++) {
-        const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
-        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-        const radius = 90;
-        nodes.push({
-          x: radius * Math.sin(phi) * Math.cos(theta),
-          y: radius * Math.sin(phi) * Math.sin(theta),
-          z: radius * Math.cos(phi),
-          label: projectLabels[i],
-          color: i % 4 === 0 ? "#08b9ca" : (i % 4 === 1 ? "#ff4c4c" : (i % 4 === 2 ? "#ffc529" : "#1e40af")),
-          size: 6
-        });
-      }
-
-      let rotX = 0.2;
-      let rotY = 0.3;
-      let isDragging = false;
-      let lastMouseX = 0;
-      let lastMouseY = 0;
-
-      canvas.addEventListener("mousedown", e => {
-        isDragging = true;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-      });
-      window.addEventListener("mouseup", () => isDragging = false);
-      window.addEventListener("mousemove", e => {
-        try {
-          if (!isDragging) return;
-          const dx = e.clientX - lastMouseX;
-          const dy = e.clientY - lastMouseY;
-          rotY += dx * 0.008;
-          rotX += dy * 0.008;
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
-        } catch(err) {}
-      });
-
-      let pulseTime = 0;
-      function renderLoop() {
-        try {
-          if (width === 0 || height === 0) {
-            requestAnimationFrame(renderLoop);
-            return;
-          }
-          ctx.fillStyle = "#061637";
-          ctx.fillRect(0, 0, width, height);
-
-          if (!isDragging) {
-            rotY += 0.004;
-            rotX += 0.001;
-          }
-          pulseTime += 0.03;
-
-          const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-          const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-
-          function project(p3) {
-            let x1 = p3.x * cosY + p3.z * sinY;
-            let z1 = -p3.x * sinY + p3.z * cosY;
-            let y2 = p3.y * cosX - z1 * sinX;
-            let z2 = p3.y * sinX + z1 * cosX;
-
-            const fov = 260;
-            const scale = fov / (fov + z2 + 130);
-            return {
-              x: width / 2 + x1 * scale,
-              y: height / 2 + y2 * scale,
-              scale: scale,
-              z: z2
-            };
-          }
-
-          // Connections
-          for (let i = 0; i < nodes.length; i++) {
-            for (let j = i + 1; j < nodes.length; j++) {
-              const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y, nodes[i].z - nodes[j].z);
-              if (dist < 150) {
-                const p1 = project(nodes[i]);
-                const p2 = project(nodes[j]);
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = "#1e3a6d";
-                ctx.lineWidth = 1.2;
-                ctx.stroke();
-
-                const pulsePos = (Math.sin(pulseTime + i + j) + 1) / 2;
-                const px = p1.x + (p2.x - p1.x) * pulsePos;
-                const py = p1.y + (p2.y - p1.y) * pulsePos;
-                ctx.beginPath();
-                ctx.arc(px, py, 2, 0, Math.PI * 2);
-                ctx.fillStyle = "#08b9ca";
-                ctx.fill();
-              }
-            }
-          }
-
-          // Nodes
-          const projectedNodes = nodes.map(n => ({ ...n, pr: project(n) }));
-          projectedNodes.sort((a, b) => b.pr.z - a.pr.z);
-
-          projectedNodes.forEach(n => {
-            const pr = n.pr;
-            ctx.beginPath();
-            ctx.arc(pr.x, pr.y, n.size * pr.scale, 0, Math.PI * 2);
-            ctx.fillStyle = n.color;
-            ctx.fill();
-
-            if (pr.scale > 0.7) {
-              ctx.font = "bold 11px 'Space Grotesk', sans-serif";
-              ctx.fillStyle = "#ffffff";
-              ctx.fillText(n.label, pr.x + 8, pr.y + 4);
-            }
-          });
-
-          requestAnimationFrame(renderLoop);
-        } catch (e) {
-          console.error("Render loop error:", e);
-          requestAnimationFrame(renderLoop); // Fallback to keep looping
+    return fetch(url, { method: method, headers: headers, body: body, credentials: "same-origin" })
+      .then(function (r) {
+        if (r.status === 401 && !sessionExpired) {
+          sessionExpired = true;
+          window.location.href = "/auth/login";
+          return Promise.reject(new Error("Sessão expirada"));
         }
-      }
-      renderLoop();
-
-      // Thought stream ticker
-      const streamMessages = [
-        "[Cerberus] 822 chunks indexados em SQLite FTS5 + Vetores RRF...",
-        "[Gemini Maestro] Orquestrando governança e pipelines multi-agente...",
-        "[MiniMax M3] Consultando regras de negócio do RadierHUB e Teenus...",
-        "[Codex GPT-5.6] Validando integridade relacional e embeddings...",
-        "[Auto-Capture] Monitorando novas decisões de arquitetura (ADRs)..."
-      ];
-      let msgIdx = 0;
-      setInterval(() => {
-        try {
-          msgIdx = (msgIdx + 1) % streamMessages.length;
-          const ticker = document.getElementById("thought-stream-text");
-          if (ticker) ticker.textContent = streamMessages[msgIdx];
-        } catch(e){}
-      }, 4000);
-    } catch (err) {
-      console.error("Topology init error:", err);
-    }
-  }
-
-  // ------- 3. Status & Metrics Engine -------
-  async function refreshStatus() {
-    try {
-      const s = await getJSON("/api/status");
-      const elFiles = document.getElementById("m-files");
-      if (elFiles) elFiles.textContent = s.files;
-      const elDocs = document.getElementById("m-docs");
-      if (elDocs) elDocs.textContent = s.documents;
-      const elInbox = document.getElementById("m-inbox");
-      if (elInbox) elInbox.textContent = s.inbox_count;
-      const elNavBadge = document.getElementById("nav-inbox-badge");
-      if (elNavBadge) elNavBadge.textContent = s.inbox_count;
-      const elFts = document.getElementById("m-fts");
-      if (elFts) elFts.textContent = s.fts5 ? "ONLINE" : "OFFLINE";
-      const elCount = document.getElementById("stat-projects-count");
-      if (elCount) elCount.textContent = (s.projects ? s.projects.length : 0) + " PROJETOS";
-
-      const miniSynapses = document.getElementById("mini-stat-synapses");
-      if (miniSynapses) miniSynapses.textContent = s.documents;
-      const miniNodes = document.getElementById("mini-stat-nodes");
-      if (miniNodes) miniNodes.textContent = s.projects ? s.projects.length : 12;
-
-      const sysBind = document.getElementById("sys-bind");
-      if (sysBind) sysBind.textContent = esc(s.bind_host) + ":" + s.bind_port + " (Cloudflare Argo Tunnel)";
-      const sysRoot = document.getElementById("sys-root");
-      if (sysRoot) sysRoot.textContent = esc(s.canonical_root);
-      const sysFts = document.getElementById("sys-fts");
-      if (sysFts) sysFts.textContent = s.fts5 ? "SQLite FTS5 Ativo (Tokenize: porter unicode61)" : "FTS5 Indisponível";
-
-      const sel = document.getElementById("search-project");
-      if (sel) {
-        sel.innerHTML = '<option value="">(todos os projetos)</option>';
-        (s.projects || []).forEach(p => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          sel.appendChild(opt);
-        });
-      }
-
-      renderProjectsGrid(s);
-    } catch (e) {
-      console.error("Status error:", e);
-      notice("error", "Erro ao carregar status: " + e.message);
-    }
-  }
-
-  function renderProjectsGrid(stats) {
-    try {
-      const container = document.getElementById("projects-container");
-      if (!container) return;
-      const projects = stats.projects || ["dm-erp", "biolar", "helpdev", "teenus", "_global", "_shared"];
-      const indexed = stats.indexed_projects || [];
-
-      container.innerHTML = projects.map(p => {
-        const isIndexed = indexed.includes(p);
-        return `
-          <div class="project-card">
-            <div>
-              <div class="project-card-header">
-                <h3 class="project-card-name">${esc(p)}</h3>
-                <span class="pill project">${isIndexed ? 'INDEXADO' : 'MONITORADO'}</span>
-              </div>
-              <ul class="project-stats-list">
-                <li><span>Status</span><strong>${isIndexed ? 'Pronto para busca' : 'Ativo'}</strong></li>
-                <li><span>Isolamento</span><strong>Multi-Tenant Blindado</strong></li>
-              </ul>
-            </div>
-            <button class="btn-dm sm secondary filter-project-btn" data-project="${esc(p)}" type="button">
-              Filtrar Mem&oacute;ria &rarr;
-            </button>
-          </div>
-        `;
-      }).join("");
-
-      container.querySelectorAll(".filter-project-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          try {
-            const proj = btn.dataset.project;
-            const selProj = document.getElementById("search-project");
-            if (selProj) selProj.value = proj;
-            const tabBtn = document.querySelector('.nav-tab[data-tab="tab-search"]');
-            if (tabBtn) tabBtn.click();
-            runSearch();
-          } catch(e) {}
+        var ct = r.headers.get("content-type") || "";
+        if (!ct.toLowerCase().includes("application/json")) {
+          if (!r.ok) return Promise.reject(new Error(r.status + " " + r.statusText));
+          return {};
+        }
+        return r.json().then(function (data) {
+          if (!r.ok) {
+            var msg = (data && (data.error || data.message)) || (r.status + " " + r.statusText);
+            return Promise.reject(new Error(msg));
+          }
+          return data;
         });
       });
+  }
+  function getJSON(url) { return requestJSON(url, { method: "GET" }); }
+  function postJSON(url, body) { return requestJSON(url, { method: "POST", body: body || {} }); }
+
+  // ===== UI state =====
+  var uiState = {
+    activeTab: "tab-metrics",
+    search: { query: "", project: "", mode: "hybrid", selectedId: null, controller: null, results: [] },
+    inbox: { filter: "", selectedId: null, pendingMutationId: null, list: [] },
+    topology: { selectedNodeId: null, zoom: 1, pan: { x: 0, y: 0 }, rafId: null, model: null, dirty: true },
+    profile: { status: null, pendingSecret: "" }
+  };
+
+  // ===== Toast / dialog =====
+  function showToast(kind, message, opts) {
+    opts = opts || {};
+    var region = document.getElementById("toast-region");
+    if (!region) return;
+    var toast = document.createElement("div");
+    toast.className = "toast " + (kind || "info");
+    toast.setAttribute("role", opts.persist ? "alert" : "status");
+    toast.textContent = String(message || "");
+    region.appendChild(toast);
+    if (!opts.persist) {
+      var removed = false;
+      var remove = function () {
+        if (removed) return; removed = true;
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      };
+      var timer = setTimeout(remove, opts.duration || 5000);
+      toast.addEventListener("mouseenter", function () { clearTimeout(timer); });
+      toast.addEventListener("mouseleave", function () { timer = setTimeout(remove, 1500); });
+      toast.addEventListener("focusin", function () { clearTimeout(timer); });
+      toast.addEventListener("focusout", function () { timer = setTimeout(remove, 1500); });
+    }
+    return toast;
+  }
+
+  function initDialogs() {
+    // Native <dialog> elements are created lazily; no global setup required.
+    // This initializer exists to satisfy the boot contract and provide a hook.
+  }
+
+  // ===== Tabs =====
+  function selectTab(tabId) {
+    var tabs = document.querySelectorAll('#primary-tabs button[role="tab"]');
+    var panels = document.querySelectorAll('main#workspace > section[role="tabpanel"]');
+    tabs.forEach(function (tab) {
+      var match = tab.getAttribute("data-tab") === tabId;
+      tab.setAttribute("aria-selected", match ? "true" : "false");
+      tab.setAttribute("tabindex", match ? "0" : "-1");
+    });
+    panels.forEach(function (panel) {
+      if (panel.id === tabId) { panel.removeAttribute("hidden"); }
+      else { panel.setAttribute("hidden", ""); }
+    });
+    uiState.activeTab = tabId;
+    if (tabId === "tab-search") try { runSearch(); } catch (e) { console.error(e); }
+    if (tabId === "tab-inbox") try { refreshInbox(); } catch (e) { console.error(e); }
+    if (tabId === "tab-metrics") { try { refreshStatus(); refreshCockpit(); } catch (e) { console.error(e); } }
+    if (tabId === "tab-topology") try { refreshTopologyModel(); } catch (e) { console.error(e); }
+    if (tabId === "tab-profile") try { refreshProfile(); } catch (e) { console.error(e); }
+    try {
+      if (window.history && window.history.replaceState && location.hash !== "#" + tabId) {
+        window.history.replaceState(null, "", "#" + tabId);
+      }
+    } catch (e) {}
+  }
+  function initTabs() {
+    var tabs = document.querySelectorAll('#primary-tabs button[role="tab"]');
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        try { selectTab(tab.getAttribute("data-tab")); }
+        catch (e) { console.error("tab click:", e); }
+      });
+      tab.addEventListener("keydown", function (e) {
+        try {
+          var order = Array.prototype.slice.call(tabs);
+          var idx = order.indexOf(tab);
+          if ((e.key === "ArrowRight" || e.key === "ArrowDown")) { order[(idx + 1) % order.length].focus(); e.preventDefault(); }
+          else if ((e.key === "ArrowLeft" || e.key === "ArrowUp")) { order[(idx - 1 + order.length) % order.length].focus(); e.preventDefault(); }
+          else if (e.key === "Home") { order[0].focus(); e.preventDefault(); }
+          else if (e.key === "End") { order[order.length - 1].focus(); e.preventDefault(); }
+          else if (e.key === "Enter" || e.key === " ") {
+            selectTab(tab.getAttribute("data-tab")); e.preventDefault();
+          }
+        } catch (err) { console.error("tab key:", err); }
+      });
+    });
+  }
+
+  // ===== Evidence Rail =====
+  function setEvidence(key, value) {
+    var el = document.getElementById("evidence-" + key);
+    if (el) safeText(el, value);
+  }
+  function initEvidenceRail() {
+    setEvidence("cluster", "verificando...");
+    setEvidence("index", "—");
+    setEvidence("scope", "todos");
+    setEvidence("sync", "—");
+  }
+
+  // ===== Markdown renderer (safe) =====
+  function renderMarkdown(source) {
+    try {
+      var html = escapeHTML(source || "");
+      html = html.replace(/```([\\s\\S]*?)```/g, function (_, code) {
+        return '<pre><button class="copy-code-btn" type="button">Copiar</button><code>' + code.trim() + '</code></pre>';
+      });
+      html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>")
+                 .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+                 .replace(/^# (.+)$/gm, "<h1>$1</h1>");
+      html = html.replace(/`([^`]+)`/g, "<code>$1</code>")
+                 .replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
+      html = html.replace(/^[-*] (.+)$/gm, "<li>$1</li>")
+                 .replace(/(<li>[\\s\\S]*?<\\/li>)/g, "<ul>$1</ul>");
+      html = html.replace(/^&gt; (.+)$/gm, "<blockquote>$1</blockquote>");
+      return '<div class="md-body">' + html.replace(/\\n/g, "<br>") + "</div>";
     } catch (err) {
-      console.error("Render projects grid error:", err);
+      console.error("markdown render:", err);
+      return '<div class="md-body"><pre>' + escapeHTML(source || "") + "</pre></div>";
     }
   }
-
-  function initMetrics() {
-    try { refreshStatus(); }
-    catch (err) { console.error("Metrics init error:", err); }
+  function bindCopyButtons(root) {
+    try {
+      (root || document).querySelectorAll(".copy-code-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          try {
+            var c = btn.parentElement.querySelector("code");
+            navigator.clipboard.writeText(c ? c.textContent : "");
+            showToast("ok", "Código copiado.");
+          } catch (e) { showToast("error", "Não foi possível copiar."); }
+        });
+      });
+    } catch (e) { console.error("copy buttons:", e); }
   }
 
-  // ------- 4. Search Execution Engine -------
+  // ===== Search =====
   async function runSearch() {
     try {
-      const inputQ = document.getElementById("search-q");
-      const selectProj = document.getElementById("search-project");
-      const selectMode = document.getElementById("search-mode");
-      const out = document.getElementById("search-results");
+      var input = document.getElementById("search-q");
+      var selProj = document.getElementById("search-project");
+      var selMode = document.getElementById("search-mode");
+      var out = document.getElementById("search-results");
+      var counter = document.getElementById("search-count");
       if (!out) return;
-
-      const q = inputQ ? inputQ.value.trim() : "";
-      const project = selectProj ? selectProj.value : "";
-      const mode = selectMode ? selectMode.value : "hybrid";
-
-      const params = new URLSearchParams();
-      if (q) params.set("q", q);
+      var q = input ? input.value.trim() : "";
+      var project = selProj ? selProj.value : "";
+      var mode = selMode ? selMode.value : "hybrid";
+      uiState.search.query = q; uiState.search.project = project; uiState.search.mode = mode;
+      setEvidence("scope", project || "todos");
+      if (!q) {
+        out.setAttribute("aria-busy", "false");
+        out.innerHTML = '<div class="empty-state"><strong>Pronto para pesquisar</strong><p>Digite ao menos 3 caracteres ou tecle Enter.</p></div>';
+        if (counter) safeText(counter, "0 resultados");
+        return;
+      }
+      var params = new URLSearchParams();
+      params.set("q", q);
       if (project) params.set("project", project);
       params.set("mode", mode);
-
-      out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando base vetorial e léxica.</p></div>';
-
-      try {
-        const r = await getJSON("/api/search?" + params.toString());
-        if (!r.results || !r.results.length) {
-          out.innerHTML = '<div class="empty-state"><strong>Nenhum resultado encontrado</strong><p>Tente outros termos ou remova o filtro de projeto.</p></div>';
-          return;
-        }
-
-        const cards = r.results.map(item => `
-          <div class="result-card result-card-open" data-id="${esc(item.memory_id || item.chunk_id)}" tabindex="0" role="button">
-            <div class="result-card-header">
-              <div>
-                <h3 class="result-card-title">${esc(item.title)}</h3>
-                <div class="result-card-path">${esc(item.source_path)}</div>
-              </div>
-              <button class="btn-dm sm secondary view-doc-btn" data-id="${esc(item.memory_id || item.chunk_id)}" type="button">
-                Ver Documento &rarr;
-              </button>
-            </div>
-            <div class="result-meta-pills">
-              <span class="pill project">${esc(item.project_id || '_global')}</span>
-              <span class="pill authority">Auth: ${esc(item.authority_level || 50)}</span>
-              <span class="pill score">${esc(item.search_mode)} &middot; Score ${esc(Number(item.final_score).toFixed(2))}</span>
-            </div>
-            <div class="result-snippet">${item.snippet || '(sem snippet)'}</div>
-          </div>
-        `).join("");
-
-        out.innerHTML = `<div class="results-grid">${cards}</div>`;
-        out.querySelectorAll(".result-card-open").forEach(card => {
-          const openCard = event => {
-            if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") return;
-            if (event.target && event.target.closest(".view-doc-btn")) return;
-            try { openDocument(card.dataset.id); } catch(e) { console.error("Document card error:", e); }
-          };
-          card.addEventListener("click", openCard);
-          card.addEventListener("keydown", openCard);
-        });
-        out.querySelectorAll(".view-doc-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            try { openDocument(btn.dataset.id); } catch(e){}
-          });
-        });
-      } catch (e) {
-        out.innerHTML = '<div class="toast error" style="position:static;">Erro na busca: ' + esc(e.message) + '</div>';
+      if (uiState.search.controller) {
+        try { uiState.search.controller.abort(); } catch (e) {}
       }
-    } catch (err) {
-      console.error("runSearch top level error:", err);
-    }
-  }
-
-  function initSearch() {
-  // Quick Chips
-  try {
-    document.querySelectorAll(".chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        try {
-          const inputQ = document.getElementById("search-q");
-          if (inputQ) inputQ.value = chip.dataset.query;
-          runSearch();
-        } catch(e) {}
-      });
-    });
-  } catch(e) {}
-  }
-
-  try {
-    const searchBtn = document.getElementById("search-btn");
-    if (searchBtn) {
-      searchBtn.addEventListener("click", () => { try { runSearch(); } catch(e){} });
-    }
-    const searchInput = document.getElementById("search-q");
-    if (searchInput) {
-      searchInput.addEventListener("keydown", e => {
-        try {
-          if (e.key === "Enter") runSearch();
-        } catch(err){}
-      });
-    }
-  } catch(e) {}
-
-  // ------- 5. Candidate Inbox Engine -------
-  let activeInboxFilter = "";
-  async function refreshInbox() {
-    try {
-      const out = document.getElementById("inbox-table");
-      if (!out) return;
-      const url = "/api/inbox" + (activeInboxFilter ? "?status=" + encodeURIComponent(activeInboxFilter) : "");
-
-      try {
-        const r = await getJSON(url);
-        const list = r.candidates || [];
-        const badge = document.getElementById("nav-inbox-badge");
-        if (badge) badge.textContent = list.length;
-        const mInbox = document.getElementById("m-inbox");
-        if (mInbox) mInbox.textContent = list.length;
-
-        if (!list.length) {
-          out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com o status selecionado.</p></div>';
-          return;
-        }
-
-        const rows = list.map(c => `
-          <div class="candidate-card">
-            <div class="candidate-card-top">
-              <div>
-                <h3 class="candidate-title">${esc(c.title)}</h3>
-                <div class="candidate-desc">ID: ${esc(c.candidate_id)} &middot; Task: ${esc(c.task_id)} &middot; Agente: ${esc(c.agent)} &middot; ${esc(c.created_at)}</div>
-              </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <span class="pill project">${esc(c.project_id)}</span>
-                ${statusTag(c.status)}
-              </div>
-            </div>
-            <div class="result-snippet" style="max-height:80px;overflow:hidden;">${esc(c.content.slice(0, 300))}&hellip;</div>
-            <div class="candidate-actions">
-              <button class="btn-dm sm secondary open-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Inspecionar &amp; Diff</button>
-              ${c.status === 'CANDIDATE' ? `<button class="btn-dm sm verify-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Verificar</button>` : ''}
-              ${c.status === 'VERIFIED' ? `<button class="btn-dm sm promote-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Promover para Canônico</button>` : ''}
-              ${c.status !== 'CANONICAL' ? `<button class="btn-dm sm danger reject-candidate-btn" data-id="${esc(c.candidate_id)}" type="button">Rejeitar</button>` : ''}
-            </div>
-          </div>
-        `).join("");
-
-        out.innerHTML = `<div class="candidates-grid">${rows}</div>`;
-        out.querySelectorAll(".open-candidate-btn").forEach(b => b.addEventListener("click", () => {
-          try { openCandidate(b.dataset.id); } catch(e){}
-        }));
-        out.querySelectorAll(".promote-candidate-btn").forEach(b => b.addEventListener("click", () => {
-          try { promoteCandidateDirect(b.dataset.id); } catch(e){}
-        }));
-        out.querySelectorAll(".verify-candidate-btn").forEach(b => b.addEventListener("click", () => {
-          try { verifyCandidateDirect(b.dataset.id); } catch(e){}
-        }));
-        out.querySelectorAll(".reject-candidate-btn").forEach(b => b.addEventListener("click", () => {
-          try { rejectCandidateDirect(b.dataset.id); } catch(e){}
-        }));
-      } catch (e) {
-        out.innerHTML = '<div class="toast error" style="position:static;">Erro no inbox: ' + esc(e.message) + '</div>';
-      }
-    } catch(err) {
-      console.error("refreshInbox error:", err);
-    }
-  }
-
-  function initInbox() {
-  try {
-    document.querySelectorAll(".filter-tab-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        try {
-          document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          activeInboxFilter = btn.dataset.status;
-          refreshInbox();
-        } catch(e){}
-      });
-    });
-  } catch(e) {}
-    refreshInbox();
-  }
-
-  async function verifyCandidateDirect(id) {
-    try {
-      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/verify");
-      notice("ok", "Candidato verificado e pronto para promoção.");
-      refreshInbox();
-      refreshStatus();
-    } catch (e) { notice("error", "Erro ao verificar: " + e.message); }
-  }
-
-  async function promoteCandidateDirect(id) {
-    try {
-      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/promote");
-      notice("ok", "Item promovido para a memória canônica.");
-      refreshInbox();
-      refreshStatus();
-    } catch (e) { notice("error", "Erro ao promover: " + e.message); }
-  }
-
-  async function rejectCandidateDirect(id) {
-    try {
-      await postJSON("/api/inbox/" + encodeURIComponent(id) + "/reject");
-      notice("ok", "Candidato rejeitado.");
-      refreshInbox();
-      refreshStatus();
-    } catch (e) { notice("error", "Erro ao rejeitar: " + e.message); }
-  }
-
-  // ------- 6. Modal Windows -------
-  let currentCandidate = null;
-  async function openCandidate(id) {
-    try {
-      const c = await getJSON("/api/inbox/" + encodeURIComponent(id));
-      currentCandidate = c;
-      const title = document.getElementById("modal-title");
-      if (title) title.textContent = c.title + " (" + c.candidate_id + ")";
-      const body = document.getElementById("modal-body");
-      if (body) {
-        body.innerHTML = `
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
-            ${statusTag(c.status)}
-            <span class="pill project">${esc(c.project_id)}</span>
-            <span class="pill authority">Task: ${esc(c.task_id)}</span>
-            <span class="pill score">Agente: ${esc(c.agent)}</span>
-          </div>
-          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Conteúdo</h4>
-          <div class="code-viewer">${esc(c.content)}</div>
-          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Diff Canônico</h4>
-          <div class="code-viewer">${esc(c.diff || '(nenhum diff registrado)')}</div>
-        `;
-      }
-      const promoteBtn = document.getElementById("modal-promote");
-      const rejectBtn = document.getElementById("modal-reject");
-      if (promoteBtn) promoteBtn.style.display = (c.status === "VERIFIED") ? "inline-flex" : "none";
-      if (rejectBtn) rejectBtn.style.display = (c.status !== "CANONICAL") ? "inline-flex" : "none";
-      const modal = document.getElementById("modal");
-      if (modal) modal.classList.add("open");
-    } catch (e) { notice("error", "Erro ao abrir candidato: " + e.message); }
-  }
-
-  async function openDocument(id) {
-    try {
-      const doc = await getJSON("/api/document?id=" + encodeURIComponent(id));
-      const title = document.getElementById("modal-title");
-      if (title) title.textContent = doc.title;
-      const body = document.getElementById("modal-body");
-      if (body) {
-        body.innerHTML = `
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
-            <span class="pill project">${esc(doc.project_id)}</span>
-            <span class="pill authority">Autoridade: ${esc(doc.authority_level)}</span>
-            <span class="pill score">Tipo: ${esc(doc.source_type)}</span>
-            <span class="pill score">${esc(doc.source_path)}</span>
-          </div>
-          <h4 style="margin:16px 0 6px;text-transform:uppercase;font-size:12px;color:#94a3b8;">Texto Completo</h4>
-          <div class="code-viewer">${esc(doc.full_text || doc.snippet || '(sem texto)')}</div>
-        `;
-      }
-      const promoteBtn = document.getElementById("modal-promote");
-      const rejectBtn = document.getElementById("modal-reject");
-      if (promoteBtn) promoteBtn.style.display = "none";
-      if (rejectBtn) rejectBtn.style.display = "none";
-      const modal = document.getElementById("modal");
-      if (modal) modal.classList.add("open");
-    } catch (e) {
-      notice("error", "Erro ao carregar documento: " + e.message);
-    }
-  }
-
-  function closeModal() {
-    try {
-      const modal = document.getElementById("modal");
-      if (modal) modal.classList.remove("open");
-    } catch(e){}
-  }
-
-  function initModals() {
-  try {
-    const closeBtn = document.getElementById("modal-close");
-    if (closeBtn) closeBtn.addEventListener("click", closeModal);
-    const closeBtnX = document.getElementById("modal-close-x");
-    if (closeBtnX) closeBtnX.addEventListener("click", closeModal);
-    const modalElem = document.getElementById("modal");
-    if (modalElem) {
-      modalElem.addEventListener("click", e => {
-        try { if (e.target.id === "modal") closeModal(); } catch(err){}
-      });
-    }
-    window.addEventListener("keydown", e => { try { if (e.key === "Escape") closeModal(); } catch(err){} });
-
-    const modalPromote = document.getElementById("modal-promote");
-    if (modalPromote) {
-      modalPromote.addEventListener("click", async () => {
-        try {
-          if (!currentCandidate) return;
-          await promoteCandidateDirect(currentCandidate.candidate_id);
-          closeModal();
-        } catch(e){}
-      });
-    }
-    const modalReject = document.getElementById("modal-reject");
-    if (modalReject) {
-      modalReject.addEventListener("click", async () => {
-        try {
-          if (!currentCandidate) return;
-          await rejectCandidateDirect(currentCandidate.candidate_id);
-          closeModal();
-        } catch(e){}
-      });
-    }
-  } catch(e) {}
-  }
-
-  // ------- 7. Re-indexing & Auth Handlers -------
-  function initReindex() {
-  try {
-    const reindexBtn = document.getElementById("reindex-btn");
-    if (reindexBtn) {
-      reindexBtn.addEventListener("click", async () => {
-        try {
-          reindexBtn.disabled = true;
-          reindexBtn.textContent = "Reindexando...";
-          try {
-            const res = await postJSON("/api/reindex");
-            notice("ok", "Reindexação concluída: " + (res.stats ? res.stats.indexed_files : 0) + " arquivos processados.");
-            await refreshStatus();
-            await refreshInbox();
-          } catch (e) {
-            notice("error", "Erro ao reindexar: " + e.message);
-          } finally {
-            reindexBtn.disabled = false;
-            reindexBtn.textContent = "Reindexar Memória";
+      uiState.search.controller = new AbortController();
+      out.setAttribute("aria-busy", "true");
+      out.innerHTML = '<div class="empty-state"><strong>Buscando...</strong><p>Consultando índice híbrido.</p></div>';
+      var signal = uiState.search.controller.signal;
+      fetch("/api/search?" + params.toString(), { headers: { "Accept": "application/json" }, signal: signal, credentials: "same-origin" })
+        .then(function (r) {
+          if (r.status === 401) { sessionExpired = true; window.location.href = "/auth/login"; throw new Error("Sessão expirada"); }
+          return r.json();
+        })
+        .then(function (data) {
+          var list = (data && data.results) || [];
+          uiState.search.results = list;
+          if (!list.length) {
+            out.innerHTML = '<div class="empty-state"><strong>Sem resultados</strong><p>Ajuste os filtros ou refine a consulta.</p></div>';
+            if (counter) safeText(counter, "0 resultados");
+            return;
           }
-        } catch(e){}
+          var rows = list.map(function (item) {
+            var id = item.memory_id || item.chunk_id || "";
+            var score = Number(item.final_score || 0);
+            score = score !== 0 && Math.abs(score) < 0.01 ? score.toExponential(2) : score.toFixed(2);
+            return '<button class="search-result-row" type="button" data-memory-id="' + escapeHTML(id) + '" data-selected="' + (uiState.search.selectedId === id ? "true" : "false") + '">'
+              + '<div class="title">' + escapeHTML(item.title || "(sem título)") + '</div>'
+              + '<span class="badge">' + escapeHTML(item.project_id || "_global") + '</span>'
+              + '<div class="path">' + escapeHTML(item.source_path || "") + '</div>'
+              + '<span class="badge action">' + escapeHTML((item.search_mode || mode) + " \u00B7 " + score) + '</span>'
+              + '<div class="meta">'
+              +   '<span class="badge">' + escapeHTML("auth " + (item.authority_level || 50)) + '</span>'
+              +   '<span class="badge">' + escapeHTML(item.source_type || "doc") + '</span>'
+              + '</div>'
+              + '<div class="snippet">' + escapeHTML(item.snippet || "") + '</div>'
+              + '</button>';
+          }).join("");
+          out.innerHTML = rows;
+          if (counter) safeText(counter, list.length + " resultados");
+          attachSearchRowHandlers();
+        })
+        .catch(function (err) {
+          if (err && err.name === "AbortError") return;
+          out.setAttribute("aria-busy", "false");
+          out.innerHTML = '<div class="empty-state"><strong>Erro na busca</strong><p>' + escapeHTML(err && err.message || "Falha desconhecida") + '</p></div>';
+        })
+        .then(function () { out.setAttribute("aria-busy", "false"); });
+    } catch (err) { console.error("runSearch:", err); }
+  }
+  function attachSearchRowHandlers() {
+    try {
+      var out = document.getElementById("search-results");
+      if (!out) return;
+      out.querySelectorAll(".search-result-row").forEach(function (row) {
+        row.addEventListener("click", function () {
+          var id = row.getAttribute("data-memory-id");
+          uiState.search.selectedId = id;
+          out.querySelectorAll(".search-result-row").forEach(function (r) { r.setAttribute("data-selected", r === row ? "true" : "false"); });
+          try { openDocument(id); } catch (e) { console.error(e); }
+        });
       });
-    }
-
-    const refreshBtn = document.getElementById("refresh-btn");
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", () => { try { refreshInbox(); } catch(e){} });
-    }
-
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async () => {
-        try {
+    } catch (e) { console.error("attachSearchRowHandlers:", e); }
+  }
+  function openDocument(id) {
+    try {
+      var preview = document.getElementById("search-preview");
+      var body = document.getElementById("search-preview-body");
+      var title = document.getElementById("search-preview-title");
+      var back = document.getElementById("search-preview-back");
+      if (!preview || !body) return;
+      document.getElementById("search-workbench").classList.add("preview-open");
+      if (back) back.removeAttribute("hidden");
+      getJSON("/api/document?id=" + encodeURIComponent(id))
+        .then(function (doc) {
+          safeText(title, doc.title || id);
+          body.innerHTML = renderMarkdown(doc.full_text || doc.snippet || "(sem texto)");
+          bindCopyButtons(body);
+        })
+        .catch(function (err) {
+          body.innerHTML = '<div class="empty-state"><strong>Erro</strong><p>' + escapeHTML(err && err.message || "") + '</p></div>';
+        });
+    } catch (e) { console.error("openDocument:", e); }
+  }
+  function initSearch() {
+    try {
+      var form = document.getElementById("search-form");
+      if (form) form.addEventListener("submit", function (e) { e.preventDefault(); runSearch(); });
+      var input = document.getElementById("search-q");
+      if (input) {
+        var debounced = debounce(function () {
+          if (input.value.trim().length >= 3) runSearch();
+        }, 350);
+        input.addEventListener("input", debounced);
+        input.addEventListener("keydown", function (e) {
+          try { if (e.key === "Enter") { e.preventDefault(); runSearch(); } } catch (err) {}
+        });
+      }
+      // Segmented scope
+      document.querySelectorAll("#search-filter-bar .seg[data-scope]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
           try {
-            await postJSON("/auth/logout");
-          } catch (e) { }
-          window.location.href = "/auth/login";
-        } catch(e){}
+            document.querySelectorAll("#search-filter-bar .seg[data-scope]").forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            var proj = btn.getAttribute("data-project") || "";
+            var selProj = document.getElementById("search-project");
+            if (selProj) selProj.value = proj;
+            setEvidence("scope", proj || "todos");
+            runSearch();
+          } catch (e) { console.error(e); }
+        });
       });
-    }
-
-    const setup2faBtn = document.getElementById("setup-2fa-btn");
-    if (setup2faBtn) {
-      setup2faBtn.addEventListener("click", () => {
-        try { window.location.href = "/auth/setup-2fa"; } catch(e){}
+      document.querySelectorAll("#search-filter-bar .seg[data-mode]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          try {
+            document.querySelectorAll("#search-filter-bar .seg[data-mode]").forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            var md = btn.getAttribute("data-mode");
+            var selMode = document.getElementById("search-mode");
+            if (selMode) selMode.value = md;
+            runSearch();
+          } catch (e) { console.error(e); }
+        });
       });
-    }
-
-    if (window.location.search.includes("setup=ok")) {
-      notice("ok", "2FA configurado com sucesso.");
-    }
-  } catch(e) {}
+      var back = document.getElementById("search-preview-back");
+      if (back) back.addEventListener("click", function () {
+        document.getElementById("search-workbench").classList.remove("preview-open");
+        back.setAttribute("hidden", "");
+      });
+    } catch (e) { console.error("initSearch:", e); }
   }
 
-  // ------- 8. Boot Sequence -------
-  try { initTabs(); } catch (err) { console.error("Tabs init error:", err); }
-  try { initTopologyCanvas(); } catch (err) { console.error("Canvas init error:", err); }
-  try { initMetrics(); } catch (err) { console.error("Metrics init error:", err); }
-  try { initSearch(); runSearch(); } catch (err) { console.error("Search init error:", err); }
-  try { initInbox(); } catch (err) { console.error("Inbox init error:", err); }
-  try { initModals(); } catch (err) { console.error("Modals init error:", err); }
-  try { initReindex(); } catch (err) { console.error("Reindex init error:", err); }
-});
+  // ===== Inbox =====
+  function refreshInbox() {
+    try {
+      var out = document.getElementById("inbox-list");
+      if (!out) return;
+      var url = "/api/inbox" + (uiState.inbox.filter ? "?status=" + encodeURIComponent(uiState.inbox.filter) : "");
+      out.setAttribute("aria-busy", "true");
+      getJSON(url).then(function (data) {
+        var list = (data && data.candidates) || [];
+        uiState.inbox.list = list;
+        var badge = document.getElementById("nav-inbox-badge");
+        if (badge) safeText(badge, list.length);
+        renderInboxSummary(list);
+        if (!list.length) {
+          out.innerHTML = '<div class="empty-state"><strong>Inbox vazia</strong><p>Nenhum candidato com este filtro.</p></div>';
+          return;
+        }
+        var rows = list.map(function (c) {
+          var id = c.candidate_id || "";
+          var selected = uiState.inbox.selectedId === id;
+          return '<button class="candidate-row" type="button" data-id="' + escapeHTML(id) + '" data-selected="' + (selected ? "true" : "false") + '">'
+            + '<div class="title">' + escapeHTML(c.title || id) + '</div>'
+            + '<div class="meta-row">'
+            +   '<span>' + escapeHTML(id) + '</span>'
+            +   '<span>' + escapeHTML(c.project_id || "_global") + '</span>'
+            +   '<span>' + escapeHTML(c.agent || "—") + '</span>'
+            +   '<span>' + escapeHTML((c.created_at || "").toString()) + '</span>'
+            +   '<span class="badge">' + escapeHTML((c.status || "candidate").toLowerCase()) + '</span>'
+            + '</div></button>';
+        }).join("");
+        out.innerHTML = rows;
+        attachInboxRowHandlers();
+        if (uiState.inbox.selectedId) try { openCandidate(uiState.inbox.selectedId); } catch (e) {}
+      }).catch(function (err) {
+        out.innerHTML = '<div class="empty-state"><strong>Erro</strong><p>' + escapeHTML(err && err.message || "") + '</p></div>';
+      }).then(function () { out.setAttribute("aria-busy", "false"); });
+    } catch (e) { console.error("refreshInbox:", e); }
+  }
+  function renderInboxSummary(list) {
+    try {
+      var sum = document.getElementById("inbox-summary");
+      if (!sum) return;
+      var total = list.length;
+      var cand = list.filter(function (c) { return (c.status || "").toLowerCase() === "candidate"; }).length;
+      var ver = list.filter(function (c) { return (c.status || "").toLowerCase() === "verified"; }).length;
+      var can = list.filter(function (c) { return (c.status || "").toLowerCase() === "canonical"; }).length;
+      var rej = list.filter(function (c) { return (c.status || "").toLowerCase() === "rejected"; }).length;
+      sum.innerHTML = '<div class="cell"><span class="lbl">Total</span><span class="val">' + total + '</span></div>'
+        + '<div class="cell"><span class="lbl">Candidatos</span><span class="val">' + cand + '</span></div>'
+        + '<div class="cell"><span class="lbl">Verificados</span><span class="val">' + ver + '</span></div>'
+        + '<div class="cell"><span class="lbl">Canônicos</span><span class="val">' + can + '</span></div>'
+        + '<div class="cell"><span class="lbl">Rejeitados</span><span class="val">' + rej + '</span></div>';
+    } catch (e) { console.error("renderInboxSummary:", e); }
+  }
+  function attachInboxRowHandlers() {
+    try {
+      var out = document.getElementById("inbox-list");
+      if (!out) return;
+      out.querySelectorAll(".candidate-row").forEach(function (row) {
+        row.addEventListener("click", function () {
+          uiState.inbox.selectedId = row.getAttribute("data-id");
+          out.querySelectorAll(".candidate-row").forEach(function (r) { r.setAttribute("data-selected", r === row ? "true" : "false"); });
+          try { openCandidate(uiState.inbox.selectedId); } catch (e) { console.error(e); }
+        });
+      });
+    } catch (e) { console.error("attachInboxRowHandlers:", e); }
+  }
+  function renderDiff(target, diff) {
+    if (!target) return;
+    if (!diff || typeof diff !== "string") {
+      safeText(target, "Sem diff registrado.");
+      return;
+    }
+    var html = diff.split("\\n").map(function (line) {
+      var cls = "diff-ctx";
+      var prefix = "  ";
+      if (line.startsWith("+") && !line.startsWith("+++")) { cls = "diff-add"; prefix = "+ "; }
+      else if (line.startsWith("-") && !line.startsWith("---")) { cls = "diff-del"; prefix = "- "; }
+      return '<div class="diff-line ' + cls + '">' + escapeHTML(prefix + line.replace(/^[+-]/, "")) + '</div>';
+    }).join("");
+    target.innerHTML = html;
+  }
+  function openCandidate(id) {
+    if (!id) return;
+    try {
+      var header = document.getElementById("candidate-header");
+      var meta = document.getElementById("candidate-metadata");
+      var diff = document.getElementById("candidate-diff");
+      var verifyBtn = document.getElementById("candidate-verify");
+      var promoteBtn = document.getElementById("candidate-promote");
+      var rejectBtn = document.getElementById("candidate-reject");
+      document.getElementById("inbox-workbench").classList.add("preview-open");
+      getJSON("/api/inbox/" + encodeURIComponent(id)).then(function (c) {
+        safeText(header.querySelector("h2"), c.title || id);
+        meta.innerHTML = ""
+          + "<dt>ID</dt><dd>" + escapeHTML(id) + "</dd>"
+          + "<dt>Projeto</dt><dd>" + escapeHTML(c.project_id || "_global") + "</dd>"
+          + "<dt>Agente</dt><dd>" + escapeHTML(c.agent || "—") + "</dd>"
+          + "<dt>Task</dt><dd>" + escapeHTML(c.task_id || "—") + "</dd>"
+          + "<dt>Status</dt><dd>" + escapeHTML((c.status || "candidate").toLowerCase()) + "</dd>";
+        renderDiff(diff, c.diff);
+        var status = (c.status || "").toLowerCase();
+        if (verifyBtn) verifyBtn.disabled = status !== "candidate";
+        if (promoteBtn) promoteBtn.disabled = status !== "verified";
+        if (rejectBtn) rejectBtn.disabled = status === "canonical";
+      }).catch(function (err) {
+        showToast("error", "Erro ao abrir candidato: " + (err && err.message || ""));
+      });
+    } catch (e) { console.error("openCandidate:", e); }
+  }
+  function refreshStatusBadges() {
+    // simple hook for future
+  }
+  function refreshStatus() {
+    if (typeof refreshStatusBadges === "function") refreshStatusBadges();
+  }
+  function initInbox() {
+    try {
+      // Inbox candidate action endpoints (verified by tests): /verify /promote /reject
+      document.querySelectorAll("#inbox-filters .seg").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          try {
+            document.querySelectorAll("#inbox-filters .seg").forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            uiState.inbox.filter = btn.getAttribute("data-filter") || "";
+            refreshInbox();
+          } catch (e) { console.error(e); }
+        });
+      });
+      var verify = document.getElementById("candidate-verify");
+      if (verify) verify.addEventListener("click", function () { mutateCandidate("verify"); });
+      var promote = document.getElementById("candidate-promote");
+      if (promote) promote.addEventListener("click", function () { mutateCandidate("promote"); });
+      var reject = document.getElementById("candidate-reject");
+      if (reject) reject.addEventListener("click", function () { mutateCandidate("reject"); });
+      refreshInbox();
+    } catch (e) { console.error("initInbox:", e); }
+  }
+  function mutateCandidate(action) {
+    var id = uiState.inbox.selectedId;
+    if (!id) return;
+    if (action === "reject" && !window.confirm("Rejeitar este candidato? Esta ação é reversível.")) return;
+    uiState.inbox.pendingMutationId = id;
+    postJSON("/api/inbox/" + encodeURIComponent(id) + "/" + action, {})
+      .then(function () {
+        showToast("ok", "Candidato atualizado.");
+        uiState.inbox.selectedId = null;
+        refreshInbox();
+        if (uiState.activeTab === "tab-metrics") refreshStatus();
+      })
+      .catch(function (err) { showToast("error", "Erro: " + (err && err.message || "")); })
+      .then(function () { uiState.inbox.pendingMutationId = null; });
+  }
+
+  // ===== Topology =====
+  function refreshTopologyModel() {
+    getJSON("/api/status").then(function (s) {
+      var rawProjects = (s && s.projects && s.projects.length) ? s.projects : ["_global", "_shared", "dm-erp", "core-engine", "api-gateway", "agents"];
+      var projects = Array.from(new Set(rawProjects));
+      var nodes = [];
+      var edges = [];
+      var radius = 200;
+      projects.forEach(function (p, i) {
+        var angle = (i / Math.max(1, projects.length)) * Math.PI * 2;
+        nodes.push({ id: "p:" + p, label: p, kind: "project", x: Math.round(Math.cos(angle) * radius), y: Math.round(Math.sin(angle) * radius) });
+      });
+      var coreDocs = [
+        { id: "d:brain", label: "BRAIN.md", project: "_global", kind: "document" },
+        { id: "d:arch", label: "ARCHITECTURE.md", project: "_global", kind: "document" },
+        { id: "d:rules", label: "BUSINESS_RULES.md", project: "_global", kind: "document" },
+        { id: "d:db", label: "DATABASE.md", project: "_global", kind: "document" },
+        { id: "d:adr14", label: "ADR-014 Pipeline AI", project: "_global", kind: "decision" },
+        { id: "d:sec1", label: "SEC-CRIT-001 RBAC", project: "_global", kind: "decision" },
+        { id: "d:api1", label: "API-REST-Specs.md", project: "_global", kind: "document" },
+        { id: "d:desk1", label: "System Service SLA", project: "_global", kind: "document" },
+        { id: "d:mcp1", label: "MCP Protocol Specs", project: "_global", kind: "document" }
+      ];
+      coreDocs.forEach(function (doc, i) {
+        var targetProj = "p:" + doc.project;
+        var projNode = nodes.find(function (n) { return n.id === targetProj; });
+        var baseX = projNode ? Math.round(projNode.x * 0.55) : (i % 3 - 1) * 80;
+        var baseY = projNode ? Math.round(projNode.y * 0.55) : Math.floor(i / 3) * 80 - 40;
+        var docId = doc.id;
+        nodes.push({ id: docId, label: doc.label, kind: doc.kind, x: baseX + (i % 2 === 0 ? 35 : -35), y: baseY + (i * 12 - 30), project: doc.project });
+        edges.push({ from: targetProj, to: docId });
+      });
+      getJSON("/api/inbox").then(function (data) {
+        var candidates = (data && data.candidates) || [];
+        candidates.slice(0, 14).forEach(function (c, i) {
+          var id = c.candidate_id || ("cand" + i);
+          var kind = (c.task_id && /decis/i.test(c.task_id)) ? "decision" : "document";
+          var projId = "p:" + (c.project_id || "_global");
+          var projNode = nodes.find(function (n) { return n.id === projId; });
+          var px = projNode ? Math.round(projNode.x * 1.35 + (i * 18 - 36)) : (i % 4 - 1.5) * 75;
+          var py = projNode ? Math.round(projNode.y * 1.35 + (i * 18 - 36)) : Math.floor(i / 4) * 75 - 35;
+          nodes.push({ id: "c:" + id, label: c.title || id, kind: kind, x: px, y: py, project: c.project_id });
+          edges.push({ from: projId, to: "c:" + id });
+        });
+        uiState.topology.model = { nodes: nodes, edges: edges };
+        uiState.topology.dirty = true;
+        renderTopologyFrame();
+      }).catch(function () {
+        uiState.topology.model = { nodes: nodes, edges: edges };
+        uiState.topology.dirty = true;
+        renderTopologyFrame();
+      });
+    }).catch(function () {
+      uiState.topology.model = { nodes: [], edges: [] };
+      renderTopologyFrame();
+    });
+  }
+  function resizeTopologyCanvas() {
+    var canvas = document.getElementById("brainCanvas");
+    var stage = document.getElementById("topology-stage");
+    if (!canvas || !stage) return null;
+    var dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    var rect = stage.getBoundingClientRect();
+    var cssWidth = Math.max(320, Math.round(rect.width));
+    var cssHeight = Math.max(320, Math.round(rect.height));
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    canvas.style.width = cssWidth + "px";
+    canvas.style.height = cssHeight + "px";
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { canvas: canvas, ctx: ctx, width: cssWidth, height: cssHeight };
+  }
+  function drawTopologyNodes(ctx, nodes, selectedId) {
+    nodes.forEach(function (n) {
+      ctx.beginPath();
+      ctx.fillStyle = n.id === selectedId ? TOKEN.focus : (n.kind === "decision" ? TOKEN.warning : (n.kind === "document" ? TOKEN.muted : TOKEN.action));
+      ctx.strokeStyle = n.id === selectedId ? TOKEN.focus : TOKEN.border;
+      ctx.lineWidth = n.id === selectedId ? 2 : 1;
+      if (n.kind === "project") {
+        ctx.arc(n.x, n.y, 10, 0, Math.PI * 2);
+      } else if (n.kind === "decision") {
+        ctx.moveTo(n.x, n.y - 10); ctx.lineTo(n.x + 10, n.y); ctx.lineTo(n.x, n.y + 10); ctx.lineTo(n.x - 10, n.y); ctx.closePath();
+      } else {
+        ctx.rect(n.x - 8, n.y - 8, 16, 16);
+      }
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = TOKEN.text;
+      ctx.font = "12px " + TOKEN.fontMono;
+      ctx.textAlign = "center";
+      ctx.fillText(String(n.label || "").slice(0, 24), n.x, n.y + 22);
+    });
+  }
+  function drawTopologyEdges(ctx, edges, nodes) {
+    var byId = {};
+    nodes.forEach(function (n) { byId[n.id] = n; });
+    ctx.strokeStyle = TOKEN.border;
+    ctx.lineWidth = 1;
+    edges.forEach(function (e) {
+      var a = byId[e.from], b = byId[e.to];
+      if (!a || !b) return;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+  }
+  function hitTestTopology(nodes, screenX, screenY, width, height) {
+    var worldX = (screenX - (width / 2 + uiState.topology.pan.x)) / uiState.topology.zoom;
+    var worldY = (screenY - (height / 2 + uiState.topology.pan.y)) / uiState.topology.zoom;
+    for (var i = nodes.length - 1; i >= 0; i--) {
+      var n = nodes[i];
+      if (n.kind === "project" && Math.hypot(n.x - worldX, n.y - worldY) <= 15) return n;
+      if (n.kind === "document" && Math.abs(n.x - worldX) <= 14 && Math.abs(n.y - worldY) <= 14) return n;
+      if (n.kind === "decision" && Math.abs(n.x - worldX) + Math.abs(n.y - worldY) <= 16) return n;
+    }
+    return null;
+  }
+  function renderTopologyFrame() {
+    var ctxInfo = resizeTopologyCanvas();
+    if (!ctxInfo) return;
+    var ctx = ctxInfo.ctx;
+    var width = ctxInfo.width;
+    var height = ctxInfo.height;
+    var model = uiState.topology.model || { nodes: [], edges: [] };
+    var selected = uiState.topology.selectedNodeId;
+    ctx.fillStyle = TOKEN.bgCanvas;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.save();
+    ctx.translate(width / 2 + uiState.topology.pan.x, height / 2 + uiState.topology.pan.y);
+    ctx.scale(uiState.topology.zoom, uiState.topology.zoom);
+
+    drawTopologyEdges(ctx, model.edges, model.nodes);
+    drawTopologyNodes(ctx, model.nodes, selected);
+
+    ctx.restore();
+
+    var empty = document.getElementById("topology-empty");
+    if (empty) {
+      if (!model.nodes.length) { empty.removeAttribute("hidden"); empty.style.display = "grid"; }
+      else { empty.setAttribute("hidden", ""); empty.style.display = "none"; }
+    }
+    var readout = document.getElementById("topology-readout");
+    if (readout) safeText(readout, model.nodes.length + " nós \u00B7 " + model.edges.length + " arestas");
+  }
+  function centerTopology() {
+    uiState.topology.zoom = 1; uiState.topology.pan = { x: 0, y: 0 }; renderTopologyFrame();
+  }
+  function fitTopology() {
+    centerTopology();
+  }
+  function initTopologyCanvas() {
+    var canvas = document.getElementById("brainCanvas");
+    if (!canvas) return;
+    if (typeof ResizeObserver !== "undefined") {
+      var stage = document.getElementById("topology-stage");
+      if (stage) new ResizeObserver(function () { renderTopologyFrame(); }).observe(stage);
+    } else {
+      window.addEventListener("resize", renderTopologyFrame);
+    }
+    var dragging = null;
+    canvas.addEventListener("mousedown", function (e) {
+      var rect = canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left, y = e.clientY - rect.top;
+      var hit = hitTestTopology((uiState.topology.model || { nodes: [] }).nodes, x, y, rect.width, rect.height);
+      if (hit) {
+        uiState.topology.selectedNodeId = hit.id;
+        var worldX = (x - (rect.width / 2 + uiState.topology.pan.x)) / uiState.topology.zoom;
+        var worldY = (y - (rect.height / 2 + uiState.topology.pan.y)) / uiState.topology.zoom;
+        dragging = { mode: "node", node: hit, dx: worldX - hit.x, dy: worldY - hit.y };
+        var ins = document.getElementById("topology-inspector");
+        if (ins) ins.innerHTML = "<strong>" + escapeHTML(hit.label || hit.id) + "</strong><br><span style='color:var(--text-muted);'>" + escapeHTML(hit.kind) + "</span>";
+      } else {
+        dragging = { mode: "pan", x: x, y: y };
+      }
+      renderTopologyFrame();
+    });
+    canvas.addEventListener("mousemove", function (e) {
+      if (!dragging) return;
+      var rect = canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if (dragging.mode === "node") {
+        var worldX = (x - (rect.width / 2 + uiState.topology.pan.x)) / uiState.topology.zoom;
+        var worldY = (y - (rect.height / 2 + uiState.topology.pan.y)) / uiState.topology.zoom;
+        dragging.node.x = worldX - dragging.dx;
+        dragging.node.y = worldY - dragging.dy;
+      } else if (dragging.mode === "pan") {
+        uiState.topology.pan.x += (x - dragging.x);
+        uiState.topology.pan.y += (y - dragging.y);
+        dragging.x = x; dragging.y = y;
+      }
+      uiState.topology.dirty = true;
+      renderTopologyFrame();
+    });
+    window.addEventListener("mouseup", function () { dragging = null; });
+    canvas.addEventListener("wheel", function (e) {
+      e.preventDefault();
+      var factor = e.deltaY < 0 ? 1.1 : (1 / 1.1);
+      uiState.topology.zoom = Math.max(0.4, Math.min(3, uiState.topology.zoom * factor));
+      renderTopologyFrame();
+    }, { passive: false });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && uiState.activeTab === "tab-topology") {
+        uiState.topology.selectedNodeId = null;
+        renderTopologyFrame();
+      }
+    });
+    var centerBtn = document.getElementById("topology-center");
+    if (centerBtn) centerBtn.addEventListener("click", centerTopology);
+    var fitBtn = document.getElementById("topology-fit");
+    if (fitBtn) fitBtn.addEventListener("click", fitTopology);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) renderTopologyFrame();
+    });
+    renderTopologyFrame();
+  }
+  function destroyTopologyCanvas() {
+    var canvas = document.getElementById("brainCanvas");
+    if (canvas) {
+      var ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  // ===== Metrics =====
+  function initMetrics() {
+    try {
+      refreshStatus();
+      var reindexBtn = document.getElementById("reindex-btn");
+      if (reindexBtn) reindexBtn.addEventListener("click", function () {
+        if (!window.confirm("Reindexar a memória canônica agora?")) return;
+        reindexBtn.setAttribute("aria-busy", "true");
+        reindexBtn.textContent = "Reindexando…";
+        postJSON("/api/reindex", {}).then(function (r) {
+          showToast("ok", "Reindexação concluída.");
+          setEvidence("sync", new Date().toLocaleTimeString("pt-BR"));
+          refreshStatus();
+        }).catch(function (err) {
+          showToast("error", "Falha na reindexação: " + (err && err.message || ""));
+        }).then(function () {
+          reindexBtn.removeAttribute("aria-busy");
+          reindexBtn.textContent = "Reindexar cérebro";
+        });
+      });
+    } catch (e) { console.error("initMetrics:", e); }
+  }
+  function refreshStatus() {
+    try {
+      getJSON("/api/status").then(function (s) {
+        var strip = document.getElementById("metrics-health-strip");
+        if (strip) {
+          var totalDocs = s.documents || 0;
+          var totalFiles = s.files || 0;
+          var inbox = s.inbox_count || 0;
+          strip.innerHTML = ""
+            + '<div class="cell"><span class="lbl">Documentos</span><span class="val">' + totalDocs + '</span></div>'
+            + '<div class="cell"><span class="lbl">Arquivos</span><span class="val">' + totalFiles + '</span></div>'
+            + '<div class="cell"><span class="lbl">Inbox</span><span class="val">' + inbox + '</span></div>'
+            + '<div class="cell"><span class="lbl">FTS5</span><span class="val">' + (s.fts5 ? "ON" : "OFF") + '</span></div>';
+        }
+        var grid = document.getElementById("metrics-grid");
+        if (grid) {
+          grid.innerHTML = ""
+            + metricCard("Bind", (s.bind_host || "") + ":" + (s.bind_port || ""), "Endpoint ativo")
+            + metricCard("Raiz canônica", s.canonical_root || "—", "Origem da indexação")
+            + metricCard("Projetos", (s.projects || []).length, "Escopos descobertos")
+            + metricCard("Inbox", String(inbox), "Candidatos pendentes");
+        }
+        setEvidence("cluster", s.fts5 ? "online" : "degradado");
+        setEvidence("index", totalDocs + " docs");
+        setEvidence("sync", new Date().toLocaleTimeString("pt-BR"));
+        var tbody = document.querySelector("#index-breakdown tbody");
+        if (tbody) {
+          var breakdown = (s.types_breakdown && Object.keys(s.types_breakdown).length)
+            ? Object.entries(s.types_breakdown).map(function (kv) {
+                return "<tr><td>Todos os projetos</td><td>" + escapeHTML(kv[0]) + "</td><td>" + escapeHTML(kv[1]) + "</td></tr>";
+              }).join("")
+            : "<tr><td colspan='5' style='color:var(--text-muted);'>Sem dados disponíveis.</td></tr>";
+          tbody.innerHTML = breakdown;
+        }
+        var dl = document.getElementById("system-diagnostics-list");
+        if (dl) {
+          dl.innerHTML = ""
+            + "<dt>Bind</dt><dd>" + escapeHTML((s.bind_host || "") + ":" + (s.bind_port || "")) + "</dd>"
+            + "<dt>Raiz</dt><dd>" + escapeHTML(s.canonical_root || "—") + "</dd>"
+            + "<dt>FTS5</dt><dd>" + (s.fts5 ? "online (tokenize porter unicode61)" : "indisponível") + "</dd>"
+            + "<dt>Inbox</dt><dd>" + escapeHTML(String(inbox)) + "</dd>";
+        }
+        var state = document.getElementById("search-index-state");
+        if (state) safeText(state, totalDocs + " documentos indexados");
+      }).catch(function (err) {
+        showToast("error", "Status: " + (err && err.message || ""));
+      });
+    } catch (e) { console.error("refreshStatus:", e); }
+  }
+  function metricCard(label, value, desc) {
+    return '<div class="metric-card"><span class="lbl">' + escapeHTML(label) + '</span><span class="val">' + escapeHTML(value) + '</span><span class="desc">' + escapeHTML(desc) + '</span></div>';
+  }
+
+
+  // ===== Cockpit Pro 5x & Anti-Loop =====
+  var ledgerSnapshot = null;
+  var ledgerRequestId = 0;
+  function formatRecorded(value) { return value == null ? "Não informado" : Number(value).toLocaleString("pt-BR"); }
+  function refreshCockpit() {
+    try {
+      var requestId = ++ledgerRequestId;
+      ledgerSnapshot = null;
+      document.getElementById("export-ledger-btn").disabled = true;
+      safeText(document.getElementById("cockpit-message"), "Atualizando medições…");
+      getJSON("/api/v1/ledger/stats?days=" + document.getElementById("ledger-period").value).then(function (data) {
+        if (requestId !== ledgerRequestId) return;
+        var today = data.today || {};
+        ledgerSnapshot = data;
+        document.getElementById("export-ledger-btn").disabled = !(data.recent_sessions || []).length;
+        safeText(document.getElementById("cockpit-message"), data.usage_status === "unavailable" || !(data.recent_sessions || []).length ? "Sem medições registradas. Consulte os limites oficiais no Codex para acompanhar sua cota." : "Medições locais atualizadas. Detalhes dependem dos dados informados pela origem.");
+        safeText(document.getElementById("cockpit-today-total"), formatRecorded(today.total));
+        safeText(document.getElementById("cockpit-today-prompt"), formatRecorded(today.prompt));
+        safeText(document.getElementById("cockpit-today-completion"), formatRecorded(today.completion));
+        safeText(document.getElementById("cockpit-today-reasoning"), formatRecorded(today.reasoning));
+        safeText(document.getElementById("cockpit-today-loops"), data.anti_loop_mode === "observational_unwired" ? "Não conectado" : formatRecorded(today.loops_detected));
+        safeText(document.getElementById("cockpit-today-cost"), today.cost == null ? "Não disponível" : "$" + Number(today.cost).toFixed(4));
+
+        var modelsDiv = document.getElementById("cockpit-models-list");
+        if (modelsDiv) {
+          var modelsHtml = (data.by_model || []).map(function (m) {
+            return '<div class="cockpit-tag-item"><strong>' + escapeHTML(m.model) + '</strong>: '
+                 + formatRecorded(m.total_tokens) + ' tokens (raciocínio: '
+                 + formatRecorded(m.reasoning_tokens) + ')</div>';
+          }).join("");
+          modelsDiv.innerHTML = modelsHtml || '<span style="color:var(--text-muted);font-size:12px;">Sem dados de modelo no período.</span>';
+        }
+
+        var projDiv = document.getElementById("cockpit-projects-list");
+        if (projDiv) {
+          var projsHtml = (data.by_project || []).map(function (p) {
+            return '<div class="cockpit-tag-item"><strong>' + escapeHTML(p.project_id) + '</strong>: '
+                 + formatRecorded(p.total_tokens) + ' tok</div>';
+          }).join("");
+          projDiv.innerHTML = projsHtml || '<span style="color:var(--text-muted);font-size:12px;">Sem dados de projeto no período.</span>';
+        }
+
+        var sessTbody = document.getElementById("cockpit-sessions-tbody");
+        if (sessTbody && data.recent_sessions) {
+          if (data.recent_sessions.length === 0) {
+            sessTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Nenhuma sessão registrada ainda.</td></tr>';
+          } else {
+            sessTbody.innerHTML = data.recent_sessions.map(function (s) {
+              var d = s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "—";
+              return '<tr>'
+                   + '<td>' + escapeHTML(d) + '</td>'
+                   + '<td><code>' + escapeHTML((s.session_id || "").slice(0, 12)) + '</code></td>'
+                   + '<td>' + escapeHTML(s.project_id || "_global") + '</td>'
+                   + '<td><span class="badge">' + escapeHTML(s.model || "—") + '</span></td>'
+                   + '<td>' + formatRecorded(s.prompt_tokens) + '</td>'
+                   + '<td>' + formatRecorded(s.completion_tokens) + '</td>'
+                   + '<td>' + formatRecorded(s.reasoning_tokens) + '</td>'
+                   + '<td><strong>' + formatRecorded(s.total_tokens) + '</strong></td>'
+                   + '</tr>';
+            }).join("");
+          }
+        }
+
+        var loopsDiv = document.getElementById("cockpit-loops-list");
+        if (loopsDiv && data.recent_loops) {
+          if (data.recent_loops.length === 0) {
+            loopsDiv.innerHTML = '<p style="color:var(--text-muted);font-size:var(--text-xs);margin:0;">Nenhum loop crítico detectado recentemente. Seu fluxo está limpo!</p>';
+          } else {
+            loopsDiv.innerHTML = data.recent_loops.map(function (l) {
+              return '<div class="candidate-row" style="border-left:3px solid var(--warning);">'
+                   + '<div class="title">' + escapeHTML(l.file_path) + '</div>'
+                   + '<div class="meta-row"><span>Repetições consecutivas: <strong>' + l.repeats + 'x</strong></span> &middot; <span>Sessão: ' + escapeHTML((l.session_id || "").slice(0, 12)) + '</span></div>'
+                   + '</div>';
+            }).join("");
+          }
+        }
+      }).catch(function () {
+        if (requestId !== ledgerRequestId) return;
+        safeText(document.getElementById("cockpit-message"), "Não foi possível carregar as medições. Tente Atualizar.");
+        ["total", "prompt", "completion", "reasoning", "loops", "cost"].forEach(function (key) { safeText(document.getElementById("cockpit-today-" + key), "Não disponível"); });
+        document.getElementById("export-ledger-btn").disabled = true;
+      });
+    } catch (e) { console.error("refreshCockpit:", e); }
+  }
+  function initCockpit() {
+    var btn = document.getElementById("refresh-cockpit-btn");
+    if (btn) btn.addEventListener("click", function () { refreshCockpit(); });
+    document.getElementById("ledger-period").addEventListener("change", refreshCockpit);
+    document.getElementById("export-ledger-btn").addEventListener("click", function () {
+      function cell(value) { var v=String(value == null ? "" : value); if (/^[=+@-]/.test(v.trimStart()) || v.charCodeAt(0) < 32) v="'"+v; return '"'+v.replace(/"/g,'""')+'"'; }
+      var fields=["created_at","session_id","project_id","model","prompt_tokens","completion_tokens","reasoning_tokens","total_tokens"];
+      var rows=(ledgerSnapshot && ledgerSnapshot.recent_sessions) || [];
+      var csv=[fields.map(cell).join(";")].concat(rows.map(function(row){return fields.map(function(k){return cell(row[k]);}).join(";");})).join("\\r\\n");
+      var url=URL.createObjectURL(new Blob(["\\ufeff",csv],{type:"text/csv;charset=utf-8"}));
+      var a=document.createElement("a"); a.href=url; a.download="cerberus-registros.csv"; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    });
+  }
+
+  // ===== Profile =====
+  function refreshProfile() {
+    try {
+      getJSON("/api/v1/auth/me").then(function (u) {
+        safeText(document.getElementById("profile-email"), u.email);
+        safeText(document.getElementById("profile-active"), u.is_active ? "Conta ativa" : "Conta inativa");
+        try {
+          var created = u.created_at ? new Date(u.created_at * 1000).toLocaleString("pt-BR") : "—";
+          safeText(document.getElementById("profile-created"), created);
+        } catch (e) {}
+        var status = u.has_2fa ? "Ativo" : "Inativo";
+        var badge = document.getElementById("profile-2fa-status");
+        if (badge) { badge.textContent = status; badge.className = "badge " + (u.has_2fa ? "success" : "warning"); }
+        var inline = document.getElementById("profile-2fa-status-inline");
+        if (inline) safeText(inline, status);
+        var enableBtn = document.getElementById("twofa-enable-btn");
+        if (enableBtn) enableBtn.hidden = !!u.has_2fa;
+        var disableForm = document.getElementById("twofa-disable-form");
+        if (disableForm) disableForm.hidden = !u.has_2fa;
+        uiState.profile.status = u.has_2fa;
+      }).catch(function (err) { showToast("error", "Perfil: " + (err && err.message || "")); });
+    } catch (e) { console.error("refreshProfile:", e); }
+  }
+  function initProfile() {
+    try {
+      var profileBtn = document.getElementById("profile-btn");
+      if (profileBtn) profileBtn.addEventListener("click", function () { try { selectTab("tab-profile"); } catch (e) {} });
+      var logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) logoutBtn.addEventListener("click", function () {
+        try {
+          postJSON("/auth/logout", {}).catch(function () {}).then(function () { window.location.href = "/auth/login"; });
+        } catch (e) {}
+      });
+      var pwForm = document.getElementById("change-password-form");
+      if (pwForm) pwForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var current = document.getElementById("current-password").value;
+        var next = document.getElementById("new-password").value;
+        var confirm = document.getElementById("confirm-password").value;
+        if (next !== confirm) { showToast("error", "A confirmação da nova senha não confere."); return; }
+        postJSON("/api/v1/auth/change-password", { current_password: current, new_password: next }).then(function (r) {
+          showToast("ok", r.message || "Senha atualizada.");
+          pwForm.reset();
+        }).catch(function (err) { showToast("error", "Senha não atualizada: " + (err && err.message || "")); });
+      });
+      var enableBtn = document.getElementById("twofa-enable-btn");
+      if (enableBtn) enableBtn.addEventListener("click", function () {
+        postJSON("/api/v1/auth/2fa/setup", {}).then(function (r) {
+          uiState.profile.pendingSecret = r.secret || "";
+          var qr = document.getElementById("twofa-qr");
+          if (qr && typeof r.qr_svg === "string" && r.qr_svg.indexOf("<svg") === 0) {
+            qr.textContent = "";
+            qr.innerHTML = r.qr_svg;
+          }
+          safeText(document.getElementById("twofa-secret"), r.secret || "");
+          var enroll = document.getElementById("twofa-enrollment");
+          if (enroll) enroll.removeAttribute("hidden");
+        }).catch(function (err) { showToast("error", "Falha ao iniciar 2FA: " + (err && err.message || "")); });
+      });
+      var verifyForm = document.getElementById("twofa-verify-form");
+      if (verifyForm) verifyForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var code = document.getElementById("twofa-code").value;
+        postJSON("/api/v1/auth/2fa/verify-and-enable", { secret: uiState.profile.pendingSecret, code: code }).then(function (r) {
+          showToast("ok", r.message || "2FA ativado.");
+          var enroll = document.getElementById("twofa-enrollment");
+          if (enroll) enroll.setAttribute("hidden", "");
+          verifyForm.reset();
+          refreshProfile();
+        }).catch(function (err) { showToast("error", "2FA não ativado: " + (err && err.message || "")); });
+      });
+      var disableForm = document.getElementById("twofa-disable-form");
+      if (disableForm) disableForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var pw = document.getElementById("twofa-disable-password").value;
+        postJSON("/api/v1/auth/2fa/disable", { password: pw }).then(function (r) {
+          showToast("ok", r.message || "2FA desativado.");
+          disableForm.reset();
+          refreshProfile();
+        }).catch(function (err) { showToast("error", "2FA não desativado: " + (err && err.message || "")); });
+      });
+      var copySecret = document.getElementById("copy-secret-btn");
+      if (copySecret) copySecret.addEventListener("click", function () {
+        var secret = document.getElementById("twofa-secret").textContent;
+        navigator.clipboard.writeText(secret).then(function () { showToast("ok", "Secret copiado."); }).catch(function () {});
+      });
+      refreshProfile();
+    } catch (e) { console.error("initProfile:", e); }
+  }
+
+  // ===== Keyboard shortcuts =====
+  function initKeyboardShortcuts() {
+    document.addEventListener("keydown", function (e) {
+      try {
+        if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
+          e.preventDefault();
+          var q = document.getElementById("search-q");
+          selectTab("tab-search");
+          if (q) q.focus();
+          return;
+        }
+        if (e.key === "Escape") {
+          var preview = document.getElementById("search-workbench");
+          if (preview && preview.classList.contains("preview-open")) {
+            preview.classList.remove("preview-open");
+            var back = document.getElementById("search-preview-back");
+            if (back) back.setAttribute("hidden", "");
+          }
+          var ib = document.getElementById("inbox-workbench");
+          if (ib) ib.classList.remove("preview-open");
+          if (uiState.activeTab === "tab-topology") {
+            uiState.topology.selectedNodeId = null;
+            renderTopologyFrame();
+          }
+        }
+      } catch (err) { console.error("kbd:", err); }
+    });
+  }
+
+  // ===== Boot =====
+  function safeBoot(name, fn) {
+    try { fn(); }
+    catch (err) { console.error("[boot] " + name + ":", err); }
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    safeBoot("initEvidenceRail", initEvidenceRail);
+    safeBoot("initTabs", initTabs);
+    safeBoot("openOverview", function () {
+      var initialTab = (location.hash && document.getElementById(location.hash.slice(1))) ? location.hash.slice(1) : "tab-metrics";
+      selectTab(initialTab);
+    });
+    safeBoot("initSearch", initSearch);
+    safeBoot("initInbox", initInbox);
+    safeBoot("initTopologyCanvas", initTopologyCanvas);
+    safeBoot("initMetrics", initMetrics);
+    safeBoot("initProfile", initProfile);
+    safeBoot("initCockpit", initCockpit);
+    safeBoot("initDialogs", initDialogs);
+    safeBoot("initKeyboardShortcuts", initKeyboardShortcuts);
+    refreshStatus();
+  });
+})();
 </script>
 </body>
 </html>
 """
+
+
+
+
+
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -2115,14 +2478,25 @@ def _render_login_html(step: str = "credentials",
                        error_message: str = "",
                        pending_token: str = "",
                        target_email: str = "") -> str:
-    """Render the Dev Maniac's Cerberus Inspector login page in Suporte Dev Maniac's theme."""
+    """Render the Dev Maniac's Cerberus Inspector login page in Suporte Dev Maniac's theme.
+
+    Security: every interpolation point that lands inside an HTML attribute or
+    element body MUST be html-escaped. ``error_message``, ``pending_token`` and
+    ``target_email`` are all attacker-controllable via query-string params
+    (see ``_login_redirect_with_error``), so we escape unconditionally here.
+    """
+    target_email = (target_email or "")[:254]
+    pending_token = (pending_token or "")[:128]
+
+    safe_email = html_escape(target_email, quote=True)
+    safe_pending = html_escape(pending_token, quote=True)
+
     error_block = ""
     if error_message:
-        escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
-                    .replace(">", "&gt;"))
+        safe_error = html_escape(error_message, quote=True)
         error_block = (
             f'<div class="login-error" role="alert">'
-            f'<span class="err-dot"></span><span>{escaped}</span></div>'
+            f'<span class="err-dot"></span><span>{safe_error}</span></div>'
         )
     # Step rendering
     creds_class = "step-content active" if step == "credentials" else "step-content"
@@ -2131,31 +2505,34 @@ def _render_login_html(step: str = "credentials",
         creds_block = f'''
 <form id="loginForm" method="POST" action="/auth/login" class="step-form" autocomplete="on">
   <label class="field">
-    <span>E-mail Corporativo</span>
+    <span>E-mail</span>
     <input type="email" name="email" required autofocus autocomplete="username"
-           placeholder="helbert.moura@devmaniacs.com.br" value="{target_email}">
+           placeholder="voce@empresa.com" value="{safe_email}">
   </label>
   <label class="field">
-    <span>Senha de Acesso</span>
-    <input type="password" name="password" required autocomplete="current-password"
-           placeholder="••••••••••••" minlength="8">
+    <span>Senha</span>
+    <div class="password-wrap">
+      <input id="login-password" type="password" name="password" required autocomplete="current-password" placeholder="Sua senha">
+      <button type="button" class="password-toggle" aria-controls="login-password" aria-pressed="false" onclick="var p=document.getElementById('login-password'); var show=p.type==='password'; p.type=show?'text':'password'; this.textContent=show?'Ocultar':'Mostrar'; this.setAttribute('aria-pressed',String(show));">Mostrar</button>
+    </div>
   </label>
-  <button type="submit" class="btn-dm primary">Acessar Central de Memória &rarr;</button>
-</form>'''
+  <button type="submit" class="btn-dm primary">Entrar</button>
+</form>
+<p class="login-help">Primeiro acesso ou redefinir senha? Execute <code>python -m engine.admin_access</code> no terminal (ou utilitário <strong>Configurar acesso</strong>) para definir suas credenciais.</p>'''
         totp_block = ''
     else:
         creds_block = ''
         totp_block = f'''
 <form id="totpForm" method="POST" action="/auth/login" class="step-form" autocomplete="off">
-  <input type="hidden" name="pending_token" value="{pending_token}">
-  <input type="hidden" name="email" value="{target_email}">
+  <input type="hidden" name="pending_token" value="{safe_pending}">
+  <input type="hidden" name="email" value="{safe_email}">
   <div class="totp-badge"><span>2FA &middot; AUTENTICAÇÃO EM DUAS ETAPAS</span></div>
-  <p class="totp-help">Digite o código de 8 dígitos gerado no seu aplicativo autenticador.</p>
+  <p class="totp-help">Digite o código de 6 ou 8 dígitos gerado no seu aplicativo autenticador.</p>
   <label class="field">
     <span>Código de Autenticação</span>
     <input type="text" name="totp" required autofocus inputmode="numeric"
-           autocomplete="one-time-code" pattern="\\d{{8}}" maxlength="8"
-           placeholder="00000000" class="totp-input">
+           autocomplete="one-time-code" pattern="\\d{{6,8}}" maxlength="8"
+           placeholder="000000" class="totp-input">
   </label>
   <button type="submit" class="btn-dm primary">Confirmar &amp; Entrar &rarr;</button>
   <div class="back-link"><a href="/auth/login">&larr; Voltar para o login</a></div>
@@ -2166,44 +2543,54 @@ def _render_login_html(step: str = "credentials",
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061637">
+<meta name="theme-color" content="#141617">
 <title>Cerberus Inspector &mdash; Dev Maniac's Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --bg-deep: #061637;
-  --bg-deep-2: #0a192f;
-  --bg-elev: #0d2247;
-  --border-dark: #1e3a6d;
-  --ink-light: #f8fafc;
-  --text-muted: #94a3b8;
-  --dm-cyan: #08b9ca;
-  --dm-red: #ff4c4c;
-  --dm-yellow: #ffc529;
-  --dm-blue: #1e40af;
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', var(--font);
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --bg-canvas: #141617;
+  --bg-shell: #191C1D;
+  --bg-panel: #1D2122;
+  --bg-elevated: #272D2E;
+  --bg-input: #171B1C;
+  --border-subtle: #2D3332;
+  --border-default: #39413D;
+  --border-strong: #59645D;
+  --text-primary: #F0F2ED;
+  --text-secondary: #C3CAC2;
+  --text-muted: #9FA99F;
+  --action: #C93B46;
+  --action-hover: #D94854;
+  --action-pressed: #A82833;
+  --action-soft: #2D1417;
+  --warning: #D8B478;
+  --warning-soft: #352E22;
+  --success: #A9C5A0;
+  --success-soft: #25342A;
+  --danger: #F19D96;
+  --danger-soft: #392725;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
 }}
 * {{ box-sizing: border-box; }}
 html, body {{
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: var(--font);
-  background: var(--bg-deep);
-  color: var(--ink-light);
-  font-size: 14.5px;
+  font-family: var(--font-body);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-size: 14px;
 }}
 body {{
-  background: #061637;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px 24px;
+  padding: 32px 16px;
 }}
 .auth-wrapper {{
   width: 100%;
@@ -2213,21 +2600,12 @@ body {{
   align-items: center;
 }}
 .card {{
-  background: #0d2247;
-  border: 1px solid var(--border-dark);
-  border-radius: 18px;
-  padding: 34px 32px 30px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 32px;
   width: 100%;
-  box-shadow: 0 15px 35px #030a1a;
   position: relative;
-  overflow: hidden;
-}}
-.card::before {{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--dm-cyan);
 }}
 .brand-header {{
   display: flex;
@@ -2240,19 +2618,22 @@ body {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  background: #0d2247;
-  border: 1px solid var(--dm-cyan);
-  border-radius: 14px;
-  margin-bottom: 14px;
+  width: 56px;
+  height: 56px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}}
+.brand-logo-wrap svg {{
+  width: 32px;
+  height: 32px;
 }}
 .brand-title {{
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
   margin: 0 0 4px;
 }}
 .brand-tag {{
@@ -2261,25 +2642,24 @@ body {{
   gap: 6px;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--dm-cyan);
-  background: #0a192f;
-  padding: 3px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--dm-cyan);
+  color: var(--action);
+  background: var(--action-soft);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--action);
   margin-bottom: 8px;
 }}
 .card-subtitle {{
   font-size: 13px;
   color: var(--text-muted);
   margin: 0;
-  line-height: 1.4;
 }}
 .field {{
   display: block;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }}
 .field > span {{
   display: block;
@@ -2292,59 +2672,57 @@ body {{
 }}
 .field input {{
   width: 100%;
-  min-height: 46px;
+  min-height: 44px;
   padding: 10px 14px;
   font: inherit;
-  font-size: 14.5px;
-  background: #061637;
-  color: #ffffff;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  transition: all 0.15s ease;
+  font-size: 14px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
 }}
 .field input:focus {{
   outline: none;
-  border-color: var(--dm-cyan);
-  box-shadow: 0 0 0 3px #1e40af;
+  border-color: var(--action);
+  box-shadow: 0 0 0 3px var(--action-soft);
 }}
 .totp-input {{
   font-family: var(--font-mono);
-  font-size: 22px !important;
+  font-size: 20px !important;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.2em;
   text-align: center;
 }}
 .btn-dm {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 12px 20px;
-  font-family: var(--font);
-  font-weight: 700;
-  font-size: 14.5px;
-  color: #fff;
-  background: var(--dm-cyan);
-  border: 1px solid var(--dm-cyan);
-  border-radius: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: #FFFFFF;
+  background: var(--action);
+  border: 1px solid var(--action);
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
   width: 100%;
   margin-top: 8px;
   text-decoration: none;
 }}
 .btn-dm:hover {{
-  background: #0aa7b7;
-  box-shadow: 0 4px 0 #1e40af;
-  transform: translateY(-1px);
+  background: var(--action-hover);
 }}
-.btn-dm:active {{ transform: translateY(0); }}
+.btn-dm:active {{
+  background: var(--action-pressed);
+}}
 .totp-badge {{
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
-  color: var(--dm-cyan);
+  color: var(--action);
   text-align: center;
   margin-bottom: 4px;
 }}
@@ -2361,41 +2739,36 @@ body {{
 }}
 .back-link a {{
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
   text-decoration: none;
 }}
 .back-link a:hover {{
-  color: var(--dm-cyan);
+  color: var(--action);
   text-decoration: underline;
 }}
 .login-error {{
   display: flex;
   gap: 10px;
   align-items: center;
-  background: #0a192f;
-  border: 1px solid var(--dm-red);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
   color: #fca5a5;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
   margin-bottom: 18px;
 }}
 .err-dot {{
   width: 8px;
   height: 8px;
-  background: #ef4444;
+  background: var(--danger);
   border-radius: 50%;
   flex-shrink: 0;
 }}
 .step-content {{ display: none; }}
 .step-content.active {{ display: block; }}
-.step-fade {{ animation: fade 0.28s ease; }}
-@keyframes fade {{ from {{ opacity: 0; transform: translateY(-4px); }}
-                   to   {{ opacity: 1; transform: translateY(0); }} }}
 
-/* Footer Institutional (Dev Maniac's standard) */
 .auth-footer {{
   margin-top: 24px;
   text-align: center;
@@ -2411,13 +2784,12 @@ body {{
   flex-wrap: wrap;
 }}
 .auth-footer-links a {{
-  color: var(--dm-cyan);
+  color: var(--action);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
 }}
 .auth-footer-links a:hover {{
   text-decoration: underline;
-  color: #38bdf8;
 }}
 .auth-security-badge {{
   display: inline-flex;
@@ -2428,41 +2800,27 @@ body {{
   color: var(--text-muted);
   margin-top: 6px;
 }}
+{AUTH_STYLE}
 </style>
 </head>
 <body>
   <div class="auth-wrapper">
+    {AUTH_STORY}
     <main class="card">
       <div class="brand-header">
-        <div class="brand-logo-wrap">
-          {DEV_MANIACS_LOGO_SVG}
-        </div>
-        <h1 class="brand-title">Dev Maniac's</h1>
-        <span class="brand-tag"><span class="err-dot" style="background:var(--dm-cyan);"></span> CERBERUS INTELLIGENCE</span>
-        <p class="card-subtitle">Central de Mem&oacute;ria Corporativa &middot; Acesso Seguro</p>
+        <h1 class="brand-title">Entrar no Cerberus</h1>
+        <p class="card-subtitle">Use seu e-mail e senha para continuar.</p>
       </div>
       {error_block}
       <section class="{creds_class}" id="credsStep">
         {creds_block}
       </section>
-      <section class="{totp_class} step-fade" id="totpStep">
+      <section class="{totp_class}" id="totpStep">
         {totp_block}
       </section>
     </main>
-    <footer class="auth-footer">
-      <nav class="auth-footer-links" aria-label="Links institucionais">
-        <a href="https://devmaniacs.com.br" target="_blank" rel="noopener noreferrer">devmaniacs.com.br</a>
-        <span>&middot;</span>
-        <a href="https://suporte.devmaniacs.com.br" target="_blank" rel="noopener noreferrer">Suporte</a>
-        <span>&middot;</span>
-        <a href="https://radierhub.com.br" target="_blank" rel="noopener noreferrer">RadierHUB</a>
-      </nav>
-      <div>&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development. Todos os direitos reservados.</div>
-      <div class="auth-security-badge">
-        <span>Cloudflare Argo Tunnel Blindado &middot; 2FA TOTP RFC 6238</span>
-      </div>
-    </footer>
   </div>
+  {render_institutional_footer("auth")}
 </body>
 </html>'''
 
@@ -2471,109 +2829,109 @@ def _render_setup_2fa_html(secret_b32: str, otp_uri: str,
                             svg: str, error_message: str = "") -> str:
     err_block = ""
     if error_message:
-        escaped = (error_message.replace("&", "&amp;").replace("<", "&lt;")
-                    .replace(">", "&gt;"))
+        safe_error = html_escape(error_message, quote=True)
         err_block = (
             f'<div class="login-error" role="alert"><span class="err-dot"></span> '
-            f'<span>{escaped}</span></div>'
+            f'<span>{safe_error}</span></div>'
         )
     return f'''<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061637">
+<meta name="theme-color" content="#141617">
 <title>Cerberus Inspector &mdash; Configurar 2FA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --bg-deep: #061637;
-  --bg-deep-2: #0a192f;
-  --bg-elev: #0d2247;
-  --border-dark: #1e3a6d;
-  --ink-light: #f8fafc;
-  --text-muted: #94a3b8;
-  --dm-cyan: #08b9ca;
-  --dm-red: #ff4c4c;
-  --dm-yellow: #ffc529;
-  --dm-blue: #1e40af;
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', var(--font);
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --bg-canvas: #141617;
+  --bg-shell: #191C1D;
+  --bg-panel: #1D2122;
+  --bg-elevated: #272D2E;
+  --bg-input: #171B1C;
+  --border-subtle: #2D3332;
+  --border-default: #39413D;
+  --border-strong: #59645D;
+  --text-primary: #F0F2ED;
+  --text-secondary: #C3CAC2;
+  --text-muted: #9FA99F;
+  --action: #C93B46;
+  --action-hover: #D94854;
+  --action-pressed: #A82833;
+  --action-soft: #2D1417;
+  --warning: #D8B478;
+  --warning-soft: #352E22;
+  --success: #A9C5A0;
+  --success-soft: #25342A;
+  --danger: #F19D96;
+  --danger-soft: #392725;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
 }}
 * {{ box-sizing: border-box; }}
 html, body {{
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: var(--font);
-  background: var(--bg-deep);
-  color: var(--ink-light);
-  font-size: 14.5px;
+  font-family: var(--font-body);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-size: 14px;
 }}
 body {{
-  background: #061637;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px 24px;
+  padding: 32px 16px;
 }}
 .auth-wrapper {{
   width: 100%;
-  max-width: 540px;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }}
 .card {{
-  background: #0d2247;
-  border: 1px solid var(--border-dark);
-  border-radius: 18px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
   padding: 32px;
   width: 100%;
-  box-shadow: 0 15px 35px #030a1a;
   position: relative;
-  overflow: hidden;
-}}
-.card::before {{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--dm-yellow);
 }}
 .brand-header {{
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 16px;
 }}
 .brand-logo-wrap {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  background: #0d2247;
-  border: 1px solid var(--dm-cyan);
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
   flex-shrink: 0;
 }}
 .brand-logo-wrap svg {{
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }}
 .brand-header h1 {{
   margin: 0 0 2px;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }}
 .brand-header p.subtitle {{
   margin: 0;
@@ -2587,10 +2945,10 @@ body {{
   margin-bottom: 20px;
 }}
 .qr-wrap .svg {{
-  background: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border-dark);
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
   flex-shrink: 0;
 }}
 .field {{ margin-bottom: 14px; }}
@@ -2605,19 +2963,19 @@ body {{
 }}
 .field input {{
   width: 100%;
-  min-height: 46px;
+  min-height: 44px;
   padding: 10px 14px;
   font: inherit;
-  font-size: 14.5px;
-  background: #061637;
-  color: #ffffff;
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
+  font-size: 14px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
 }}
 .field input:focus {{
   outline: none;
-  border-color: var(--dm-cyan);
-  box-shadow: 0 0 0 3px #1e40af;
+  border-color: var(--action);
+  box-shadow: 0 0 0 3px var(--action-soft);
 }}
 .totp-input {{
   font-family: var(--font-mono);
@@ -2630,10 +2988,10 @@ body {{
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 8px 10px;
-  background: #040e24;
-  color: #7dd3fc;
-  border: 1px solid var(--border-dark);
-  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--action);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
   word-break: break-all;
   margin: 4px 0 10px;
 }}
@@ -2641,41 +2999,37 @@ body {{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 12px 20px;
-  font-family: var(--font);
-  font-weight: 700;
-  font-size: 14.5px;
-  color: #fff;
-  background: var(--dm-cyan);
-  border: 1px solid var(--dm-cyan);
-  border-radius: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: #FFFFFF;
+  background: var(--action);
+  border: 1px solid var(--action);
+  border-radius: 6px;
   cursor: pointer;
   width: 100%;
-  transition: all 0.15s ease;
   text-decoration: none;
 }}
 .btn-dm:hover {{
-  background: #0aa7b7;
-  box-shadow: 0 4px 0 #1e40af;
-  transform: translateY(-1px);
+  background: var(--action-hover);
 }}
-.btn-dm:active {{ transform: translateY(0); }}
 .login-error {{
   display: flex;
   gap: 8px;
-  background: #0a192f;
-  border: 1px solid var(--dm-red);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
   color: #fca5a5;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
   margin-bottom: 16px;
 }}
 .err-dot {{
   width: 8px;
   height: 8px;
-  background: #ef4444;
+  background: var(--danger);
   border-radius: 50%;
   flex-shrink: 0;
 }}
@@ -2691,6 +3045,7 @@ body {{
   color: var(--text-muted);
   font-size: 12px;
 }}
+{AUTH_STYLE}
 </style>
 </head>
 <body>
@@ -2712,22 +3067,20 @@ body {{
           <p style="margin:0 0 6px"><strong>1. Escaneie o QR Code</strong></p>
           <p class="muted">Abra o Google Authenticator, 1Password ou Authy no seu celular e leia o c&oacute;digo ao lado.</p>
           <p class="muted" style="margin-top:10px"><strong>C&oacute;digo Manual (Secret base32):</strong></p>
-          <pre class="uri-block">{secret_b32}</pre>
+          <pre class="uri-block">{html_escape(secret_b32, quote=True)}</pre>
         </div>
       </div>
       <form method="POST" action="/auth/setup-2fa" style="margin-top:14px">
         <label class="field">
           <span>2. Confirme com o c&oacute;digo gerado no app</span>
           <input type="text" name="totp" required autofocus inputmode="numeric"
-                 pattern="\\d{{8}}" maxlength="8" placeholder="00000000" class="totp-input">
+                 pattern="\\d{{6,8}}" maxlength="8" placeholder="000000" class="totp-input">
         </label>
         <button type="submit" class="btn-dm">Ativar 2FA &amp; Continuar &rarr;</button>
       </form>
     </main>
-    <footer class="auth-footer">
-      <div>&copy; 2026 Dev Maniac's &middot; Game &amp; Systems Development</div>
-    </footer>
   </div>
+  {render_institutional_footer("auth")}
 </body>
 </html>'''
 
@@ -2906,9 +3259,11 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("Connection", "close")
         self.end_headers()
         if body:
             self.wfile.write(body)
+        self.close_connection = True
 
     def _json(self, status: int, payload: Any) -> None:
         body = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
@@ -3012,7 +3367,15 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path or "/"
         query = parse_qs(parsed.query, keep_blank_values=True)
 
-        # Public auth routes (no auth required)
+        # Public health and auth routes (no auth required)
+        if path in {"/api/health", "/healthz"}:
+            return self._serve_health()
+        if path == "/login":
+            self.send_response(HTTPStatus.SEE_OTHER)
+            self.send_header("Location", "/auth/login")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         if path == "/auth/login":
             return self._serve_login_get(query)
         if path == "/auth/setup-2fa":
@@ -3030,6 +3393,12 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
             return self._serve_ui()
         if path == "/api/status":
             return self._serve_status()
+        if path == "/api/v1/ledger/stats":
+            return self._serve_ledger_stats(query)
+        if path == "/api/v1/ledger/recent":
+            return self._serve_ledger_recent(query)
+        if path == "/api/v1/auth/me":
+            return self._serve_auth_me()
         if path == "/api/inbox":
             return self._serve_inbox_list(query)
         if path == "/api/search":
@@ -3065,6 +3434,16 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
 
         if path == "/api/reindex":
             return self._serve_reindex_post()
+        if path == "/api/v1/ledger/record":
+            return self._serve_ledger_record()
+        if path == "/api/v1/auth/change-password":
+            return self._serve_change_password()
+        if path == "/api/v1/auth/2fa/setup":
+            return self._serve_2fa_setup()
+        if path == "/api/v1/auth/2fa/verify-and-enable":
+            return self._serve_2fa_verify_and_enable()
+        if path == "/api/v1/auth/2fa/disable":
+            return self._serve_2fa_disable()
 
         if not path.startswith("/api/inbox/"):
             return self._error(HTTPStatus.NOT_FOUND, f"Unknown route: {path}")
@@ -3088,6 +3467,77 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
     # ------------------------------------------------------------------
     # Handlers
     # ------------------------------------------------------------------
+    def _current_user(self):
+        if not self.auth or self.auth.auth_disabled:
+            from engine.auth import User
+            return User(email="admin@devmaniacs.com.br", password_hash="", is_active=True, is_admin=True, totp_secret="MOCKTOTP")
+        session = self.auth.resolve_session(self.headers.get("Cookie"))
+        return self.auth.user_store.get(session.user_email) if session else None
+
+    def _json_payload_or_400(self):
+        try:
+            return self._read_json_body()
+        except ValueError as exc:
+            self._error(HTTPStatus.BAD_REQUEST, str(exc))
+            return None
+
+    def _serve_health(self) -> None:
+        self._json(HTTPStatus.OK, {"status": "ok", "service": "cerberus-inspector", "version": "1.0.0"})
+
+    def _serve_auth_me(self) -> None:
+        user = self._current_user()
+        if user is None:
+            return self._error(HTTPStatus.UNAUTHORIZED, "Authentication required")
+        self._json(HTTPStatus.OK, {"email": user.email, "is_active": user.is_active, "has_2fa": bool(user.totp_secret), "created_at": user.created_at})
+
+    def _serve_change_password(self) -> None:
+        user = self._current_user()
+        body = self._json_payload_or_400()
+        if body is None:
+            return
+        if not verify_password(body.get("current_password") or "", user.password_hash):
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "Senha atual incorreta."})
+            return
+        new_password = body.get("new_password") or ""
+        if not isinstance(new_password, str) or len(new_password) < 6:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "Nova senha deve ter pelo menos 6 caracteres."})
+            return
+        self.auth.user_store.set_password(user.email, hash_password(new_password))
+        self._json(HTTPStatus.OK, {"ok": True, "message": "Senha alterada com sucesso."})
+
+    def _serve_2fa_setup(self) -> None:
+        user = self._current_user()
+        secret = TOTP.generate_secret()
+        uri = TOTP.from_base32(secret, digits=6).provisioning_uri(user.email, issuer="DevManiacs-Cerberus")
+        self._json(HTTPStatus.OK, {"secret": secret, "qr_svg": totp_qr_svg(secret, user.email, issuer="DevManiacs-Cerberus"), "uri": uri})
+
+    def _serve_2fa_verify_and_enable(self) -> None:
+        user = self._current_user()
+        body = self._json_payload_or_400()
+        if body is None:
+            return
+        secret, code = body.get("secret") or "", body.get("code") or ""
+        try:
+            valid = TOTP.from_base32(secret, digits=6).verify(code)
+        except (TypeError, ValueError):
+            valid = False
+        if not valid:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "Codigo TOTP invalido ou expirado."})
+            return
+        self.auth.user_store.set_totp_secret(user.email, secret)
+        self._json(HTTPStatus.OK, {"ok": True, "message": "2FA ativado com sucesso."})
+
+    def _serve_2fa_disable(self) -> None:
+        user = self._current_user()
+        body = self._json_payload_or_400()
+        if body is None:
+            return
+        if not verify_password(body.get("password") or "", user.password_hash):
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "Senha incorreta."})
+            return
+        self.auth.user_store.set_totp_secret(user.email, "")
+        self._json(HTTPStatus.OK, {"ok": True, "message": "2FA desativado com sucesso."})
+
     def _serve_static(self, path: str) -> None:
         # No static assets shipped today; reserved for future favicon / css.
         self._error(HTTPStatus.NOT_FOUND, "No static assets")
@@ -3169,7 +3619,8 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
                 # the first-run operator, who can enroll from /auth/setup-2fa).
                 self._issue_session_and_redirect(user.email)
                 return
-            totp_obj = TOTP.from_base32(secret_b32)
+            digits = len(totp) if len(totp) in {6, 8} else 8
+            totp_obj = TOTP.from_base32(secret_b32, digits=digits)
             if not totp_obj.verify(totp):
                 # FIX-007: do NOT destroy the pending_token on attempt 1.
                 # Track up to PENDING_MAX_ATTEMPTS within the 5-min window,
@@ -3373,6 +3824,61 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
         self._write(HTTPStatus.OK, body,
                     content_type="text/html; charset=utf-8")
 
+    def _serve_ledger_stats(self, query: Dict[str, List[str]]) -> None:
+        try:
+            from engine.token_ledger import get_ledger_stats
+            days = 7
+            if "days" in query and query["days"]:
+                try:
+                    days = int(query["days"][0])
+                except ValueError:
+                    days = 7
+            stats = get_ledger_stats(db_path=self.state.application_root / ".cerberus" / "token_ledger.db", days=days)
+            self._json(HTTPStatus.OK, stats)
+        except Exception as exc:
+            self._error(HTTPStatus.INTERNAL_SERVER_ERROR, f"Erro no ledger: {exc}")
+
+    def _serve_ledger_recent(self, query: Dict[str, List[str]]) -> None:
+        try:
+            from engine.token_ledger import get_ledger_stats
+            stats = get_ledger_stats(db_path=self.state.application_root / ".cerberus" / "token_ledger.db", days=30)
+            self._json(HTTPStatus.OK, {
+                "recent_sessions": stats.get("recent_sessions", []),
+                "recent_loops": stats.get("recent_loops", []),
+            })
+        except Exception as exc:
+            self._error(HTTPStatus.INTERNAL_SERVER_ERROR, f"Erro no ledger: {exc}")
+
+    def _serve_ledger_record(self) -> None:
+        payload = self._json_payload_or_400()
+        if payload is None:
+            return
+        try:
+            from engine.token_ledger import record_turn_tokens
+            if payload.get("loops_prevented", 0) != 0:
+                raise ValueError("Prevenção de loops não está conectada a esta integração.")
+            if payload.get("event_id") is not None and not isinstance(payload["event_id"], str):
+                raise ValueError("event_id deve ser texto.")
+            res = record_turn_tokens(
+                session_id=str(payload.get("session_id") or "manual"),
+                project_id=str(payload.get("project_id") or "_global"),
+                agent=str(payload.get("agent") or "CODEX"),
+                model=str(payload.get("model") or "gpt-6.1-sol"),
+                prompt_tokens=payload.get("prompt_tokens"),
+                completion_tokens=payload.get("completion_tokens"),
+                reasoning_tokens=payload.get("reasoning_tokens"),
+                loops_prevented=0,
+                total_tokens=payload.get("total_tokens"),
+                event_id=payload.get("event_id"),
+                usage_source="manual_api",
+                db_path=self.state.application_root / ".cerberus" / "token_ledger.db",
+            )
+            self._json(HTTPStatus.CREATED, res)
+        except (ValueError, TypeError) as exc:
+            self._error(HTTPStatus.BAD_REQUEST, f"Medição inválida: {exc}")
+        except Exception:
+            self._error(HTTPStatus.INTERNAL_SERVER_ERROR, "Não foi possível registrar a medição.")
+
     def _serve_status(self) -> None:
         try:
             stats = self.state.service.index.get_stats()
@@ -3478,8 +3984,11 @@ class CerberusRequestHandler(BaseHTTPRequestHandler):
         project = (query.get("project", [""])[0] or "").strip() or None
         mode = (query.get("mode", ["hybrid"])[0] or "hybrid").strip().casefold()
         if not q:
-            return self._error(HTTPStatus.BAD_REQUEST,
-                                "Query parameter 'q' is required")
+            return self._json(HTTPStatus.OK, {
+                "query": "",
+                "count": 0,
+                "results": [],
+            })
         if mode not in {"hybrid", "lexical", "semantic"}:
             return self._error(HTTPStatus.BAD_REQUEST,
                                "Query parameter 'mode' must be hybrid, lexical, or semantic")

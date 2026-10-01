@@ -1,32 +1,64 @@
-# 🚀 Workflow: Prevenção Anti-Vibecode para Novos Projetos (Modo 2)
+# 🚀 Workflow: Construção de Novos Projetos do Zero (Modo Greenfield)
 
-Garantir que novos projetos nasçam com identidade proprietária, acessibilidade nativa e alta discoverability para humanos e IAs desde o primeiro commit.
+> **Regra Primária:** NUNCA comece desenhando o "Hero Section" ou espalhando "Cards". O design profissional começa no domínio de negócio, nos dados e nos fluxos de trabalho reais.
 
 ---
 
-## O Ciclo de Fundação de Novos Projetos
+## O Ciclo Estruturado de 15 Passos (Do Domínio ao Polimento)
 
-### 1. Brand Lock (Dia 0)
-Antes de construir o primeiro componente de UI:
-1. **Defina o `DESIGN.md`:** Cores semânticas, tipografia, escalas de espaçamento e regras de densidade.
-2. **Defina o Tom de Voz:** Linguagem técnica e assertiva em pt-BR, verbos de ação nos botões.
-3. **Selecione a Família de Ícones:** Escolha uma única biblioteca (Lucide ou Tabler) e configure no projeto.
+### Passo 1: Classificação do Domínio & Função do Sistema
+Identifique a natureza fundamental da aplicação:
+- **Marketing / Editorial / Showcase:** Persuasão, storytelling, ritmo visual amplo, foco em conversão.
+- **ERP / Backoffice / Ferramenta Operacional:** Eficiência, previsibilidade, densidade ergonômica, suporte a teclado para jornada de 8h/dia.
 
-### 2. Scaffold Técnico com AEO/GEO Integrado (Dia 1)
-O scaffold inicial do projeto **já deve conter**:
-- `/public/llms.txt` e `/public/llms-full.txt` estruturados.
-- `robots.txt` permitindo rastreadores legítimos de busca e de IA (Google-Extended, GPTBot, PerplexityBot).
-- `sitemap.xml` dinâmico ou estático.
-- Componente base de SEO injetando JSON-LD de `Organization` e `WebSite`.
+### Passo 2: Definição do Design DNA (8 Dimensões)
+Documente no `DESIGN.md` as 8 dimensões de identidade:
+*(Personalidade, Densidade, Geometria, Contraste, Cor, Tipografia, Motion e Layout)* conforme [`references/design-dna-signature.md`](../references/design-dna-signature.md).
 
-### 3. Componentes com Primitivas Acessíveis
-- Utilize a **Frontend Toolbox** para selecionar bibliotecas de base (Radix/Base UI/TanStack).
-- Conecte as primitivas aos tokens do `DESIGN.md`.
-- Evite criar formulários e tabelas artesanais sem testes de teclado e acessibilidade.
+### Passo 3: Criação da Assinatura Visual (Design Signature)
+Defina o elemento proprietário e memorável da interface que impede que ela seja confundida com qualquer outro template (ex.: cabeçalho operacional com linha do tempo contínua, tipografia editorial gravada, split-view integrado).
 
-### 4. Quality Gate de Pré-Entrega
-Nenhum novo módulo é aprovado para release sem:
-- [ ] Zero erros de linter e TypeScript (`tsc --noEmit`).
-- [ ] Auditoria visual livre de clichês proibidos (gradientes genéricos, cards idênticos).
-- [ ] Verificação responsiva em viewports 360px, 768px e 1440px.
-- [ ] Validação ortográfica pt-BR aprovada.
+### Passo 4: Governança de Dependências & Licenças
+Selecione as bibliotecas de fundação seguindo [`workflows/dependency-governance.md`](./dependency-governance.md). Exija licenças permissivas (MIT, Apache-2.0) e vete qualquer dependência GPL/AGPL.
+
+### Passo 5: Arquitetura de Tokens de Design
+Configure o sistema de tokens em 3 camadas (Primitivos → Semânticos → Componentes) em CSS Variables globais.
+
+### Passo 6: Tipografia & Calibração Numérica
+Selecione tipografia de autor (evite o piloto automático de Inter/Roboto quando o domínio pedir distinção). Configure `font-display: swap` e habilite `tabular-nums` para colunas numéricas e financeiras.
+
+### Passo 7: Instalação de Família Única de Ícones
+Adote uma única biblioteca de ícones vetoriais profissionais (ex: Lucide ou Tabler). Vete expressamente o uso de emojis no lugar de ícones em interfaces operacionais.
+
+### Passo 8: Estrutura de Layout & App Shell
+Construa o esqueleto da interface (Header, Sidebar retrátil, Área de Trabalho, Breadcrumbs) usando CSS Grid moderno e Container Queries. Evite o vício de centralizar tudo com `max-w-7xl mx-auto` em sistemas operacionais.
+
+### Passo 9: Modelagem Conduzida por Dados e Tarefas Reais
+Mapeie os fluxos primários do operador: qual é o dado principal? Qual é a próxima decisão? Desenhe a interface a partir da hierarquia da informação, nunca desenhando caixas vazias para depois preencher.
+
+### Passo 10: Implementação de Grids & Formulários Robustos
+Utilize `@tanstack/react-table` para tabelas ricas (com cabeçalho fixo, ordenação acessível e colunas pinadas) e `react-hook-form` + `zod` para formulários validados com labels explícitos e mensagens inline.
+
+### Passo 11: Implementação Mandatória da Tríade de Estados
+Toda tela DEVE conter nativamente:
+1. **Empty State:** Contexto + Ícone/Ilustração sóbria + CTA de ação direta.
+2. **Loading State:** Skeleton screens proporcionais com dimensões exatas da informação final.
+3. **Error State:** Feedback claro de erro com instrução de recuperação.
+
+### Passo 12: Dosagem de Motion & Microinterações
+Adicione feedback de transição estritamente causal (80ms a 180ms) conforme [`references/motion-discipline.md`](../references/motion-discipline.md), com suporte obrigatório a `prefers-reduced-motion`.
+
+### Passo 13: Recomposição Mobile Responsiva
+Projete a adaptação para telas estreitas (360px a 390px): transforme tabelas em cartões operacionais empilhados, mova ações para Bottom Sheets e garanta touch targets mínimos de 48px × 48px.
+
+### Passo 14: Fundação de AEO / GEO & Descoberta
+Antes da primeira release, publique na pasta `/public/`:
+- `llms.txt` e `llms-full.txt` documentando a organização para IA.
+- `robots.txt` e `sitemap.xml`.
+- Metadados OpenGraph e schemas JSON-LD estruturados.
+
+### Passo 15: Quality Gate & Vibecode Risk Score
+Execute a validação final:
+- [ ] Vibecode Risk Score ≤ 15 (conforme [`references/anti-vibecode.md`](../references/anti-vibecode.md)).
+- [ ] Zero erros no console e zero quebras horizontais em 360px.
+- [ ] Aprovação na suíte de testes e revisão ortográfica rigorosa em pt-BR.

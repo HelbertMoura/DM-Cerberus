@@ -7,6 +7,7 @@ import os
 import sys
 import json
 import shutil
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -139,6 +140,74 @@ try {{ & "{self.python_exe}" -m engine.cli @args; exit $LASTEXITCODE }} finally 
             "status": "INSTALLED",
             "locations": [str(local_bin), str(cerebro_bin)]
         }
+
+    def install_codex_hooks(self, dry_run: bool = False,
+                            codex_home: Optional[Path] = None) -> Dict[str, Any]:
+        """Merge owned hooks only; preserve unrelated handlers and all trust state."""
+        from engine.agent_hooks import atomic_json, CONTEXT_EVENTS, CAPTURE_EVENTS
+
+        directory = Path(codex_home) if codex_home else self.user_home / ".codex"
+        target = directory / "hooks.json"
+        document = {}
+        if target.exists():
+            try:
+                document = json.loads(target.read_text(encoding="utf-8-sig"))
+            except (OSError, ValueError) as exc:
+                raise ValueError(f"Invalid hooks config; refusing to overwrite: {target}") from exc
+        if not isinstance(document, dict) or not isinstance(document.get("hooks", {}), dict):
+            raise ValueError(f"Invalid hooks object; refusing to overwrite: {target}")
+        hooks = document.setdefault("hooks", {})
+        for groups in hooks.values():
+            if not isinstance(groups, list) or any(not isinstance(group, dict) or
+                    not isinstance(group.get("hooks"), list) or
+                    any(not isinstance(handler, dict) for handler in group["hooks"]) for group in groups):
+                raise ValueError(f"Invalid hook groups; refusing to overwrite: {target}")
+        before = json.dumps(document, sort_keys=True)
+        sources = []
+        for event in sorted(CONTEXT_EVENTS | CAPTURE_EVENTS):
+            context_event = event in CONTEXT_EVENTS
+            script = self.cerebro_root / "hooks" / ("codex_context.py" if context_event else "claude_session_capture.py")
+            sources.append(script)
+            command = f'"{self.python_exe}" "{script}"'
+            # PowerShell needs its invocation operator for a quoted executable.
+            # Literal quotes also keep $, backticks and apostrophes in paths inert.
+            windows_command = "& " + " ".join("'" + str(path).replace("'", "''") + "'"
+                                                for path in (self.python_exe, script))
+            if not context_event:
+                command += " --agent CODEX --quiet"
+                windows_command += " --agent CODEX --quiet"
+            handler = {"type": "command", "command": command, "commandWindows": windows_command,
+                       "timeout": 10 if context_event else 3}
+            if context_event:
+                handler.update({"statusMessage": "Consultando o DM-Cerebro", "additionalContextLimit": 2000})
+            owned = []
+            normalized_script = str(script).replace("\\", "/").casefold()
+            for group in hooks.setdefault(event, []):
+                for existing in group["hooks"]:
+                    normalized_command = str(existing.get("command", "")).replace("\\", "/").casefold()
+                    # Exact quoted path, not a substring of a different installation.
+                    if f'"{normalized_script}"' in normalized_command and existing.get("type") == "command":
+                        owned.append(existing)
+            if owned:
+                for existing in owned:
+                    existing.update(handler)
+            else:
+                hooks[event].append({"matcher": "", "hooks": [handler]})
+        result = {"target": "Codex hooks", "file": str(target),
+                  "events": sorted(CONTEXT_EVENTS | CAPTURE_EVENTS),
+                  "trust": "Review new or changed definitions in Codex /hooks; no trust is granted by this installer."}
+        if dry_run:
+            return {**result, "status": "PREVIEW"}
+        if any(not source.is_file() for source in sources):
+            raise ValueError("Hook scripts are missing from this DM-Cerebro installation")
+        if target.exists() and before == json.dumps(document, sort_keys=True):
+            return {**result, "status": "ALREADY_PRESENT"}
+        if target.exists():
+            backup = target.with_name(f"{target.name}.bak-cerberus-hooks-{time.time_ns()}.bak")
+            shutil.copy2(target, backup)
+            result["backup"] = str(backup)
+        atomic_json(target, document)
+        return {**result, "status": "INSTALLED"}
 
     def install_all(self) -> List[Dict[str, Any]]:
         results = []

@@ -53,6 +53,7 @@ DEPLOY COLLISION RISK: <LOW | MEDIUM | HIGH | N/A>
 8. **Dúvida Flash vs M3**: raciocínio/design ➔ Flash; **implementação pesada** ➔ M3.
 9. **Dúvida M2.7 vs M3**: preferir M3. M2.7 é o atalho opcional, não o caminho padrão.
 10. **Raciocínio profundo, refatoração multi-módulo com contexto gigante (>500k tokens), algoritmos complexos**? ➔ `Qwen 3.8 Max` ou `DeepSeek V4 Pro` (Token Plan Alibaba no OpenCode/Qwen Code).
+11. **Proteção contra Inflação de Tokens no OpenCode / MiniMax**: Ao delegar tarefas para o OpenCode (especialmente MiniMax M3), o Maestro **DEVE** quebrar em micropassos atômicos (1 componente / 1 arquivo / 1 endpoint por vez). É **terminantemente proibido** enviar tarefas monolíticas ("faça 5 abas, todos os testes e componentes de uma vez"). Entre cada micropasso concluído, deve-se rodar `/compact` no OpenCode para manter o contexto sob 10k tokens.
 
 ---
 

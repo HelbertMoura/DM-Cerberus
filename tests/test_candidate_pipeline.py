@@ -2,6 +2,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
+from unittest.mock import patch
 
 from engine.capture import AutoCaptureEngine, CandidateStore, _fingerprint, redact_secrets
 
@@ -88,6 +91,45 @@ class TestCandidatePipeline(unittest.TestCase):
         second = self.engine.capture_learning(**kwargs)
         self.assertEqual("SKIPPED_DUPLICATE", second["status"])
         self.assertEqual(first["candidate_id"], second["candidate_id"])
+
+    def test_concurrent_duplicate_capture_publishes_once(self) -> None:
+        original_lookup = self.engine.store.find_by_fingerprint
+        barrier = Barrier(2)
+
+        def lookup(fingerprint):
+            found = original_lookup(fingerprint)
+            barrier.wait(timeout=5)
+            return found
+
+        def capture(agent):
+            return self.engine.capture_learning(title="Concurrent capture", content="Two hooks must publish one complete candidate.",
+                project_id="dm-cerebro", task_id="TASK-CONCURRENT", agent_role=agent)
+
+        results, failures = [], []
+        with patch.object(self.engine.store, "find_by_fingerprint", side_effect=lookup):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                futures = [pool.submit(capture, agent) for agent in ("CODEX", "CLAUDE_CODE")]
+                for future in futures:
+                    try:
+                        results.append(future.result())
+                    except Exception as exc:
+                        failures.append(type(exc).__name__)
+        self.assertEqual([], failures, "parallel capture must not share a temporary filename")
+        self.assertEqual(["CANDIDATE", "SKIPPED_DUPLICATE"], sorted(r["status"] for r in results))
+        self.assertEqual(1, len(self.engine.store.list()))
+
+    def test_capture_race_never_resets_a_verified_candidate(self) -> None:
+        kwargs = dict(title="Review remains valid", content="An automatic capture must preserve a reviewed candidate.",
+            project_id="dm-cerebro", task_id="TASK-ORIGINAL", agent_role="CODEX")
+        captured = self.engine.capture_learning(**kwargs)
+        self.engine.verify(captured["candidate_id"])
+        # Simulate another writer publishing/reviewing after the lookup snapshot.
+        with patch.object(self.engine.store, "find_by_fingerprint", return_value=None):
+            result = self.engine.capture_learning(**{**kwargs, "task_id": "TASK-LATER"})
+        self.assertEqual("SKIPPED_DUPLICATE", result["status"])
+        stored = self.engine.store.get(captured["candidate_id"])
+        self.assertEqual("VERIFIED", stored.status.value)
+        self.assertEqual("TASK-ORIGINAL", stored.task_id)
 
     def test_promote_previews_by_default_and_only_apply_writes(self) -> None:
         captured = self.engine.capture_learning(

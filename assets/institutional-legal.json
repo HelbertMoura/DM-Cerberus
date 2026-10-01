@@ -1,0 +1,66 @@
+{
+  "eyebrow": "OPEN SOURCE & LOCAL-FIRST",
+  "title": "Privacidade, Licença & Soberania",
+  "closeLabel": "Fechar documento legal",
+  "productNote": "Nota de arquitetura: DM-Cerebro / Cerberus opera sob o princípio Local-First. Todos os dados, índices e memórias residem exclusivamente nesta máquina.",
+  "tabs": {
+    "privacy": "Privacidade Local",
+    "terms": "Licença MIT",
+    "lgpd": "Soberania de Dados"
+  },
+  "privacy": {
+    "badge": "LOCAL-FIRST PRIVACY",
+    "title": "Política de Privacidade Local-First",
+    "intro": "O Cerberus foi projetado com foco total em privacidade e soberania de dados para engenharia com IA. Esta aplicação é 100% local.",
+    "sections": [
+      {
+        "heading": "1. Armazenamento Exclusivamente Local",
+        "content": "Todos os bancos SQLite (.cerberus/index.db, .cerberus/token_ledger.db), arquivos markdown de projeto, tarefas e logs residem única e exclusivamente no disco deste computador. Nenhum dado é sincronizado com servidores externos ou serviços em nuvem."
+      },
+      {
+        "heading": "2. Zero Telemetria Externa",
+        "content": "O Cerberus não possui trackers, analytics remotos ou rotinas ocultas de telemetria. Seu consumo de tokens, regras de projeto e métricas pertencem apenas a você."
+      },
+      {
+        "heading": "3. Redação e Segurança de Credenciais",
+        "content": "O motor possui filtros ativos de higienização que redactam automaticamente segredos, tokens de API (ex: chaves sk-...) e credenciais antes da entrega de contexto para agentes de IA."
+      },
+      {
+        "heading": "4. Controle Total do Usuário",
+        "content": "Você possui controle absoluto para auditar, modificar ou excluir qualquer registro a qualquer momento, sem necessidade de solicitações ou autorizações externas."
+      }
+    ]
+  },
+  "terms": {
+    "badge": "LICENÇA MIT",
+    "title": "Termos de Uso e Licença de Código Aberto",
+    "intro": "O Cerberus é um software de código aberto, livre e gratuito, distribuído sob os termos da licença permissiva MIT.",
+    "sections": [
+      {
+        "heading": "1. Liberdade de Uso e Modificação",
+        "content": "É concedida permissão, livre de custos, a qualquer pessoa para utilizar, copiar, modificar, integrar em outros projetos, distribuir e aplicar este software tanto em projetos pessoais quanto comerciais."
+      },
+      {
+        "heading": "2. Condições e Atribuição",
+        "content": "A única condição exigida pela licença MIT é a preservação do aviso de copyright original e da nota de autoria da Dev Maniac's Systems no código-fonte."
+      },
+      {
+        "heading": "3. Isenção de Responsabilidade",
+        "content": "O software é fornecido 'no estado em que se encontra' (AS IS), sem garantias expressas ou implícitas de qualquer natureza. Os autores não serão responsáveis por quaisquer danos decorrentes do uso do software."
+      }
+    ]
+  },
+  "lgpd": {
+    "badge": "SOBERANIA DE DADOS",
+    "title": "Soberania e Direitos do Titular",
+    "intro": "Como o Cerberus não coleta dados em servidores remotos, a Dev Maniac's não atua como operadora ou controladora externa dos seus dados de código.",
+    "rights": [
+      "Autonomia total: você é o único titular, operador e custodiante dos seus dados.",
+      "Portabilidade sem aprisionamento: dados armazenados em padrões abertos universais (Markdown com frontmatter YAML e SQLite stdlib).",
+      "Eliminação imediata: remover a pasta local .cerberus/ apaga permanentemente todo o histórico do computador."
+    ],
+    "limitationNotice": "Para reportar vulnerabilidades de segurança, sugerir melhorias ou colaborar com o projeto, utilize o repositório oficial no GitHub ou nosso canal de contato.",
+    "email": "contato@devmaniacs.com.br",
+    "cta": "Falar com a Dev Maniac's"
+  }
+}

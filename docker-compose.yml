@@ -27,24 +27,23 @@ services:
       - "127.0.0.1:7331:7331"
     environment:
       CERBERUS_ROOT: /data
-      CERBERUS_ALLOWED_ROOTS: /data:/opt/sistemas/dm-cerebro
+      CERBERUS_ALLOWED_ROOTS: /data
       CERBERUS_UI_HOST: 0.0.0.0
       CERBERUS_UI_PORT: "7331"
       CERBERUS_UI_ALLOW_LAN: "1"
       CERBERUS_AUTH_DISABLE: "0"
       CERBERUS_SECRET_KEY: ${CERBERUS_SECRET_KEY:?set a strong secret in .env}
-      CERBERUS_ADMIN_EMAIL: ${CERBERUS_ADMIN_EMAIL:-helbert.moura@devmaniacs.com.br}
+      CERBERUS_ADMIN_EMAIL: ${CERBERUS_ADMIN_EMAIL:-admin@devmaniacs.com.br}
       CERBERUS_ADMIN_PASSWORD: ${CERBERUS_ADMIN_PASSWORD:?set an initial admin password}
       # FIX-007: trust proxy headers + secure cookies when behind CF.
       CERBERUS_TRUST_PROXY: ${CERBERUS_TRUST_PROXY:-1}
       CERBERUS_SECURE_COOKIES: ${CERBERUS_SECURE_COOKIES:-1}
     volumes:
-      - /opt/sistemas/dm-cerebro:/data
+      - ${CERBERUS_DATA_PATH:-./data}:/data
     networks:
       - cerberus-net
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "-w", "%{http_code}\n",
-             "http://127.0.0.1:7331/"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7331/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3

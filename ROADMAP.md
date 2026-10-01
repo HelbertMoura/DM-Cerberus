@@ -31,7 +31,13 @@ Dev Maniac's opera em **3 frentes paralelas**:
 | 05 | DM-Cerebro | Git + GitHub Actions backup | Helbert | 23/08 | 25/08/2026 |
 | 06 | Biolar | SEFAZ DF-e módulo fiscal | Z.AI Hermes | 01/09 | 15/10/2026 |
 
-### 💡 Backlog (Sem Data)
+### 💡 Backlog & Pendências Estratégicas
+- [ ] **Frontend Global:** Adotar pipeline de **Design Iterativo com MiniMax M3** (prototipagem com Live Preview visual, tokens e UI Industrial Solid-State)
+- [ ] **CanteiroHUB (Obras):** Integração **Open-Meteo** (previsão horária de chuva e tempo para Diário de Obra e planejamento de concretagem)
+- [ ] **CanteiroHUB (Cronograma):** Integração **BrasilAPI Feriados** (cálculo automático de dias úteis no Cronograma Físico-Financeiro)
+- [ ] **CanteiroHUB (Financeiro):** Integração **AwesomeAPI Câmbio & SELIC/CDI** (reajuste automático de parcelas e índices contratuais)
+- [ ] **Biolar Dedetizadora:** Integração **Open-Meteo** (bloqueio/alerta automático de agendamento de dedetização externa em dias de chuva)
+- [ ] **Biolar & dm-erp (Cadastros):** Integração **ViaCEP & BrasilAPI CNPJ / ReceitaWS** (autopreenchimento e validação cadastral)
 - [ ] CanteiroHUB Módulo 09 (Cronograma Físico) — usar dados da wiki EAP
 - [ ] HelpDev — v2 com integração WhatsApp Business
 - [ ] DM-PDV — NFC-e + SAT (depende de A1 do Biolar)

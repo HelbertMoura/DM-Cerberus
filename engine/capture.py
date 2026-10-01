@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -59,12 +60,22 @@ class CandidateStore:
             raise ValueError("Candidate path escapes inbox")
         return path
 
-    def save(self, candidate: Candidate) -> Path:
+    def save(self, candidate: Candidate, *, create_only: bool = False) -> Optional[Path]:
         target = self._path(candidate.candidate_id)
-        temp = target.with_suffix(".tmp")
-        temp.write_text(json.dumps(candidate.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        os.replace(temp, target)
-        return target
+        temp = target.with_name(f"{target.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            temp.write_text(json.dumps(candidate.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            if create_only:
+                try:
+                    # Publish a complete file atomically without replacing another writer's candidate.
+                    os.link(temp, target)
+                except FileExistsError:
+                    return None
+            else:
+                os.replace(temp, target)
+            return target
+        finally:
+            temp.unlink(missing_ok=True)
 
     def get(self, candidate_id: str) -> Candidate:
         try:
@@ -87,7 +98,13 @@ class CandidateStore:
         return None
 
     def list(self) -> List[Candidate]:
-        return [self.get(path.stem) for path in sorted(self.inbox_dir.glob("*.json"))]
+        candidates: List[Candidate] = []
+        for path in sorted(self.inbox_dir.glob("*.json")):
+            try:
+                candidates.append(self.get(path.stem))
+            except ValueError:
+                continue
+        return candidates
 
 
 class AutoCaptureEngine:
@@ -123,7 +140,12 @@ class AutoCaptureEngine:
             status=CandidateStatus.QUARANTINED if findings else CandidateStatus.CANDIDATE,
             secret_findings=findings,
         )
-        path = self.store.save(item)
+        path = self.store.save(item, create_only=True)
+        if path is None:
+            published = self.store.get(item.candidate_id)
+            if published.fingerprint != item.fingerprint:
+                raise ValueError("Candidate identity collision")
+            return {"status": "SKIPPED_DUPLICATE", "candidate_id": published.candidate_id}
         return {"status": item.status.value, "candidate_id": item.candidate_id, "candidate_path": str(path)}
 
     def ingest_report(self, report_path_or_content: str, task_id: Optional[str] = None,

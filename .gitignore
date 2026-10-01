@@ -1,7 +1,7 @@
-# Gitignore do DM-Cerebro
+# Gitignore do DM-Cerberus / Cerebro Engine
 # Dev Maniac's Systems — Helbert Moura
 
-# Pastas temporárias e processadas (após 90 dias, deletar manualmente)
+# Pastas temporárias e processadas
 raw/processed/*/
 !raw/processed/.gitkeep
 
@@ -21,19 +21,19 @@ desktop.ini
 # Logs
 *.log
 
-# Binários grandes (PDFs de ingesting devem ser movidos para processed/)
+# Binários grandes
 *.pdf
 *.zip
 *.rar
 *.7z
 *.tar.gz
 
-# Editor
+# Editor e IDEs
 .vscode/
 .idea/
 *.iml
 
-# Python (se houver scripts)
+# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -41,16 +41,33 @@ __pycache__/
 venv/
 .cerberus/
 
-# Node (se houver)
+# Node
 node_modules/
 dist/
 build/
 
-# Ambiente
+# Ambiente e credenciais locais
 .env
 .env.local
 *.local
 
-# Cuidado: NÃO ignorar
-# - *.md (são o cérebro!)
-# - *.json de configuração legítima
+# Bases de projetos privadas (preservadas localmente no disco, ignoradas pelo Git)
+projects/*
+!projects/README.md
+!projects/example-project/
+!projects/example-project/**
+
+# Wiki privada e infraestrutura interna (preservadas localmente, ignoradas pelo Git)
+wiki/*
+!wiki/README.md
+!wiki/protocolo-triade-agentes.md
+
+# Documentos operacionais locais e relatórios internos
+BRAIN.md
+HANDOVER.md
+MEMORY.md
+DECISIONS.md
+archive/
+reports/
+prompts/
+scratch/

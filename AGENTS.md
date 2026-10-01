@@ -5,12 +5,11 @@ atualizado: 2026-08-26
 status: ativo
 ---
 
-# 🤖 AGENTS.md — Universal Agent Entry Point (DM-CEREBRO)
+# 🤖 AGENTS.md — Universal Agent Entry Point (Cerberus)
 
-> **Localização canônica:** `C:\Users\Helbert\Desktop\DM-Cerebro\`
-> **Propriedade Intelectual:** Dev Maniac's Systems (Helbert Moura)
-> **Companion (cliente-específico):** o cérebro do **dm-erp** vive em `docs/brain/` no repositório `dm-erp` e segue governança própria. Não duplicar.
-> **Governança AI oficial (multimodelo):** arquivo `protocolo-equipe-ai.md` dentro do repositório `dm-erp` (cérebro do dm-erp / RadierHUB), registrado como `TASK-GOV-AI-008` (26/08/2026) · **ADR-014 (dm-erp)** — este é o **texto canônico**. Em ambiente onde `dm-erp` é vizinho do DM-CEREBRO, o caminho relativo a partir deste arquivo costuma ser `../migra/dm-erp/docs/brain/wiki/protocolo-equipe-ai.md`; ajuste conforme seu layout local. Esta página é a **versão corporativa** (DM-Cerebro), alinhada à do dm-erp mas adaptada ao contexto multi-produto.
+> **Projeto:** DM-Cerberus / Cerebro Engine
+> **Mantenedor & Autoria:** Dev Maniac's Systems (Helbert Moura)
+> **Padrão de Governança AI:** Minimal Persistent Context, Taxonomia Canônica e MCP Standard.
 
 ---
 
@@ -26,6 +25,21 @@ Modelos modernos não precisam ler a empresa inteira antes de consertar um botã
 ---
 
 ## 📋 2. O Task Contract (Padrão de Delegação Maestro ➔ Executor)
+
+### Fluxo enxuto do Cerberus
+
+- O hook entrega apenas uma orientação curta; busque memória quando a tarefa exigir. Nas leituras MCP, passe o mesmo `session_id`
+  da conversa, preferindo o token `cbr-...` informado pelo hook. Sem token, escolha um ID
+  único para esta conversa e preserve-o; projeto e tarefa não identificam uma conversa.
+- Comece com até dois previews, com teto padrão de 1.200 caracteres. Expanda apenas fontes pertinentes com `cerberus_get_memory`;
+  leia páginas pequenas e respeite o saldo da conversa. Reinicie a cota somente depois de
+  compactação ou limpeza efetiva, nunca para contornar o limite durante a mesma janela.
+- Salve `cerberus_save_task_state` em marcos e antes de encerrar a tarefa: objetivo,
+  decisões, arquivos, validação e próximo passo. Na retomada, leia `cerberus_get_task_state`
+  antes de buscar histórico. Registre incertezas e resultados reais; mantenha logs fora do resumo.
+- Procure arquivos com `rg` e leia os trechos necessários. Use testes focais com saída
+  concisa; amplie a regressão conforme o risco. Delegue contexto e ownership específicos,
+  sem copiar a conversa inteira. Relate resultado, evidência e pendência de forma curta.
 
 Toda tarefa delegada pelo Maestro utiliza o contrato conciso:
 

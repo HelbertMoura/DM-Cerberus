@@ -8,6 +8,27 @@ from pathlib import Path
 
 
 class TestMCPProtocol(unittest.TestCase):
+    def test_mcp_wire_preserves_unescaped_utf8_on_windows(self) -> None:
+        repo = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            content = "Memória com acentuação e proveniência íntegra."
+            request = {"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {
+                "name": "cerberus_capture_learning", "arguments": {
+                    "title": "Lição do protocolo", "content": content, "project_id": "test",
+                    "task_id": "TASK-UTF8", "agent_role": "CODEX"}}}
+            env = dict(os.environ, CERBERUS_ROOT=str(root), CERBERUS_ALLOWED_ROOTS=str(root),
+                       PYTHONIOENCODING="cp1252", PYTHONPATH=str(repo))
+            proc = subprocess.run([sys.executable, "-m", "engine.cli", "mcp"], cwd=repo, env=env,
+                input=(json.dumps(request, ensure_ascii=False) + "\n").encode("utf-8"),
+                capture_output=True, timeout=10)
+            self.assertEqual(0, proc.returncode, proc.stderr)
+            response = json.loads(proc.stdout.decode("utf-8"))
+            result = json.loads(response["result"]["content"][0]["text"])
+            candidate = json.loads(Path(result["candidate_path"]).read_text(encoding="utf-8"))
+            self.assertEqual(content, candidate["content"])
+            self.assertEqual("Lição do protocolo", candidate["title"])
+
     def test_subprocess_capture_is_candidate_only_and_no_promotion_tool(self) -> None:
         repo = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as tmp:
@@ -28,7 +49,7 @@ class TestMCPProtocol(unittest.TestCase):
             proc = subprocess.run(
                 [sys.executable, "-m", "engine.mcp_server"], cwd=repo, env=env,
                 input="".join(json.dumps(value) + "\n" for value in requests),
-                text=True, capture_output=True, timeout=10,
+                text=True, encoding="utf-8", capture_output=True, timeout=10,
             )
             self.assertEqual(0, proc.returncode, proc.stderr)
             responses = [json.loads(line) for line in proc.stdout.splitlines()]
@@ -74,7 +95,7 @@ class TestMCPProtocol(unittest.TestCase):
             proc = subprocess.run(
                 [sys.executable, "-m", "engine.mcp_server"], cwd=repo, env=env,
                 input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}) + "\n",
-                text=True, capture_output=True, timeout=10,
+                text=True, encoding="utf-8", capture_output=True, timeout=10,
             )
             self.assertNotEqual(0, proc.returncode)
             self.assertEqual("", proc.stdout)
@@ -83,7 +104,7 @@ class TestMCPProtocol(unittest.TestCase):
             cli_proc = subprocess.run(
                 [sys.executable, "-m", "engine.cli", "mcp"], cwd=repo, env=env,
                 input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}) + "\n",
-                text=True, capture_output=True, timeout=10,
+                text=True, encoding="utf-8", capture_output=True, timeout=10,
             )
             self.assertNotEqual(0, cli_proc.returncode)
             self.assertFalse((Path(outside_tmp) / ".cerberus").exists())

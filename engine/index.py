@@ -290,30 +290,31 @@ class SQLiteMemoryIndex:
         # Construct FTS MATCH expression: prefix matching on terms (e.g. 'sefaz*' OR 'rateio*')
         fts_query = " OR ".join([f'"{t}"*' for t in terms])
 
-        where_clauses = ["documents_fts MATCH ?"]
-        params: List[Any] = [fts_query]
+        # Operational retrieval uses current knowledge; history remains in the index.
+        where_clauses: List[str] = ["d.status = ?"]
+        filter_params: List[Any] = [MemoryStatus.ACTIVE.value]
 
         # Project filtering
         if project_id:
             if include_global:
                 where_clauses.append("(d.project_id = ? OR d.project_id = '_global')")
-                params.append(project_id)
+                filter_params.append(project_id)
             else:
                 where_clauses.append("d.project_id = ?")
-                params.append(project_id)
+                filter_params.append(project_id)
 
         # Source type filtering
         if source_types:
             placeholders = ",".join(["?"] * len(source_types))
             where_clauses.append(f"d.source_type IN ({placeholders})")
-            params.extend(source_types)
+            filter_params.extend(source_types)
 
         # Authority threshold
         if min_authority > 0:
             where_clauses.append("d.authority_level >= ?")
-            params.append(min_authority)
+            filter_params.append(min_authority)
 
-        where_sql = " AND ".join(where_clauses)
+        where_sql = " AND ".join(["documents_fts MATCH ?"] + where_clauses)
 
         sql = f"""
         SELECT 
@@ -337,54 +338,87 @@ class SQLiteMemoryIndex:
         ORDER BY bm25_rank ASC
         LIMIT ?;
         """
-        params.append(limit * 2)  # fetch extra for re-ranking
 
-        results: List[SearchResult] = []
-        with self._get_connection() as con:
-            cur = con.execute(sql, params)
-            for row in cur.fetchall():
-                try:
-                    tags = json.loads(row[6]) if row[6] else []
-                except Exception:
-                    tags = []
-                try:
-                    meta = json.loads(row[11]) if row[11] else {}
-                except Exception:
-                    meta = {}
+        def fetch_pass(match_expr: str) -> List[SearchResult]:
+            """One FTS pass: rows mapped to SearchResult, best final_score first."""
+            pass_params: List[Any] = [match_expr] + filter_params + [limit * 2]
+            out: List[SearchResult] = []
+            with self._get_connection() as con:
+                cur = con.execute(sql, pass_params)
+                for row in cur.fetchall():
+                    try:
+                        tags = json.loads(row[6]) if row[6] else []
+                    except Exception:
+                        tags = []
+                    try:
+                        meta = json.loads(row[11]) if row[11] else {}
+                    except Exception:
+                        meta = {}
 
-                item = MemoryItem(
-                    memory_id=row[0],
-                    project_id=row[1],
-                    source_path=row[2],
-                    source_type=SourceType(row[3]) if row[3] in [s.value for s in SourceType] else SourceType.UNKNOWN,
-                    title=row[4],
-                    authority_level=row[5],
-                    tags=tags,
-                    snippet=row[7],
-                    full_text=row[8],
-                    updated_at=row[9],
-                    status=MemoryStatus(row[10]) if row[10] in [s.value for s in MemoryStatus] else MemoryStatus.ACTIVE,
-                    metadata=meta
-                )
+                    item = MemoryItem(
+                        memory_id=row[0],
+                        project_id=row[1],
+                        source_path=row[2],
+                        source_type=SourceType(row[3]) if row[3] in [s.value for s in SourceType] else SourceType.UNKNOWN,
+                        title=row[4],
+                        authority_level=row[5],
+                        tags=tags,
+                        snippet=row[7],
+                        full_text=row[8],
+                        updated_at=row[9],
+                        status=MemoryStatus(row[10]) if row[10] in [s.value for s in MemoryStatus] else MemoryStatus.ACTIVE,
+                        metadata=meta
+                    )
 
-                # In SQLite FTS5 bm25(), lower values are more relevant
-                raw_bm25 = row[12]
-                lexical_score = max(0.1, 10.0 / (1.0 + max(0.0, raw_bm25)))
-                authority_boost = 1.0 + (item.authority_level / 100.0)
-                final_score = lexical_score * authority_boost
+                    # In SQLite FTS5 bm25(), lower values are more relevant
+                    raw_bm25 = row[12]
+                    lexical_score = -raw_bm25
+                    authority_boost = 1.0 + (item.authority_level / 100.0)
+                    final_score = lexical_score * authority_boost
 
-                highlight = row[13] if row[13] else item.snippet
+                    highlight = row[13] if row[13] else item.snippet
 
-                results.append(SearchResult(
-                    item=item,
-                    lexical_score=lexical_score,
-                    authority_boost=authority_boost,
-                    final_score=final_score,
-                    matched_snippets=[highlight]
-                ))
+                    out.append(SearchResult(
+                        item=item,
+                        lexical_score=lexical_score,
+                        authority_boost=authority_boost,
+                        final_score=final_score,
+                        matched_snippets=[highlight]
+                    ))
+            out.sort(key=lambda x: x.final_score, reverse=True)
+            return out
 
-        # Re-sort by final combined score descending
-        results.sort(key=lambda x: x.final_score, reverse=True)
+        results = fetch_pass(fts_query)
+
+        # Distinctive terms (long, or ALL-CAPS acronyms) get an exact-match
+        # priority pass, but only if they are actually RARE in this corpus:
+        # BM25's tf/title bias lets documents that merely repeat common query
+        # words outrank a document containing a rare, highly specific token
+        # exactly once. Length alone is not rarity — measure document
+        # frequency and keep only terms the corpus does not drown.
+        priority_terms = [t for t in terms if len(t) >= 7 or (t.isupper() and len(t) >= 5)]
+        if priority_terms:
+            df_threshold = max(limit, 5)
+            rare_terms: List[str] = []
+            with self._get_connection() as con:
+                for t in priority_terms:
+                    df = con.execute(
+                        "SELECT count(*) FROM documents_fts "
+                        "JOIN documents d ON documents_fts.rowid = d.rowid "
+                        f"WHERE {where_sql}",
+                        [f'"{t}"'] + filter_params,
+                    ).fetchone()[0]
+                    if df <= df_threshold:
+                        rare_terms.append(t)
+            if rare_terms:
+                priority_query = " OR ".join(f'"{t}"' for t in rare_terms)
+                priority_results = fetch_pass(priority_query)
+                if priority_results:
+                    for rank, r in enumerate(priority_results, 1):
+                        r.priority_rank = rank
+                    seen = {r.item.memory_id for r in priority_results}
+                    results = priority_results + [r for r in results if r.item.memory_id not in seen]
+
         return results[:limit]
 
     def get_stats(self) -> Dict[str, Any]:
